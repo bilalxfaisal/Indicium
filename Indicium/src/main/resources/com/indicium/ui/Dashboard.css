@@ -1,0 +1,165 @@
+/* ═══════════════════════════════════════════
+   INDICIUM  –  Dashboard Stylesheet
+   Palette: dark teal-black + cyan accent
+═══════════════════════════════════════════ */
+
+/* ── Root / Scene ── */
+.root {
+    -fx-background-color: #0D1B1E;
+    -fx-font-family: "Segoe UI", "Franklin Gothic Medium", sans-serif;
+}
+
+/* ── Top Nav Bar ── */
+#TopNavBar
+{
+    -fx-background-color: #0D1B1E;
+    -fx-border-color: #1a2f34;
+    -fx-border-width: 0 0 1 0;
+}
+
+.app-title {
+    -fx-text-fill: #EEF9FA;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Franklin Gothic Medium Cond";
+}
+
+/* ── Top nav buttons ── */
+.top-nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #90A4AE;
+    -fx-font-size: 13px;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+}
+
+.top-nav-btn:hover {
+    -fx-background-color: #132226;
+    -fx-text-fill: #EEF9FA;
+}
+
+.top-nav-btn.active {
+    -fx-background-color: #00BCD4;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-weight: bold;
+}
+
+/* ── Avatar circle ── */
+.avatar-circle {
+    -fx-background-color: #00BCD4;
+    -fx-background-radius: 50;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-max-width: 36;
+    -fx-max-height: 36;
+}
+
+.avatar-label {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+
+/* ── Sidebar ── */
+#SideNavBar {
+    -fx-background-color: #132226;
+    -fx-min-height: 590;
+}
+
+/* ── Sidebar buttons (default = invisible, blends with bg) ── */
+.side-nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #90A4AE;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 14 10 14;
+    -fx-background-radius: 10;
+    -fx-pref-width: 190;
+    -fx-graphic-text-gap: 10;
+    -fx-cursor: hand;
+
+}
+.side-nav-icon
+{
+    -fx-fit-width: 30;
+    -fx-fit-height: 45;
+}
+
+.side-nav-btn:hover {
+    -fx-background-color: #1a2f34;
+    -fx-text-fill: #B2EBF2;
+}
+
+/* ── Active sidebar button → cyan ── */
+.side-nav-btn.side-active {
+    -fx-background-color: #00BCD4;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-weight: bold;
+}
+
+.side-nav-btn.side-active:hover {
+    -fx-background-color: #0097A7;
+    -fx-text-fill: #EEF9FA;
+}
+
+/* ── Main content area ── */
+.main-content {
+    -fx-background-color: #EEF9FA;
+}
+
+/* ── Welcome text ── */
+.welcome-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-family: "Franklin Gothic Medium";
+}
+
+.welcome-sub {
+    -fx-font-size: 13px;
+    -fx-text-fill: #4A6B70;
+}
+
+/* ── Stat cards ── */
+.stat-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 18 20 18 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);
+    -fx-min-width: 150;
+}
+
+.stat-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #4A6B70;
+}
+
+.stat-value {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00BCD4;
+    -fx-font-family: "Franklin Gothic Medium";
+}
+
+/* ── Section heading ── */
+.section-heading {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0D1B1E;
+    -fx-padding: 10 0 0 0;
+}
+
+/* ── Activity box ── */
+.activity-box {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);
+    -fx-min-height: 120;
+}
+
+.activity-empty {
+    -fx-text-fill: #90A4AE;
+    -fx-font-size: 13px;
+}

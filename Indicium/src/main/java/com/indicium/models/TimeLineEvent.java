@@ -1,4 +1,4 @@
 package com.indicium.models;
 
-public class TimeLine {
+public class TimeLineEvent {
 }

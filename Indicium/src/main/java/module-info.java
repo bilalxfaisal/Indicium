@@ -3,6 +3,7 @@ module com.indicium {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
+    requires java.desktop;
 
     // This allows JavaFX to "see" your UI classes to render them
     opens com.indicium.ui to javafx.fxml;
