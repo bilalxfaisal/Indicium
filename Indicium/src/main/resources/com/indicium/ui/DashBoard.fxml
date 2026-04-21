@@ -11,7 +11,13 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="1000.0" stylesheets="@Dashboard.css" type="BorderPane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.indicium.ui.DashBoardController">
+<fx:root type="BorderPane"
+         prefHeight="650.0"
+         prefWidth="1000.0"
+         stylesheets="@Dashboard.css"
+         xmlns="http://javafx.com/javafx/25"
+         xmlns:fx="http://javafx.com/fxml/1">
+
 
     <!-- ═══════════════════════════ TOP NAV ═══════════════════════════ -->
     <top>
@@ -21,7 +27,7 @@
 
                 <!-- Logo icon -->
                 <ImageView fx:id="logoIcon" fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
-                    <image><Image url="@Assets/icons8-menu-100.png" /></image>
+                    <Image url="@Assets/icons8-menu-100.png"/>
                 </ImageView>
 
                 <!-- App name -->
