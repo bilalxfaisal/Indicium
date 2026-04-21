@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 
 public class Case {
-    private int caseID;
+    final private int caseID;
     private String title;
     private LocalDateTime incidentDate;
     private CaseStatus status;
