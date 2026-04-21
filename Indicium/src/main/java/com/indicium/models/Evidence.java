@@ -16,6 +16,7 @@ enum EvidenceStatus
 
 public class Evidence {
 
+    private static int idsCount = 1;
     private String name;
     private int evidenceID;
     private String filePath;
@@ -32,21 +33,22 @@ public class Evidence {
     public Evidence()
     {
         this.setDefaultValues();
+        this.evidenceID = idsCount++;
     }
-    public Evidence(int id, File file)
+    public Evidence(File file)
     {
         this.setDefaultValues();
-        this.evidenceID = id;
+        this.evidenceID = idsCount++;
         this.isLocked = false;
         this.digitalFingerprint = null;
         this.setDataFromFile(file);
     }
-    public Evidence(int id, File file, String fingerprint)
+    public Evidence(File file, String fingerprint)
     {
         this.setDefaultValues();
         this.evidenceFile = file;
         this.digitalFingerprint = fingerprint;
-        this.evidenceID = id;
+        this.evidenceID = idsCount++;
         this.isLocked = false;
         this.setDataFromFile(file);
     }
@@ -170,16 +172,16 @@ public class Evidence {
     {
         System.out.println(
                 "========== Evidence Details ==========\n" +
-                "Evidence ID   : " + evidenceID + "\n" +
-                "Name          : " + name + "\n" +
-                "Type          : " + type + "\n" +
-                "Size (bytes)  : " + size + "\n" +
-                "File Path     : " + filePath + "\n" +
-                "Fingerprint   : " + digitalFingerprint + "\n" +
-                "Locked        : " + isLocked + "\n" +
-                "Status        : " + status + "\n" +
-                "Case IDs      : " + caseIDs + "\n" +
-                "======================================"
+                        "Evidence ID   : " + evidenceID + "\n" +
+                        "Name          : " + name + "\n" +
+                        "Type          : " + type + "\n" +
+                        "Size (bytes)  : " + size + "\n" +
+                        "File Path     : " + filePath + "\n" +
+                        "Fingerprint   : " + digitalFingerprint + "\n" +
+                        "Locked        : " + isLocked + "\n" +
+                        "Status        : " + status + "\n" +
+                        "Case IDs      : " + caseIDs + "\n" +
+                        "======================================"
         );
     }
 }
