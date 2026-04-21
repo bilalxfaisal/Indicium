@@ -19,7 +19,7 @@ public class Case {
 
 
     public int getCaseID() {return caseID;}
-    public void setCaseID(int caseID) {this.caseID = caseID;}
+    //public void setCaseID(int caseID) {this.caseID = caseID;}
 
     public String getTitle() {return title;}
     public void setTitle(String title) {this.title = title;}
