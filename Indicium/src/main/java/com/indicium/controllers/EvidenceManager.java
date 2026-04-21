@@ -6,6 +6,15 @@ import com.indicium.services.HashGenerator;
 import com.indicium.repository.EvidenceRepo;
 import java.io.File;
 
+enum EvidenceStatus
+{
+    COLLECTED,
+    VERIFIED,
+    LINKED,
+    ARCHIVED,
+    DISCARDED
+}
+
 public class EvidenceManager
 {
     public Evidence ingestEvidence(int caseID, File file)
@@ -32,7 +41,7 @@ public class EvidenceManager
         }
 
         // Step 3: Create evidence object (UC5 - <<create>> evidence:Evidence)
-        Evidence evidence = new Evidence(nextEvidenceID++, file, fileHash);
+        Evidence evidence = new Evidence(file, fileHash);
         evidence.setStatus(EvidenceStatus.COLLECTED.ordinal());
 
         // Step 4: Link evidence to the case
