@@ -4,53 +4,42 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
+<fx:root type="AnchorPane" styleClass="main-content"
+         stylesheets="@HomeBoard.css"
+         xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <VBox spacing="20.0"
+              AnchorPane.leftAnchor="30.0"
+              AnchorPane.rightAnchor="30.0"
+              AnchorPane.topAnchor="30.0">
 
-<AnchorPane fx:id="mainContent" styleClass="main-content" HBox.hgrow="ALWAYS" xmlns:fx="http://javafx.com/fxml/1">
-        <children>
+            <Label fx:id="welcomeLabel" styleClass="welcome-title" text="Welcome back, John!" />
+            <Label styleClass="welcome-sub" text="Here's what's happening with your investigation today." />
 
-            <VBox spacing="20.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0"
-                  AnchorPane.topAnchor="30.0"><!-- Welcome header -->
-                <Label fx:id="welcomeLabel" styleClass="welcome-title" text="Welcome back, John!"/>
-                <Label styleClass="welcome-sub" text="Here's what's happening with your investigation today."/>
-
-                <!-- Stats row -->
-                <HBox spacing="16.0">
-                    <children>
-                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                            <children>
-                                <Label styleClass="stat-label" text="Active Cases"/>
-                                <Label fx:id="statCases" styleClass="stat-value" text="0"/>
-                            </children>
-                        </VBox>
-                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                            <children>
-                                <Label styleClass="stat-label" text="Evidence Items"/>
-                                <Label fx:id="statEvidence" styleClass="stat-value" text="0"/>
-                            </children>
-                        </VBox>
-                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                            <children>
-                                <Label styleClass="stat-label" text="Timeline Events"/>
-                                <Label fx:id="statTimeline" styleClass="stat-value" text="0"/>
-                            </children>
-                        </VBox>
-                        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                            <children>
-                                <Label styleClass="stat-label" text="Audit Entries"/>
-                                <Label fx:id="statAudit" styleClass="stat-value" text="0"/>
-                            </children>
-                        </VBox>
-                    </children>
-                </HBox>
-
-                <!-- Recent activity placeholder -->
-                <Label styleClass="section-heading" text="Recent Activity"/>
-                <VBox fx:id="recentActivityBox" spacing="8.0" styleClass="activity-box">
-                    <Label styleClass="activity-empty" text="No recent activity."/>
+            <HBox spacing="16.0">
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="stat-label" text="Active Cases" />
+                    <Label fx:id="statCases" styleClass="stat-value" text="0" />
                 </VBox>
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="stat-label" text="Evidence Items" />
+                    <Label fx:id="statEvidence" styleClass="stat-value" text="0" />
+                </VBox>
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="stat-label" text="Timeline Events" />
+                    <Label fx:id="statTimeline" styleClass="stat-value" text="0" />
+                </VBox>
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="stat-label" text="Audit Entries" />
+                    <Label fx:id="statAudit" styleClass="stat-value" text="0" />
+                </VBox>
+            </HBox>
 
+            <Label styleClass="section-heading" text="Recent Activity" />
+            <VBox fx:id="recentActivityBox" spacing="8.0" styleClass="activity-box">
+                <Label styleClass="activity-empty" text="No recent activity." />
             </VBox>
 
-        </children>
-    </AnchorPane>
-
+        </VBox>
+    </children>
+</fx:root>

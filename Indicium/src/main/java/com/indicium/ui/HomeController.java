@@ -6,29 +6,27 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 
-
 import java.io.IOException;
 
 public class HomeController extends AnchorPane {
 
-    @FXML
-    private Label welcomeLabel;
+    @FXML private Label welcomeLabel;
     @FXML private Label statCases;
     @FXML private Label statEvidence;
     @FXML private Label statTimeline;
     @FXML private Label statAudit;
-    @FXML private VBox recentActivityBox;
+    @FXML private VBox  recentActivityBox;
 
     public HomeController() {
         FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/com/indicium/ui/Home.fxml")
+                getClass().getResource("/com/indicium/ui/HomeBoard.fxml")  // ← fixed
         );
         loader.setRoot(this);
         loader.setController(this);
         try {
             loader.load();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load Home.fxml: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to load HomeBoard.fxml: " + e.getMessage(), e);
         }
     }
 

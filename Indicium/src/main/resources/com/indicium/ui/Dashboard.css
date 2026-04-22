@@ -8,6 +8,10 @@
     -fx-background-color: #0D1B1E;
     -fx-font-family: "Segoe UI", "Franklin Gothic Medium", sans-serif;
 }
+/* ── Center content area ── */
+.main-content {
+    -fx-background-color: #EEF9FA;
+}
 
 /* ── Top Nav Bar ── */
 #TopNavBar

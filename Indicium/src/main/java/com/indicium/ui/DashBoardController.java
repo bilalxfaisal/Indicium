@@ -4,17 +4,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.Node;
-import com.indicium.ui.CaseDashBoardController;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-public class DashBoardController extends BorderPane {  //  extends BorderPane
+public class DashBoardController extends BorderPane {
 
     // ── Top nav ──
     @FXML private Button navDashboard;
@@ -34,18 +30,10 @@ public class DashBoardController extends BorderPane {  //  extends BorderPane
     @FXML private Button sideIntegrity;
     @FXML private Button sideUserMgr;
 
-    // ── Content ──
-    @FXML private Label welcomeLabel;
-    @FXML private Label statCases;
-    @FXML private Label statEvidence;
-    @FXML private Label statTimeline;
-    @FXML private Label statAudit;
-    @FXML private VBox  recentActivityBox;
-
     private List<Button> topNavButtons;
     private List<Button> sideNavButtons;
 
-    //  Constructor handles FXML loading
+    // ── Constructor ──
     public DashBoardController() {
         URL fxmlUrl = getClass().getResource("/com/indicium/ui/DashBoard.fxml");
 
@@ -56,8 +44,8 @@ public class DashBoardController extends BorderPane {  //  extends BorderPane
         }
 
         FXMLLoader loader = new FXMLLoader(fxmlUrl);
-        loader.setRoot(this);        // this IS the BorderPane
-        loader.setController(this);  // this IS the controller
+        loader.setRoot(this);
+        loader.setController(this);
 
         try {
             loader.load();
@@ -66,7 +54,6 @@ public class DashBoardController extends BorderPane {  //  extends BorderPane
         }
     }
 
-    // Called automatically after FXML fields are injected
     @FXML
     public void initialize() {
         topNavButtons  = List.of(navDashboard, navNotes, navVideos, navTools, navForum);
@@ -76,32 +63,52 @@ public class DashBoardController extends BorderPane {  //  extends BorderPane
 
         setActiveTopNav(navDashboard);
         setActiveSideNav(sideHome);
-        loadStats();
+
+        // ── Load home screen as default center on startup ──
+        navigateTo(new HomeController());
     }
 
-    // ── Top Nav Handlers ──
-    @FXML private void handleNavDashboard() { setActiveTopNav(navDashboard); setActiveSideNav(sideHome); }
-    @FXML private void handleNavNotes()     { setActiveTopNav(navNotes); }
-    @FXML private void handleNavVideos()    { setActiveTopNav(navVideos); }
-    @FXML private void handleNavTools()     { setActiveTopNav(navTools); }
-    @FXML private void handleNavForum()     { setActiveTopNav(navForum); }
-
-    // ── Sidebar Handlers ──
-    @FXML private void handleSideCases()
-    { setActiveSideNav(sideCases);
-        CaseDashBoardController caseDCon = new CaseDashBoardController();
-        navigateTo(caseDCon);
-
+    // ── Core swap method ──
+    private void navigateTo(Node target) {
+        this.setCenter(target);
     }
-    @FXML private void handleSideEvidence()    { setActiveSideNav(sideEvidence); }
-    @FXML private void handleSideTimeline()    { setActiveSideNav(sideTimeline); }
-    @FXML private void handleSideAuditLog()    { setActiveSideNav(sideAuditLog); }
-    @FXML private void handleSideReport()      { setActiveSideNav(sideReport); }
-    @FXML private void handleSideSettings()    { setActiveSideNav(sideSettings); }
-    @FXML private void handleSideIntegrity()   { setActiveSideNav(sideIntegrity); }
-    @FXML private void handleSideUserManager() { setActiveSideNav(sideUserMgr); }
 
-    // ── Active State Helpers ──
+    // ══════════════════════════════════════════
+    //  TOP NAV HANDLERS
+    // ══════════════════════════════════════════
+
+    @FXML
+    private void handleNavDashboard() {
+        setActiveTopNav(navDashboard);
+        setActiveSideNav(sideHome);
+        navigateTo(new HomeController());
+    }
+
+    @FXML private void handleNavNotes()  { setActiveTopNav(navNotes);  /* TODO: NotesController */ }
+    @FXML private void handleNavVideos() { setActiveTopNav(navVideos); /* TODO: SearchController */ }
+    @FXML private void handleNavTools()  { setActiveTopNav(navTools);  /* TODO: ToolsController */ }
+    @FXML private void handleNavForum()  { setActiveTopNav(navForum);  /* TODO: NotificationsController */ }
+
+    // ══════════════════════════════════════════
+    //  SIDEBAR HANDLERS
+    // ══════════════════════════════════════════
+
+    @FXML
+    private void handleSideCases() {
+        setActiveSideNav(sideCases);
+        navigateTo(new CaseDashBoardController());
+    }
+
+    // ── TODO stubs ──
+    @FXML private void handleSideEvidence()    { setActiveSideNav(sideEvidence);  /* TODO: EvidenceController */ }
+    @FXML private void handleSideTimeline()    { setActiveSideNav(sideTimeline);  /* TODO: TimelineController */ }
+    @FXML private void handleSideAuditLog()    { setActiveSideNav(sideAuditLog);  /* TODO: AuditController */ }
+    @FXML private void handleSideReport()      { setActiveSideNav(sideReport);    /* TODO: ReportController */ }
+    @FXML private void handleSideSettings()    { setActiveSideNav(sideSettings);  /* TODO: SettingsController */ }
+    @FXML private void handleSideIntegrity()   { setActiveSideNav(sideIntegrity); /* TODO: IntegrityController */ }
+    @FXML private void handleSideUserManager() { setActiveSideNav(sideUserMgr);   /* TODO: UserManagerController */ }
+
+    // ── Active state helpers ──
     private void setActiveTopNav(Button target) {
         topNavButtons.forEach(b -> b.getStyleClass().remove("active"));
         target.getStyleClass().add("active");
@@ -110,21 +117,5 @@ public class DashBoardController extends BorderPane {  //  extends BorderPane
     private void setActiveSideNav(Button target) {
         sideNavButtons.forEach(b -> b.getStyleClass().remove("side-active"));
         target.getStyleClass().add("side-active");
-    }
-
-    // ── Stats ──
-    private void loadStats() {
-        statCases.setText("12");
-        statEvidence.setText("47");
-        statTimeline.setText("8");
-        statAudit.setText("67");
-    }
-
-    public void setUsername(String name) {
-        welcomeLabel.setText("Welcome back, " + name + "!");
-    }
-    private void navigateTo(Node target)
-    {
-        this.setCenter(target);
     }
 }

@@ -10,158 +10,147 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root prefHeight="650.0" prefWidth="1000.0" stylesheets="@Dashboard.css" type="BorderPane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="StackPane"
+         stylesheets="@CaseDashBoard.css"
+         xmlns="http://javafx.com/javafx/25"
+         xmlns:fx="http://javafx.com/fxml/1">
 
-    <!-- ═══════════════════════════ CENTER ═══════════════════════════ -->
-    <center>
-        <HBox>
+    <!-- ══════════ MAIN CONTENT ══════════ -->
+    <VBox spacing="0" styleClass="cases-content" StackPane.alignment="TOP_LEFT">
 
-            <!-- ══════════ MAIN CONTENT ══════════ -->
-            <VBox spacing="0.0" styleClass="cases-content" HBox.hgrow="ALWAYS">
-
-                <!-- ── Section Header ── -->
-                <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="cases-header" stylesheets="@CaseDashBoard.css">
-                    <padding><Insets bottom="16.0" left="24.0" right="24.0" top="20.0" /></padding>
-                    <children>
-                        <VBox spacing="4.0" stylesheets="@CaseDashBoard.css">
-                            <Label styleClass="section-title" stylesheets="@CaseDashBoard.css" text="Cases" textFill="#f8ffff" />
-                            <HBox spacing="16.0">
-                                <Label fx:id="countActive" styleClass="count-badge,badge-active" text="0 Active" />
-                                <Label fx:id="countArchived" styleClass="count-badge,badge-archived" text="0 Archived" />
-                                <Label fx:id="countLocked" styleClass="count-badge,badge-locked" text="0 Locked" />
-                                <!-- TODO: Bind counts from DB -->
-                            </HBox>
-                        </VBox>
-                        <Region stylesheets="@CaseDashBoard.css" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="btnNewCase" onAction="#handleNewCase" styleClass="btn-new-case" stylesheets="@CaseDashBoard.css" text="+ New Case" />
-                    </children>
+        <!-- ── Section Header ── -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="cases-header">
+            <padding><Insets bottom="16" left="24" right="24" top="20" /></padding>
+            <VBox spacing="4">
+                <Label styleClass="section-title" text="Cases" />
+                <HBox spacing="16">
+                    <Label fx:id="countActive"   styleClass="count-badge,badge-active"   text="0 Active" />
+                    <Label fx:id="countArchived" styleClass="count-badge,badge-archived" text="0 Archived" />
+                    <Label fx:id="countLocked"   styleClass="count-badge,badge-locked"   text="0 Locked" />
                 </HBox>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnNewCase" onAction="#handleNewCase"
+                    styleClass="btn-new-case" text="+ New Case" />
+        </HBox>
 
-                <!-- ── Filter Row ── -->
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="filter-row" stylesheets="@CaseDashBoard.css">
-                    <padding><Insets bottom="12.0" left="24.0" right="24.0" top="4.0" /></padding>
-                    <children>
+        <!-- ── Filter Row ── -->
+        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="filter-row">
+            <padding><Insets bottom="12" left="24" right="24" top="4" /></padding>
+            <HBox alignment="CENTER_LEFT" spacing="6" styleClass="search-box">
+                <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                    <image><Image url="@Assets/icons8-search-100.png" /></image>
+                </ImageView>
+                <TextField fx:id="searchField" onKeyReleased="#handleSearch"
+                           prefWidth="180" promptText="Search cases..."
+                           styleClass="search-field" />
+            </HBox>
+            <ComboBox fx:id="filterPriority" onAction="#handleFilter"
+                      prefWidth="120" promptText="Priority" styleClass="filter-combo" />
+            <ComboBox fx:id="filterStatus" onAction="#handleFilter"
+                      prefWidth="120" promptText="Status" styleClass="filter-combo" />
+            <DatePicker fx:id="filterDateFrom" onAction="#handleFilter"
+                        prefWidth="130" promptText="From" styleClass="filter-date" />
+            <DatePicker fx:id="filterDateTo" onAction="#handleFilter"
+                        prefWidth="130" promptText="To" styleClass="filter-date" />
+            <Button fx:id="btnClearFilters" onAction="#handleClearFilters"
+                    prefHeight="30" prefWidth="90"
+                    styleClass="btn-clear-filters" text="✕ Clear" />
+        </HBox>
 
-                        <!-- Search -->
-                        <HBox alignment="CENTER_LEFT" spacing="6.0" styleClass="search-box" stylesheets="@CaseDashBoard.css">
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <image><Image url="@Assets/icons8-search-100.png" /></image>
-                            </ImageView>
-                            <TextField fx:id="searchField" onKeyReleased="#handleSearch" prefWidth="180.0" promptText="Search cases..." styleClass="search-field" />
-                        </HBox>
+        <!-- ── Table Header ── -->
+        <HBox spacing="0" styleClass="table-header">
+            <padding><Insets bottom="10" left="24" right="24" top="10" /></padding>
+            <Label prefWidth="110" styleClass="col-header" text="CASE ID" />
+            <Label prefWidth="220" styleClass="col-header" text="TITLE" />
+            <Label prefWidth="90"  styleClass="col-header" text="PRIORITY" />
+            <Label prefWidth="110" styleClass="col-header" text="DATE" />
+            <Label prefWidth="100" styleClass="col-header" text="STATUS" />
+            <Label styleClass="col-header" text="ACTIONS" HBox.hgrow="ALWAYS" />
+        </HBox>
 
-                        <!-- Priority filter -->
-                        <ComboBox fx:id="filterPriority" onAction="#handleFilter" prefWidth="120.0" promptText="Priority" styleClass="filter-combo" />
-                        <!-- TODO: Populate with: All, High, Medium, Low -->
+        <!-- ── Cases List (scrollable) ── -->
+        <ScrollPane fitToWidth="true" styleClass="cases-scroll" VBox.vgrow="ALWAYS">
+            <VBox fx:id="caseListContainer" spacing="0" styleClass="case-list">
 
-                        <!-- Status filter -->
-                        <ComboBox fx:id="filterStatus" onAction="#handleFilter" prefWidth="120.0" promptText="Status" styleClass="filter-combo" />
-                        <!-- TODO: Populate with: All, Active, Archived, Locked -->
-
-                        <!-- Date From -->
-                        <DatePicker fx:id="filterDateFrom" onAction="#handleFilter" prefWidth="130.0" promptText="From" styleClass="filter-date" />
-
-                        <!-- Date To -->
-                        <DatePicker fx:id="filterDateTo" onAction="#handleFilter" prefWidth="130.0" promptText="To" styleClass="filter-date" />
-
-                        <!-- Clear filters -->
-                        <Button fx:id="btnClearFilters" onAction="#handleClearFilters" prefHeight="30.0" prefWidth="90.0" styleClass="btn-clear-filters" stylesheets="@CaseDashBoard.css" text="✕ Clear" />
-
-                    </children>
-                </HBox>
-
-                <!-- ── Table Header ── -->
-                <HBox spacing="0.0" styleClass="table-header" stylesheets="@CaseDashBoard.css">
-                    <padding><Insets bottom="10.0" left="24.0" right="24.0" top="10.0" /></padding>
-                    <children>
-                        <Label prefWidth="110.0" styleClass="col-header" text="CASE ID" />
-                        <Label prefWidth="220.0" styleClass="col-header" text="TITLE" />
-                        <Label prefWidth="90.0" styleClass="col-header" text="PRIORITY" />
-                        <Label prefWidth="110.0" styleClass="col-header" text="DATE" />
-                        <Label prefWidth="100.0" styleClass="col-header" text="STATUS" />
-                        <Label styleClass="col-header" text="ACTIONS" HBox.hgrow="ALWAYS" />
-                    </children>
-                </HBox>
-
-                <!-- ── Cases List (scrollable) ── -->
-                <ScrollPane fitToWidth="true" styleClass="cases-scroll" VBox.vgrow="ALWAYS">
-                    <VBox fx:id="caseListContainer" spacing="0.0" styleClass="case-list">
-                        <!-- TODO: Rows injected here dynamically from DB via CaseDashBoardController -->
-
-                        <!-- ── Empty State (shown when no cases) ── -->
-                        <VBox fx:id="emptyState" alignment="CENTER" spacing="12.0" styleClass="empty-state" stylesheets="@CaseDashBoard.css" VBox.vgrow="ALWAYS">
-                            <padding><Insets top="80.0" /></padding>
-                            <children>
-                                <Label styleClass="empty-icon" text="📁" />
-                                <Label styleClass="empty-title" text="No cases found." />
-                                <Label styleClass="empty-sub" text="Try adjusting your filters or create a new case." />
-                                <Button onAction="#handleNewCase" styleClass="btn-new-case" text="+ New Case" />
-                            </children>
-                        </VBox>
-
-                    </VBox>
-                </ScrollPane>
+                <!-- Empty State -->
+                <VBox fx:id="emptyState" alignment="CENTER" spacing="12"
+                      styleClass="empty-state" VBox.vgrow="ALWAYS">
+                    <padding><Insets top="80" /></padding>
+                    <Label styleClass="empty-icon" text="📁" />
+                    <Label styleClass="empty-title" text="No cases found." />
+                    <Label styleClass="empty-sub"
+                           text="Try adjusting your filters or create a new case." />
+                    <Button onAction="#handleNewCase"
+                            styleClass="btn-new-case" text="+ New Case" />
+                </VBox>
 
             </VBox>
-        </HBox>
-    </center>
+        </ScrollPane>
 
-    <!-- ═══════════════════════════ NEW CASE MODAL ═══════════════════════════ -->
-    <!-- Overlay — hidden by default, toggled via controller -->
-    <StackPane fx:id="modalOverlay" managed="false" styleClass="modal-overlay" visible="false" BorderPane.alignment="CENTER">
-        <VBox alignment="TOP_CENTER" maxWidth="480.0" spacing="16.0" styleClass="modal-box">
-            <padding><Insets bottom="28.0" left="32.0" right="32.0" top="28.0" /></padding>
-            <children>
+    </VBox>
 
-                <!-- Modal header -->
-                <HBox alignment="CENTER_LEFT">
-                    <Label styleClass="modal-title" text="New Case" HBox.hgrow="ALWAYS" />
-                    <Button onAction="#handleCloseModal" styleClass="modal-close-btn" text="✕" />
-                </HBox>
+    <!-- ══════════ NEW CASE MODAL (floats on top) ══════════ -->
+    <StackPane fx:id="modalOverlay" visible="false" managed="false"
+               styleClass="modal-overlay" alignment="CENTER">
 
-                <!-- Case Title -->
-                <VBox spacing="4.0">
-                    <Label styleClass="form-label" text="Case Title *" />
-                    <TextField fx:id="inputTitle" promptText="Enter case title" styleClass="form-field" />
-                    <Label fx:id="errorTitle" managed="false" styleClass="field-error" text="" visible="false" />
-                </VBox>
+        <VBox alignment="TOP_CENTER" maxWidth="480" spacing="16" styleClass="modal-box">
+            <padding><Insets bottom="28" left="32" right="32" top="28" /></padding>
 
-                <!-- Incident Date -->
-                <VBox spacing="4.0">
-                    <Label styleClass="form-label" text="Incident Date *" />
-                    <DatePicker fx:id="inputDate" prefWidth="416.0" styleClass="form-field" />
-                    <Label fx:id="errorDate" managed="false" styleClass="field-error" text="" visible="false" />
-                </VBox>
+            <!-- Modal header -->
+            <HBox alignment="CENTER_LEFT">
+                <Label styleClass="modal-title" text="New Case" HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleCloseModal" styleClass="modal-close-btn" text="✕" />
+            </HBox>
 
-                <!-- Priority -->
-                <VBox spacing="4.0">
-                    <Label styleClass="form-label" text="Priority *" />
-                    <ComboBox fx:id="inputPriority" prefWidth="416.0" promptText="Select priority" styleClass="form-field" />
-                    <!-- TODO: Populate with High, Medium, Low -->
-                </VBox>
+            <!-- Case Title -->
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Case Title *" />
+                <TextField fx:id="inputTitle" promptText="Enter case title"
+                           styleClass="form-field" />
+                <Label fx:id="errorTitle" managed="false" styleClass="field-error"
+                       text="" visible="false" />
+            </VBox>
 
-                <!-- Description -->
-                <VBox spacing="4.0">
-                    <Label styleClass="form-label" text="Description *" />
-                    <javafx.scene.control.TextArea fx:id="inputDescription" prefHeight="90.0" promptText="Brief description of the case..." styleClass="form-field" wrapText="true" />
-                </VBox>
+            <!-- Incident Date -->
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Incident Date *" />
+                <DatePicker fx:id="inputDate" prefWidth="416" styleClass="form-field" />
+                <Label fx:id="errorDate" managed="false" styleClass="field-error"
+                       text="" visible="false" />
+            </VBox>
 
-                <!-- Duplicate warning -->
-                <Label fx:id="errorDuplicate" managed="false" styleClass="field-error" text="⚠ A case with this title already exists." visible="false" />
+            <!-- Priority -->
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Priority *" />
+                <ComboBox fx:id="inputPriority" prefWidth="416"
+                          promptText="Select priority" styleClass="form-field" />
+            </VBox>
 
-                <!-- Buttons -->
-                <HBox alignment="CENTER_RIGHT" spacing="10.0">
-                    <Button onAction="#handleCloseModal" styleClass="btn-cancel" text="Cancel" />
-                    <Button fx:id="btnSubmitCase" onAction="#handleSubmitCase" styleClass="btn-new-case" text="Create Case" />
-                </HBox>
+            <!-- Description -->
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Description *" />
+                <TextArea fx:id="inputDescription" prefHeight="90"
+                          promptText="Brief description of the case..."
+                          styleClass="form-field" wrapText="true" />
+            </VBox>
 
-            </children>
+            <!-- Duplicate warning -->
+            <Label fx:id="errorDuplicate" managed="false" styleClass="field-error"
+                   text="⚠ A case with this title already exists." visible="false" />
+
+            <!-- Buttons -->
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button onAction="#handleCloseModal" styleClass="btn-cancel" text="Cancel" />
+                <Button fx:id="btnSubmitCase" onAction="#handleSubmitCase"
+                        styleClass="btn-new-case" text="Create Case" />
+            </HBox>
+
         </VBox>
     </StackPane>
 
