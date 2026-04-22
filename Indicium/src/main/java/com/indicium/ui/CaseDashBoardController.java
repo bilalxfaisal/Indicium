@@ -1,9 +1,13 @@
 package com.indicium.ui;
 
+import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -266,4 +270,6 @@ public class CaseDashBoardController extends StackPane {
     private void handleLockCase(String caseId)    { /* TODO: DB update status = Locked */ }
     private void handleArchiveCase(String caseId) { /* TODO: DB update status = Archived */ }
     private void handleDeleteCase(String caseId)  { /* TODO: RBAC check + confirm + DB delete */ }
+
+
 }

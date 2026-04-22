@@ -99,8 +99,11 @@ public class DashBoardController extends BorderPane {
         navigateTo(new CaseDashBoardController());
     }
 
+    @FXML private void handleSideEvidence()
+    { setActiveSideNav(sideEvidence);
+       navigateTo(new EvidenceDashBoardController());
+    }
     // ── TODO stubs ──
-    @FXML private void handleSideEvidence()    { setActiveSideNav(sideEvidence);  /* TODO: EvidenceController */ }
     @FXML private void handleSideTimeline()    { setActiveSideNav(sideTimeline);  /* TODO: TimelineController */ }
     @FXML private void handleSideAuditLog()    { setActiveSideNav(sideAuditLog);  /* TODO: AuditController */ }
     @FXML private void handleSideReport()      { setActiveSideNav(sideReport);    /* TODO: ReportController */ }

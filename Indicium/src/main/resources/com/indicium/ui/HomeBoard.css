@@ -1,6 +1,6 @@
 /* ── Main content area ── */
 .main-content {
-    -fx-background-color: #EEF9FA;
+    -fx-background-color: #F5F5F5;
 }
 
 /* ── Welcome text ── */
@@ -18,7 +18,7 @@
 
 /* ── Stat cards ── */
 .stat-card {
-    -fx-background-color: white;
+    -fx-background-color: #FFFFFF;
     -fx-background-radius: 12;
     -fx-padding: 18 20 18 20;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);
@@ -47,7 +47,7 @@
 
 /* ── Activity box ── */
 .activity-box {
-    -fx-background-color: white;
+    -fx-background-color: #FFFFFF;
     -fx-background-radius: 12;
     -fx-padding: 16;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);
