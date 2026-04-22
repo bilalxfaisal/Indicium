@@ -2,10 +2,13 @@ package com.indicium.ui;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.Node;
+import com.indicium.ui.CaseDashBoardController;
 
 import java.io.IOException;
 import java.net.URL;
@@ -84,7 +87,12 @@ public class DashBoardController extends BorderPane {  //  extends BorderPane
     @FXML private void handleNavForum()     { setActiveTopNav(navForum); }
 
     // ── Sidebar Handlers ──
-    @FXML private void handleSideCases()       { setActiveSideNav(sideCases); }
+    @FXML private void handleSideCases()
+    { setActiveSideNav(sideCases);
+        CaseDashBoardController caseDCon = new CaseDashBoardController();
+        navigateTo(caseDCon);
+
+    }
     @FXML private void handleSideEvidence()    { setActiveSideNav(sideEvidence); }
     @FXML private void handleSideTimeline()    { setActiveSideNav(sideTimeline); }
     @FXML private void handleSideAuditLog()    { setActiveSideNav(sideAuditLog); }
@@ -114,5 +122,9 @@ public class DashBoardController extends BorderPane {  //  extends BorderPane
 
     public void setUsername(String name) {
         welcomeLabel.setText("Welcome back, " + name + "!");
+    }
+    private void navigateTo(Node target)
+    {
+        this.setCenter(target);
     }
 }

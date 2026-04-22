@@ -2,6 +2,7 @@ package com.indicium.ui;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import java.io.IOException;
@@ -288,7 +289,6 @@ public class CaseDashBoardController extends BorderPane {
             errorDate.setVisible(false);
             errorDate.setManaged(false);
         }
-
         return valid;
     }
 
@@ -334,8 +334,13 @@ public class CaseDashBoardController extends BorderPane {
     // ─────────────────────────────────────────
     //  TOP / SIDE NAV (delegate to main controller)
     // ─────────────────────────────────────────
+    private void navigateTo(Node target)
+    {
+        this.setCenter(target);
+    }
 
-    @FXML private void handleNavDashboard()  { /* TODO: navigate to dashboard */ }
+    @FXML private void handleNavDashboard()
+    { /* TODO: navigate to dashboard */ }
     @FXML private void handleNavNotes()      { /* TODO: navigate to notes */ }
     @FXML private void handleNavVideos()     { /* TODO: navigate to search */ }
     @FXML private void handleNavTools()      { /* TODO: navigate to tools */ }
