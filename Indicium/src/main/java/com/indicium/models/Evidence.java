@@ -5,16 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
 
-enum EvidenceStatus
-{
-    COLLECTED,
-    VERIFIED,
-    LINKED,
-    ARCHIVED,
-    DISCARDED
-}
+import com.indicium.models.EvidenceStatus;
 
-public class Evidence {
+public class Evidence
+{
 
     private static int idsCount = 1;
     private String name;

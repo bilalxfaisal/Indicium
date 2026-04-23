@@ -9,14 +9,7 @@ import com.indicium.ui.EvidenceDashBoard;
 import java.io.File;
 import java.time.LocalDateTime;
 
-enum EvidenceStatus
-{
-    COLLECTED,
-    VERIFIED,
-    LINKED,
-    ARCHIVED,
-    DISCARDED
-}
+import com.indicium.models.EvidenceStatus;
 
 public class EvidenceManager
 {
