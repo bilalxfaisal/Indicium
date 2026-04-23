@@ -45,6 +45,17 @@ public class Case {
         this(caseID, title, incidentDate, CaseStatus.OPEN);
     }
 
+    public Case(String title, LocalDateTime incidentDate, CaseStatus status) {
+        this.caseID = generateUniqueID();
+        this.title = title;
+        this.incidentDate = incidentDate;
+        this.status = status;
+    }
+
+    public Case(String title, LocalDateTime incidentDate) {
+        this(title, incidentDate, CaseStatus.OPEN);
+    }
+
     public void addEvidence(Evidence evidence) {
         if (this.evidenceList.contains(evidence) || evidence == null) return;
         this.evidenceList.add(evidence);
@@ -93,6 +104,9 @@ public class Case {
         return false;
     }
 
+    private int generateUniqueID(){
+        return LocalDateTime.now().hashCode();
+    }
 }
 
 
