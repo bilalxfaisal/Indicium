@@ -1,4 +1,6 @@
 package com.indicium.models;
 
-public class UserAuth {
+public class UserAuth
+{
+
 }

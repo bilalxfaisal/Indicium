@@ -5,16 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
 
-enum EvidenceStatus
-{
-    COLLECTED,
-    VERIFIED,
-    LINKED,
-    ARCHIVED,
-    DISCARDED
-}
+import com.indicium.models.EvidenceStatus;
 
-public class Evidence {
+public class Evidence
+{
 
     private static int idsCount = 1;
     private String name;
@@ -93,17 +87,32 @@ public class Evidence {
         this.isLocked = true;
     }
 
+    // --- Verifications ---
     /**
      * UC5, UC7, UC10, UC12
      * Recomputes the hash of the file at filePath and compares
      * it against the stored digitalFingerprint.
      * Returns true if the file is intact, false if tampered.
      */
-    public boolean verifyIntegrity(String hash) {
+
+    public boolean verifyIntegrity(String hash)
+    {
         if (this.digitalFingerprint == null || hash == null) {
             return false;
         }
         return this.digitalFingerprint.equals(hash);
+    }
+
+    // checks if evidence belongs to the case given
+    public boolean verifyBelongsToCase(int caseID)
+    {
+        if (this.caseIDs == null) return false;
+        int i = 0;
+        while (i < caseIDs.size())
+        {
+            if (i == caseID) return true;
+        }
+        return false;
     }
 
     // --- Getters ---
@@ -150,18 +159,6 @@ public class Evidence {
         this.isLocked = true;
     }
     public void unlock() { this.isLocked = false; }
-
-    // checks if evidence belongs to the case given
-    public boolean verifyBelongsToCase(int caseID)
-    {
-        if (this.caseIDs == null) return false;
-        int i = 0;
-        while (i < caseIDs.size())
-        {
-            if (i == caseID) return true;
-        }
-        return false;
-    }
 
     public void linkWithCase(int caseID)
     {
