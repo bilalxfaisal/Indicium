@@ -5,7 +5,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -22,11 +21,11 @@
 
                 <!-- Logo icon -->
                 <ImageView fx:id="logoIcon" fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@Assets/icons8-menu-100.png" />
+                    <Image url="@Assets/icons8-menu-100%20(1).png" />
                 </ImageView>
 
                 <!-- App name -->
-                <Label styleClass="app-title" text="INDICIUM">
+                <Label prefHeight="24.0" prefWidth="93.0" styleClass="app-title" text="INDICIUM">
                     <HBox.margin><Insets left="6.0" /></HBox.margin>
                 </Label>
 
@@ -38,7 +37,14 @@
                 <Button fx:id="navNotes" onAction="#handleNavNotes" styleClass="top-nav-btn" text="Notes" />
                 <Button fx:id="navVideos" onAction="#handleNavVideos" styleClass="top-nav-btn" text="Search" />
                 <Button fx:id="navTools" onAction="#handleNavTools" styleClass="top-nav-btn" text="Tools" />
-                <Button fx:id="navForum" onAction="#handleNavForum" styleClass="top-nav-btn" text="Notifications" />
+                <Button fx:id="navForum" onAction="#handleNavForum" styleClass="top-nav-btn" text="Notifications">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@Assets/icons8-notification-100%20(1).png" />
+                     </image>
+                  </ImageView>
+               </graphic></Button>
 
                 <!-- User avatar -->
                 <StackPane styleClass="avatar-circle">
@@ -50,148 +56,115 @@
     </top>
 
     <!-- ═══════════════════════════ CENTER ═══════════════════════════ -->
+    <!-- ═══════════════════════════ CENTER ═══════════════════════════ -->
     <center>
-        <HBox>
-
-            <!-- ── Sidebar ── -->
-            <VBox id="SideNavBar" prefWidth="210.0" spacing="4.0">
-                <padding><Insets bottom="16.0" left="10.0" right="10.0" top="16.0" /></padding>
-                <children>
-
-                    <Button fx:id="sideHome" onAction="#handleNavDashboard" styleClass="side-nav-btn,side-active" text="Dashboard">
-                        <graphic>
-                            <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
-                                <image><Image url="@Assets/icons8-home-100.png" /></image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-
-                    <Button fx:id="sideCases" onAction="#handleSideCases" styleClass="side-nav-btn" text="Cases">
-                        <graphic>
-                            <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
-                        <image>
-                           <Image url="@Assets/icons8-case-100.png" />
-                        </image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-
-                    <Button fx:id="sideEvidence" onAction="#handleSideEvidence" styleClass="side-nav-btn" text="Evidence">
-                        <graphic>
-                            <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
-                                <image><Image url="@Assets/icons8-evidence-100.png" /></image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-
-                    <Button fx:id="sideTimeline" onAction="#handleSideTimeline" styleClass="side-nav-btn" text="Timeline">
-                        <graphic>
-                            <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
-                                <image><Image url="@Assets/icons8-timeline-100.png" /></image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-
-                    <Button fx:id="sideAuditLog" onAction="#handleSideAuditLog" styleClass="side-nav-btn" text="Audit Log">
-                        <graphic>
-                            <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
-                                <image><Image url="@Assets/icons8-audit-100.png" /></image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-
-                    <Button fx:id="sideReport" onAction="#handleSideReport" styleClass="side-nav-btn" text="Report">
-                        <graphic>
-                            <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
-                                <image><Image url="@Assets/icons8-report-100.png" /></image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-
-                    <!-- Spacer pushes bottom items down -->
-                    <VBox VBox.vgrow="ALWAYS" />
-
-                    <Button fx:id="sideSettings" onAction="#handleSideSettings" styleClass="side-nav-btn" text="Settings">
-                        <graphic>
-                            <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
-                                <image><Image url="@Assets/icons8-settings-100.png" /></image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-
-                    <Button fx:id="sideIntegrity" onAction="#handleSideIntegrity" styleClass="side-nav-btn" text="Integrity Manager">
-                        <graphic>
-                            <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
-                                <image><Image url="@Assets/icons8-integrity-100.png" /></image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-
-                    <Button fx:id="sideUserMgr" onAction="#handleSideUserManager" styleClass="side-nav-btn" text="User Manager">
-                        <graphic>
-                            <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
-                                <image><Image url="@Assets/icons8-accessibility-tools-100.png" /></image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-
-                </children>
-            </VBox>
-
-            <!-- ── Main Content ── -->
-            <AnchorPane fx:id="mainContent" styleClass="main-content" HBox.hgrow="ALWAYS">
-                <children>
-
-                    <VBox spacing="20.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
-                        <children>
-
-                            <!-- Welcome header -->
-                            <Label fx:id="welcomeLabel" styleClass="welcome-title" text="Welcome back, John!" />
-                            <Label styleClass="welcome-sub" text="Here's what's happening with your investigation today." />
-
-                            <!-- Stats row -->
-                            <HBox spacing="16.0">
-                                <children>
-                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                                        <children>
-                                            <Label styleClass="stat-label" text="Active Cases" />
-                                            <Label fx:id="statCases" styleClass="stat-value" text="0" />
-                                        </children>
-                                    </VBox>
-                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                                        <children>
-                                            <Label styleClass="stat-label" text="Evidence Items" />
-                                            <Label fx:id="statEvidence" styleClass="stat-value" text="0" />
-                                        </children>
-                                    </VBox>
-                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                                        <children>
-                                            <Label styleClass="stat-label" text="Timeline Events" />
-                                            <Label fx:id="statTimeline" styleClass="stat-value" text="0" />
-                                        </children>
-                                    </VBox>
-                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                                        <children>
-                                            <Label styleClass="stat-label" text="Audit Entries" />
-                                            <Label fx:id="statAudit" styleClass="stat-value" text="0" />
-                                        </children>
-                                    </VBox>
-                                </children>
-                            </HBox>
-
-                            <!-- Recent activity placeholder -->
-                            <Label styleClass="section-heading" text="Recent Activity" />
-                            <VBox fx:id="recentActivityBox" spacing="8.0" styleClass="activity-box">
-                                <Label styleClass="activity-empty" text="No recent activity." />
-                            </VBox>
-
-                        </children>
-                    </VBox>
-
-                </children>
-            </AnchorPane>
-
-        </HBox>
+        <StackPane fx:id="centerPane" />
     </center>
+
+   <left>
+
+         <!-- ── Sidebar ── -->
+         <VBox id="SideNavBar" prefWidth="210.0" spacing="4.0" BorderPane.alignment="CENTER">
+             <padding>
+            <Insets bottom="16.0" left="10.0" right="10.0" top="16.0" />
+         </padding>
+             <children>
+
+                 <Button fx:id="sideHome" onAction="#handleNavDashboard" styleClass="side-nav-btn,side-active" text="Dashboard">
+                     <graphic>
+                         <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
+                             <image>
+                        <Image url="@Assets/icons8-home-100.png" />
+                     </image>
+                         </ImageView>
+                     </graphic>
+                 </Button>
+
+                 <Button fx:id="sideCases" onAction="#handleSideCases" styleClass="side-nav-btn" text="Cases">
+                     <graphic>
+                         <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
+                     <image>
+                        <Image url="@Assets/icons8-case-100.png" />
+                     </image>
+                         </ImageView>
+                     </graphic>
+                 </Button>
+
+                 <Button fx:id="sideEvidence" onAction="#handleSideEvidence" styleClass="side-nav-btn" text="Evidence">
+                     <graphic>
+                         <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
+                             <image>
+                        <Image url="@Assets/icons8-evidence-100.png" />
+                     </image>
+                         </ImageView>
+                     </graphic>
+                 </Button>
+
+                 <Button fx:id="sideTimeline" onAction="#handleSideTimeline" styleClass="side-nav-btn" text="Timeline">
+                     <graphic>
+                         <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
+                             <image>
+                        <Image url="@Assets/icons8-timeline-100.png" />
+                     </image>
+                         </ImageView>
+                     </graphic>
+                 </Button>
+
+                 <Button fx:id="sideAuditLog" onAction="#handleSideAuditLog" styleClass="side-nav-btn" text="Audit Log">
+                     <graphic>
+                         <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
+                             <image>
+                        <Image url="@Assets/icons8-audit-100.png" />
+                     </image>
+                         </ImageView>
+                     </graphic>
+                 </Button>
+
+                 <Button fx:id="sideReport" onAction="#handleSideReport" styleClass="side-nav-btn" text="Report">
+                     <graphic>
+                         <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
+                             <image>
+                        <Image url="@Assets/icons8-report-100.png" />
+                     </image>
+                         </ImageView>
+                     </graphic>
+                 </Button>
+
+                 <!-- Spacer pushes bottom items down -->
+                 <VBox VBox.vgrow="ALWAYS" />
+
+                 <Button fx:id="sideSettings" onAction="#handleSideSettings" styleClass="side-nav-btn" text="Settings">
+                     <graphic>
+                         <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
+                             <image>
+                        <Image url="@Assets/icons8-settings-100.png" />
+                     </image>
+                         </ImageView>
+                     </graphic>
+                 </Button>
+
+                 <Button fx:id="sideIntegrity" onAction="#handleSideIntegrity" styleClass="side-nav-btn" text="Integrity Manager">
+                     <graphic>
+                         <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
+                             <image>
+                        <Image url="@Assets/icons8-integrity-100.png" />
+                     </image>
+                         </ImageView>
+                     </graphic>
+                 </Button>
+
+                 <Button fx:id="sideUserMgr" onAction="#handleSideUserManager" styleClass="side-nav-btn" text="User Manager">
+                     <graphic>
+                         <ImageView fitHeight="45.0" fitWidth="30.0" preserveRatio="true" styleClass="side-nav-icon">
+                             <image>
+                        <Image url="@Assets/icons8-accessibility-tools-100.png" />
+                     </image>
+                         </ImageView>
+                     </graphic>
+                 </Button>
+
+             </children>
+         </VBox>
+   </left>
 
 </fx:root>

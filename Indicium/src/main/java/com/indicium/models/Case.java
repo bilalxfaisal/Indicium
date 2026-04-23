@@ -45,6 +45,17 @@ public class Case {
         this(caseID, title, incidentDate, CaseStatus.OPEN);
     }
 
+    public Case(String title, LocalDateTime incidentDate, CaseStatus status) {
+        this.caseID = generateUniqueID();
+        this.title = title;
+        this.incidentDate = incidentDate;
+        this.status = status;
+    }
+
+    public Case(String title, LocalDateTime incidentDate) {
+        this(title, incidentDate, CaseStatus.OPEN);
+    }
+
     public void addEvidence(Evidence evidence) {
         if (this.evidenceList.contains(evidence) || evidence == null) return;
         this.evidenceList.add(evidence);
@@ -63,10 +74,10 @@ public class Case {
     }
 
     public boolean verifyStandardViewingPrivileges(int investigatorID){
-        if (AccessManager.isLockDownActive()){
-            System.out.println("[SECURITY] Access Denied. LockDown is Active.");
-            return false;
-        }
+       if (AccessManager.isLockDownActive()){
+           System.out.println("[SECURITY] Access Denied. LockDown is Active.");
+           return false;
+       }
 
         // if case is archived, standard investigators cannot view it
         if(this.status == CaseStatus.ARCHIVED){
@@ -74,7 +85,7 @@ public class Case {
             return false;
         }
 
-        return CaseRepository.isUserAssignedToCase(investigatorID, this.caseID);
+       return CaseRepository.isUserAssignedToCase(investigatorID, this.caseID);
     }
 
     public Case gatherRelevantData(){
@@ -93,6 +104,9 @@ public class Case {
         return false;
     }
 
+    private int generateUniqueID(){
+        return LocalDateTime.now().hashCode();
+    }
 }
 
 

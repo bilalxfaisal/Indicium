@@ -47,6 +47,7 @@ public class Evidence
         this.setDataFromFile(file);
     }
 
+
     public void setDataFromFile(File file)
     {
         if (file == null || !file.exists())
