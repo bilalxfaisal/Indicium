@@ -104,7 +104,11 @@ public class DashBoardController extends BorderPane {
        navigateTo(new EvidenceDashBoardController());
     }
     // ── TODO stubs ──
-    @FXML private void handleSideTimeline()    { setActiveSideNav(sideTimeline);  /* TODO: TimelineController */ }
+    @FXML private void handleSideTimeline()
+    {
+        setActiveSideNav(sideTimeline);
+        this.navigateTo(new TimelineController());
+    }
     @FXML private void handleSideAuditLog()    { setActiveSideNav(sideAuditLog);  /* TODO: AuditController */ }
     @FXML private void handleSideReport()      { setActiveSideNav(sideReport);    /* TODO: ReportController */ }
     @FXML private void handleSideSettings()    { setActiveSideNav(sideSettings);  /* TODO: SettingsController */ }

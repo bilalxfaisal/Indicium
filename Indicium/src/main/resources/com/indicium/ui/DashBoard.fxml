@@ -20,8 +20,8 @@
             <children>
 
                 <!-- Logo icon -->
-                <ImageView fx:id="logoIcon" fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@Assets/icons8-menu-100%20(1).png" />
+                <ImageView fx:id="logoIcon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                    <Image url="@Assets/icons8-menu-50.png" />
                 </ImageView>
 
                 <!-- App name -->

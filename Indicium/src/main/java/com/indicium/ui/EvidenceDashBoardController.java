@@ -70,7 +70,8 @@ public class EvidenceDashBoardController extends StackPane {
     private String activeLinkEvidenceId = null;
 
     // ── Constructor ──
-    public EvidenceDashBoardController() {
+    public EvidenceDashBoardController()
+    {
         URL fxmlUrl = getClass().getResource("/com/indicium/ui/EvidenceDashBoard.fxml");
         if (fxmlUrl == null)
             throw new RuntimeException("EvidenceDashBoard.fxml not found!");
