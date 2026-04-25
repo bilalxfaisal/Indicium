@@ -35,6 +35,7 @@ public class DashBoardController extends BorderPane {
     @FXML private Button sideEvidence;
     @FXML private Button sideTimeline;
     @FXML private Button sideAuditLog;
+    @FXML private Button sideCorrelation;
     @FXML private Button sideReport;
     @FXML private Button sideSettings;
     @FXML private Button sideIntegrity;
@@ -77,7 +78,7 @@ public class DashBoardController extends BorderPane {
     public void initialize()
     {
         topNavButtons = List.of(navDashboard, navNotes, navVideos, navTools, navForum);
-        sideNavButtons = List.of(sideHome, sideCases, sideEvidence, sideTimeline,
+        sideNavButtons = List.of(sideHome, sideCases, sideEvidence, sideTimeline, sideCorrelation,
                 sideAuditLog, sideReport, sideSettings, sideIntegrity, sideUserMgr);
 
         // Store original labels so we can restore them after expand
@@ -181,8 +182,15 @@ public class DashBoardController extends BorderPane {
         setActiveSideNav(sideTimeline);
         navigateTo(new TimelineController(caseId));
     }
+    public void HandleSideCorrelation() {
+        setActiveSideNav(sideCorrelation);
+    }
 
-    @FXML private void handleSideAuditLog()    { setActiveSideNav(sideAuditLog);  /* TODO */ }
+    @FXML private void handleSideAuditLog()
+    {
+        setActiveSideNav(sideAuditLog);
+        navigateTo(new AuditLogController());
+       }
     @FXML private void handleSideReport()      { setActiveSideNav(sideReport);    /* TODO */ }
     @FXML private void handleSideSettings()    { setActiveSideNav(sideSettings);  /* TODO */ }
     @FXML private void handleSideIntegrity()   { setActiveSideNav(sideIntegrity); /* TODO */ }
