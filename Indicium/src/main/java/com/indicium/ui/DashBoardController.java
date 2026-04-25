@@ -184,12 +184,14 @@ public class DashBoardController extends BorderPane {
     }
     public void HandleSideCorrelation() {
         setActiveSideNav(sideCorrelation);
+        navigateTo(new CorrelationDashBoardController());
     }
 
     @FXML private void handleSideAuditLog()
     {
         setActiveSideNav(sideAuditLog);
         navigateTo(new AuditLogController());
+
        }
     @FXML private void handleSideReport()      { setActiveSideNav(sideReport);    /* TODO */ }
     @FXML private void handleSideSettings()    { setActiveSideNav(sideSettings);  /* TODO */ }
