@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root stylesheets="@AuditLogDashboard.css" type="StackPane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+
+    <VBox spacing="0" styleClass="auditlog-content">
+
+        <!-- ── Section Header ── -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="auditlog-header">
+            <padding><Insets bottom="16" left="24" right="24" top="20" /></padding>
+
+            <VBox spacing="4">
+                <Label styleClass="section-title" text="Audit Log" />
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label fx:id="countTotal" styleClass="count-badge,badge-total" text="0 Entries" />
+                </HBox>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button fx:id="btnExport" onAction="#handleExport" styleClass="btn-export" text="Export CSV" />
+        </HBox>
+
+        <!-- ── Filter Row ── -->
+        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="filter-row">
+            <padding><Insets bottom="12" left="24" right="24" top="8" /></padding>
+
+            <!-- Search -->
+            <HBox alignment="CENTER_LEFT" spacing="6" styleClass="search-box">
+                <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                    <image><Image url="@Assets/icons8-search-100.png" /></image>
+                </ImageView>
+                <TextField fx:id="searchField" onKeyReleased="#handleSearch" prefWidth="200" promptText="Search user, ID, action..." styleClass="search-field" />
+            </HBox>
+
+            <!-- Action filter -->
+            <ComboBox fx:id="filterAction" onAction="#handleFilter" prefWidth="130" promptText="Action" styleClass="filter-combo" />
+
+            <!-- Role filter -->
+            <ComboBox fx:id="filterRole" onAction="#handleFilter" prefWidth="130" promptText="Role" styleClass="filter-combo" />
+
+            <!-- Type filter -->
+            <ComboBox fx:id="filterType" onAction="#handleFilter" prefWidth="130" promptText="Type" styleClass="filter-combo" />
+
+            <!-- Clear -->
+            <Button onAction="#handleClearFilters" styleClass="btn-clear-filters" text="Clear" />
+        </HBox>
+
+        <!-- ── Table Header ── -->
+        <HBox spacing="0" styleClass="table-header">
+            <padding><Insets bottom="10" left="24" right="24" top="10" /></padding>
+            <Label prefWidth="200" styleClass="col-header" text="USER" />
+            <Label prefWidth="150" styleClass="col-header" text="USER ID" />
+            <Label prefWidth="140" styleClass="col-header" text="ACTION" />
+            <Label prefWidth="120" styleClass="col-header" text="ROLE" />
+            <Label prefWidth="120" styleClass="col-header" text="TYPE" />
+            <Label styleClass="col-header" text="TIMESTAMP" HBox.hgrow="ALWAYS" />
+        </HBox>
+
+        <!-- ── Log List ── -->
+        <ScrollPane fitToWidth="true" styleClass="auditlog-scroll" VBox.vgrow="ALWAYS">
+            <VBox fx:id="logListContainer" spacing="0" styleClass="log-list">
+
+                <!-- Empty State -->
+                <VBox fx:id="emptyState" alignment="CENTER" spacing="12" styleClass="empty-state">
+                    <padding><Insets top="80" /></padding>
+                    <ImageView fitHeight="64" fitWidth="64" pickOnBounds="true" preserveRatio="true">
+                        <image><Image url="@Assets/icons8-audit-100_black.png" /></image>
+                    </ImageView>
+                    <Label styleClass="empty-title" text="No audit entries found." />
+                    <Label styleClass="empty-sub" text="Actions performed in the system will appear here." />
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+
+        <!-- ── Pagination Footer ── -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="pagination-bar">
+            <padding><Insets bottom="14" left="24" right="24" top="14" /></padding>
+
+            <Label fx:id="lblTotalItems" styleClass="pagination-meta" text="0 items" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button fx:id="btnPrevPage" onAction="#handlePrevPage" styleClass="btn-page" text="Previous" />
+
+            <Label styleClass="pagination-meta" text="Page" />
+            <Label fx:id="lblCurrentPage" styleClass="pagination-page-num" text="1" />
+            <Label styleClass="pagination-meta" text="of" />
+            <Label fx:id="lblTotalPages" styleClass="pagination-meta" text="1" />
+
+            <Button fx:id="btnNextPage" onAction="#handleNextPage" styleClass="btn-page" text="Next" />
+
+            <Label styleClass="pagination-meta" text="Show" />
+            <ComboBox fx:id="pageSizeCombo" prefWidth="75" styleClass="filter-combo" />
+
+        </HBox>
+
+    </VBox>
+
+</fx:root>

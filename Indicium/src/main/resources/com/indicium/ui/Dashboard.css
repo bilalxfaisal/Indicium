@@ -3,21 +3,19 @@
    Palette: dark teal-black + cyan accent
 ═══════════════════════════════════════════ */
 
-/* ── Root / Scene ── */
 .root {
     -fx-background-color: #0D1B1E;
     -fx-font-family: "Segoe UI", "Franklin Gothic Medium", sans-serif;
 }
-/* ── Center content area ── */
+
 .main-content {
-    -fx-background-color: #EEF9FA;
+    -fx-background-color: #F5F5F5;
 }
 
 /* ── Top Nav Bar ── */
-#TopNavBar
-{
+#TopNavBar {
     -fx-background-color: #0D1B1E;
-    -fx-border-color: #1a2f34;
+    -fx-border-color: #1A2F34;
     -fx-border-width: 0 0 1 0;
 }
 
@@ -28,6 +26,18 @@
     -fx-font-family: "Franklin Gothic Medium Cond";
 }
 
+/* ── Menu toggle button ── */
+.menu-toggle-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 8;
+    -fx-padding: 6 8 6 8;
+    -fx-cursor: hand;
+}
+.menu-toggle-btn:hover {
+    -fx-background-color: #1A2F34;
+}
+
 /* ── Top nav buttons ── */
 .top-nav-btn {
     -fx-background-color: transparent;
@@ -36,13 +46,12 @@
     -fx-padding: 8 16 8 16;
     -fx-background-radius: 20;
     -fx-cursor: hand;
+    -fx-border-color: transparent;
 }
-
 .top-nav-btn:hover {
     -fx-background-color: #132226;
     -fx-text-fill: #EEF9FA;
 }
-
 .top-nav-btn.active {
     -fx-background-color: #00BCD4;
     -fx-text-fill: #0D1B1E;
@@ -58,20 +67,23 @@
     -fx-max-width: 36;
     -fx-max-height: 36;
 }
-
 .avatar-label {
     -fx-text-fill: #0D1B1E;
     -fx-font-weight: bold;
     -fx-font-size: 15px;
 }
 
-/* ── Sidebar ── */
-#SideNavBar {
+/* ── Sidebar container ── */
+.side-nav-bar {
     -fx-background-color: #132226;
+    -fx-min-width: 56;
+    -fx-pref-width: 210;
     -fx-min-height: 590;
+    -fx-border-color: transparent #1A2F34 transparent transparent;
+    -fx-border-width: 0 1 0 0;
 }
 
-/* ── Sidebar buttons (default = invisible, blends with bg) ── */
+/* ── Sidebar buttons ── */
 .side-nav-btn {
     -fx-background-color: transparent;
     -fx-text-fill: #90A4AE;
@@ -79,31 +91,29 @@
     -fx-alignment: CENTER_LEFT;
     -fx-padding: 10 14 10 14;
     -fx-background-radius: 10;
-    -fx-pref-width: 190;
     -fx-graphic-text-gap: 10;
     -fx-cursor: hand;
-
+    -fx-border-color: transparent;
+    -fx-max-width: Infinity;
 }
-.side-nav-icon
-{
-    -fx-fit-width: 30;
-    -fx-fit-height: 45;
-}
-
 .side-nav-btn:hover {
-    -fx-background-color: #1a2f34;
+    -fx-background-color: #1A2F34;
     -fx-text-fill: #B2EBF2;
 }
 
-/* ── Active sidebar button → cyan ── */
+/* Active sidebar button */
 .side-nav-btn.side-active {
     -fx-background-color: #00BCD4;
     -fx-text-fill: #0D1B1E;
     -fx-font-weight: bold;
 }
-
 .side-nav-btn.side-active:hover {
     -fx-background-color: #0097A7;
     -fx-text-fill: #EEF9FA;
 }
 
+/* Collapsed state — center the icon when text is gone */
+.side-nav-bar-collapsed .side-nav-btn {
+    -fx-alignment: CENTER;
+    -fx-padding: 10 0 10 0;
+}

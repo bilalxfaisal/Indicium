@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root stylesheets="@TimelineDashboard.css" type="StackPane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+
+    <!-- ══════════════════════════════════════════════
+         STATE 1 — CASE SELECTOR
+         ══════════════════════════════════════════════ -->
+    <VBox fx:id="caseSelectorState" alignment="CENTER" managed="true" spacing="16" styleClass="selector-container" visible="true">
+
+        <VBox alignment="CENTER" spacing="6">
+            <ImageView fitHeight="90" fitWidth="90" pickOnBounds="true" preserveRatio="true">
+                <image><Image url="@Assets/icons8-clock-100.png" /></image>
+            </ImageView>
+            <Label styleClass="selector-title" text="Incident Timeline" />
+            <Label styleClass="selector-sub" text="Select a case to load and manage its timeline." />
+        </VBox>
+
+        <VBox alignment="CENTER" maxWidth="420" spacing="8">
+            <Label styleClass="form-label" text="Select Case" />
+            <HBox alignment="CENTER" spacing="10">
+                <ComboBox fx:id="caseSelector" prefWidth="300" promptText="Search or select a case..." styleClass="case-selector-combo" />
+                <Button fx:id="btnLoadTimeline" onAction="#handleLoadTimeline" prefHeight="50.0" prefWidth="144.0" styleClass="btn-load" text="Load Timeline" />
+            </HBox>
+            <Label fx:id="errorNoCase" managed="false" styleClass="field-error" text="Please select a case first." visible="false" />
+        </VBox>
+
+    </VBox>
+
+    <!-- ══════════════════════════════════════════════
+         STATE 2 — TIMELINE VIEW
+         ══════════════════════════════════════════════ -->
+    <VBox fx:id="timelineState" managed="false" spacing="0" styleClass="timeline-content" visible="false">
+
+        <!-- ── Section Header ── -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="timeline-header">
+            <padding><Insets bottom="16" left="24" right="24" top="20" /></padding>
+
+            <VBox spacing="4">
+                <Label styleClass="section-title" text="Incident Timeline" />
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label fx:id="activeCaseLabel" styleClass="active-case-label" text="No case loaded" />
+                    <Label fx:id="countEvents" styleClass="count-badge,badge-events" text="0 Events" />
+                </HBox>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <!-- Read-only banner — shown when case is Locked or Archived -->
+            <HBox fx:id="readOnlyBanner" alignment="CENTER_LEFT" managed="false" spacing="8" styleClass="readonly-banner" visible="false">
+                <ImageView fitHeight="14" fitWidth="14" pickOnBounds="true" preserveRatio="true">
+                    <image><Image url="@Assets/icons8-lock-100.png" /></image>
+                </ImageView>
+                <Label styleClass="readonly-banner-text" text="Case is locked — Timeline is read-only" />
+            </HBox>
+
+            <Button fx:id="btnChangeCase" onAction="#handleChangeCase" styleClass="btn-change-case" text="Change Case" />
+            <Button fx:id="btnAddEvent" onAction="#handleAddEvent" styleClass="btn-add-event" text="+ Add Event" />
+        </HBox>
+
+        <!-- ── Filter Row ── -->
+        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="filter-row">
+            <padding><Insets bottom="12" left="24" right="24" top="4" /></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="6" styleClass="search-box">
+                <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                    <image><Image url="@Assets/icons8-search-100.png" /></image>
+                </ImageView>
+                <TextField fx:id="searchField" onKeyReleased="#handleSearch" prefWidth="200" promptText="Search events..." styleClass="search-field" />
+            </HBox>
+
+            <DatePicker fx:id="filterDateFrom" onAction="#handleFilter" prefWidth="140" promptText="From" styleClass="filter-date" />
+
+            <DatePicker fx:id="filterDateTo" onAction="#handleFilter" prefWidth="140" promptText="To" styleClass="filter-date" />
+
+            <Button fx:id="btnClearFilters" onAction="#handleClearFilters" prefHeight="30" prefWidth="90" styleClass="btn-clear-filters" text="Clear" />
+        </HBox>
+
+        <!-- ── Timeline Scroll Area ── -->
+        <ScrollPane fitToWidth="true" styleClass="timeline-scroll" VBox.vgrow="ALWAYS">
+
+            <VBox fx:id="timelineContainer" spacing="0" styleClass="timeline-list">
+                <padding><Insets bottom="24" left="24" right="24" top="16" /></padding>
+
+                <!-- Empty State -->
+                <VBox fx:id="emptyState" alignment="CENTER" spacing="12" styleClass="empty-state" VBox.vgrow="ALWAYS">
+                    <padding><Insets top="60" /></padding>
+                    <ImageView fitHeight="64" fitWidth="64" pickOnBounds="true" preserveRatio="true">
+                        <image><Image url="@Assets/icons8-calendar-100.png" /></image>
+                    </ImageView>
+                    <Label styleClass="empty-title" text="No timeline events yet." />
+                    <Label styleClass="empty-sub" text="Add the first event to start building the incident timeline." />
+                    <Button onAction="#handleAddEvent" styleClass="btn-add-event" text="+ Add Event" />
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+
+    </VBox>
+
+    <!-- ══════════════════════════════════════════════
+         ADD / EDIT EVENT MODAL
+         ══════════════════════════════════════════════ -->
+    <StackPane fx:id="modalEventForm" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
+
+        <VBox alignment="TOP_CENTER" maxWidth="520" spacing="14" styleClass="modal-box">
+            <padding><Insets bottom="28" left="32" right="32" top="28" /></padding>
+
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT">
+                <Label fx:id="modalFormTitle" styleClass="modal-title" text="Add Event" HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleCloseEventModal" styleClass="modal-close-btn" text="X" />
+            </HBox>
+
+            <!-- Event Title -->
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Event Title *" />
+                <TextField fx:id="inputEventTitle" promptText="e.g. Suspect accessed server room" styleClass="form-field" />
+                <Label fx:id="errorEventTitle" managed="false" styleClass="field-error" text="" visible="false" />
+            </VBox>
+
+            <!-- Date + Time -->
+            <HBox spacing="12">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="Event Date *" />
+                    <DatePicker fx:id="inputEventDate" styleClass="form-field" />
+                    <Label fx:id="errorEventDate" managed="false" styleClass="field-error" text="" visible="false" />
+                </VBox>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="Event Time (HH:mm) *" />
+                    <TextField fx:id="inputEventTime" promptText="e.g. 14:35" styleClass="form-field" />
+                    <Label fx:id="errorEventTime" managed="false" styleClass="field-error" text="" visible="false" />
+                </VBox>
+            </HBox>
+
+            <!-- Description -->
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Description" />
+                <TextArea fx:id="inputEventDescription" prefHeight="80" promptText="Describe what happened at this point in time..." styleClass="form-field" wrapText="true" />
+            </VBox>
+
+            <!-- Link Evidence -->
+            <VBox spacing="4">
+                <Label styleClass="form-label" text="Link Evidence (optional)" />
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <ComboBox fx:id="inputEvidenceLink" prefWidth="340" promptText="Select evidence from this case..." styleClass="form-field" />
+                    <Button onAction="#handleAddEvidenceLink" styleClass="btn-pick-file" text="+ Add" />
+                </HBox>
+                <HBox fx:id="linkedEvidenceChips" spacing="6" styleClass="chips-row" />
+                <Label fx:id="errorEvidenceLink" managed="false" styleClass="field-error" text="" visible="false" />
+            </VBox>
+
+            <!-- Same-timestamp warning -->
+            <HBox fx:id="warnSameTimestamp" alignment="CENTER_LEFT" managed="false" spacing="8" styleClass="warn-banner" visible="false">
+                <ImageView fitHeight="14" fitWidth="14" pickOnBounds="true" preserveRatio="true">
+                    <image><Image url="@Assets/icons8-warning-100.png" /></image>
+                </ImageView>
+                <Label styleClass="field-warn" text="Another event exists at this timestamp. Both will be saved in insertion order." wrapText="true" />
+            </HBox>
+
+            <!-- Buttons -->
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button onAction="#handleCloseEventModal" styleClass="btn-cancel" text="Cancel" />
+                <Button fx:id="btnSubmitEvent" onAction="#handleSubmitEvent" styleClass="btn-add-event" text="Save Event" />
+            </HBox>
+
+        </VBox>
+    </StackPane>
+
+    <!-- ══════════════════════════════════════════════
+         DELETE CONFIRMATION MODAL
+         ══════════════════════════════════════════════ -->
+    <StackPane fx:id="modalDeleteConfirm" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
+
+        <VBox alignment="CENTER" maxWidth="400" spacing="16" styleClass="modal-box">
+            <padding><Insets bottom="28" left="32" right="32" top="28" /></padding>
+
+            <ImageView fitHeight="64" fitWidth="64" pickOnBounds="true" preserveRatio="true">
+                <image><Image url="@Assets/icons8-delete-100.png" /></image>
+            </ImageView>
+
+            <Label styleClass="modal-title" text="Delete Event?" />
+            <Label fx:id="deleteConfirmMessage" styleClass="delete-confirm-sub" text="This action cannot be undone. The event will be removed and logged in the audit trail." wrapText="true" />
+
+            <HBox alignment="CENTER" spacing="12">
+                <Button onAction="#handleCancelDelete" styleClass="btn-cancel" text="Cancel" />
+                <Button fx:id="btnConfirmDelete" onAction="#handleConfirmDelete" styleClass="btn-delete" text="Yes, Delete" />
+            </HBox>
+
+        </VBox>
+    </StackPane>
+
+</fx:root>
