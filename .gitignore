@@ -1,12 +1,12 @@
 # --- IntelliJ IDEA ---
 .idea/**
-# Explicitly un-ignore the "soul" of the project structure
+# Un-ignore the "soul" of the project structure so it works on other laptops
 !.idea/modules.xml
 !.idea/compiler.xml
 !.idea/misc.xml
 !.idea/vcs.xml
 
-# Ignore all other IDE metadata/temp files (fixes the Copilot/Agent XML issue)
+# Ignore all other IDE metadata/temp files
 .idea/*.xml
 .idea/libraries/
 .idea/shelf/
@@ -28,7 +28,16 @@ desktop.ini
 
 # --- Indicium Specific (Database & Logs) ---
 *.db
-*.sql
 *.log
 /evidence_storage/
 config.properties
+
+# IMPORTANT: Ignore your personal password file
+database.properties
+
+# Ignore general SQL dumps, but KEEP the team setup script
+*.sql
+!database_scripts/setup.sql
+
+# Ensure the library JARs are tracked so teammates have the MySQL driver
+!lib/*.jar
