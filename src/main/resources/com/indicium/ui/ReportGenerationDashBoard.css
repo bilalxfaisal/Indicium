@@ -1,0 +1,259 @@
+/* ═══════════════════════════════════════════════════════════
+   INDICIUM — ReportGenerationDashBoard.css
+   ═══════════════════════════════════════════════════════════ */
+
+.root {
+    -fx-background-color: #0D1B1E;
+    -fx-font-family: "Segoe UI";
+}
+
+.corr-content { -fx-background-color: #F5F5F5; }
+
+/* ── Subtitle ── */
+.report-subtitle {
+    -fx-text-fill: #4A6B70;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ── Export buttons ── */
+.btn-export-pdf {
+    -fx-background-color: #0D1B1E;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 18 8 18;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+.btn-export-pdf:hover   { -fx-background-color: #1A2E33; }
+.btn-export-pdf:disabled { -fx-opacity: 0.35; -fx-cursor: default; }
+
+.btn-export-csv {
+    -fx-background-color: transparent;
+    -fx-text-fill: #00BCD4;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #00BCD4;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 8 18 8 18;
+    -fx-cursor: hand;
+}
+.btn-export-csv:hover    { -fx-background-color: #00BCD4; -fx-text-fill: #FFFFFF; }
+.btn-export-csv:disabled { -fx-opacity: 0.35; -fx-cursor: default; }
+
+/* ═══════════════════════════════════════════════════════════
+   REPORT BODY
+   ═══════════════════════════════════════════════════════════ */
+
+.report-body { -fx-background-color: #F5F5F5; }
+
+/* ── Section card ── */
+.report-section {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 20 20 20 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 6, 0, 0, 2);
+}
+
+.report-section-num {
+    -fx-text-fill: #00BCD4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #E0F2F1;
+    -fx-background-radius: 6;
+    -fx-padding: 2 8 2 8;
+}
+.report-section-title {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ── Optional tag ── */
+.optional-tag {
+    -fx-text-fill: #90A4AE;
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #ECEFF1;
+    -fx-background-radius: 10;
+    -fx-padding: 2 8 2 8;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   REPORT TYPE CARDS
+   ═══════════════════════════════════════════════════════════ */
+
+.report-type-card {
+    -fx-background-color: #FAFAFA;
+    -fx-background-radius: 10;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-pref-width: 220;
+    -fx-cursor: hand;
+}
+.report-type-card:hover {
+    -fx-border-color: #00BCD4;
+    -fx-background-color: #F0FDFF;
+}
+.report-type-active {
+    -fx-border-color: #00BCD4;
+    -fx-background-color: #E0F2F1;
+}
+
+.card-type-title {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.card-type-sub {
+    -fx-text-fill: #4A6B70;
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI";
+    -fx-pref-width: 190;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CASE SELECTION
+   ═══════════════════════════════════════════════════════════ */
+
+.case-results-list {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-background-radius: 8;
+}
+.case-result-item {
+    -fx-background-color: transparent;
+    -fx-padding: 10 14 10 14;
+    -fx-cursor: hand;
+    -fx-border-color: transparent transparent #F0F0F0 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.case-result-item:hover  { -fx-background-color: #F5F5F5; }
+.case-result-id          { -fx-text-fill: #90A4AE; -fx-font-size: 11px; -fx-font-family: "Segoe UI"; }
+.case-result-title       { -fx-text-fill: #0D1B1E; -fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: "Segoe UI"; }
+
+/* Selected case chip */
+.selected-case-chip {
+    -fx-background-color: #E0F2F1;
+    -fx-background-radius: 10;
+    -fx-border-color: #00BCD4;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+}
+.chip-case-id    { -fx-text-fill: #00695C; -fx-font-size: 11px; -fx-font-weight: bold; -fx-font-family: "Segoe UI"; }
+.chip-case-title { -fx-text-fill: #0D1B1E; -fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: "Segoe UI"; }
+
+/* ═══════════════════════════════════════════════════════════
+   INCLUDE TOGGLES
+   ═══════════════════════════════════════════════════════════ */
+
+.include-toggle {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+    -fx-pref-width: 180;
+}
+.toggle-on {
+    -fx-background-color: #E0F2F1;
+    -fx-border-color: #00BCD4;
+}
+.toggle-off {
+    -fx-background-color: #FAFAFA;
+    -fx-border-color: #E0E0E0;
+}
+.include-toggle:hover { -fx-border-color: #00BCD4; }
+
+.toggle-label {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.toggle-sub {
+    -fx-text-fill: #4A6B70;
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI";
+}
+.toggle-check {
+    -fx-text-fill: #00BCD4;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.toggle-check-off {
+    -fx-text-fill: #B0BEC5;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PREVIEW SUMMARY BAR
+   ═══════════════════════════════════════════════════════════ */
+
+.preview-bar {
+    -fx-background-color: #0D1B1E;
+    -fx-background-radius: 12;
+    -fx-border-color: transparent;
+    -fx-border-radius: 12;
+}
+
+.preview-bar-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.preview-type-chip {
+    -fx-background-color: #00BCD4;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 20;
+}
+.preview-meta-label {
+    -fx-text-fill: #4A6B70;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.preview-meta-value {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-font-weight: bold;
+}
+
+/* ── Progress bar ── */
+.progress-track {
+    -fx-background-color: #1A2E33;
+    -fx-background-radius: 4;
+    -fx-pref-height: 6;
+    -fx-min-height: 6;
+    -fx-max-height: 6;
+    -fx-min-width: 260;
+}
+.progress-fill {
+    -fx-background-color: #00BCD4;
+    -fx-background-radius: 4;
+    -fx-pref-height: 6;
+    -fx-min-height: 6;
+    -fx-max-height: 6;
+    -fx-pref-width: 0;
+}

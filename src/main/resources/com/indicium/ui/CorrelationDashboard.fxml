@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!--  Stylesheets on fx:root so EVERY child node gets them -->
+<fx:root type="StackPane"
+         xmlns="http://javafx.com/javafx/25"
+         xmlns:fx="http://javafx.com/fxml/1">
+
+    <stylesheets>
+        <URL value="@CaseDashBoard.css" />
+        <URL value="@CorrelationDashboard.css" />
+    </stylesheets>
+
+    <!-- ══════════════════════════════════════════
+         LAYER 1 — MAIN CONTENT
+         ══════════════════════════════════════════ -->
+    <!-- Removed inline stylesheets="" from here -->
+    <VBox spacing="0" styleClass="corr-content"
+          StackPane.alignment="TOP_LEFT">
+
+        <!-- ── Section Header ── -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="cases-header">
+            <padding><Insets bottom="16" left="24" right="24" top="20" /></padding>
+            <VBox spacing="4">
+                <Label styleClass="section-title" text="Cross-Case Correlations" />
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label fx:id="countLinks"
+                           styleClass="count-badge,badge-active" text="0 Links" />
+                </HBox>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnNewLink"
+                    onAction="#handleNewLink"
+                    styleClass="btn-new-case" text="+ New Link" />
+        </HBox>
+
+        <!-- ── Filter Row ── -->
+        <HBox fx:id="filterRow"
+              alignment="CENTER_LEFT" spacing="10" styleClass="filter-row">
+            <padding><Insets bottom="12" left="24" right="24" top="8" /></padding>
+            <HBox alignment="CENTER_LEFT" spacing="6" styleClass="search-box">
+                <ImageView fitHeight="16" fitWidth="16"
+                           pickOnBounds="true" preserveRatio="true">
+                    <image><Image url="@Assets/icons8-search-100.png" /></image>
+                </ImageView>
+                <TextField fx:id="searchField"
+                           onKeyReleased="#handleSearch"
+                           prefWidth="200"
+                           promptText="Search case, evidence..."
+                           styleClass="search-field" />
+            </HBox>
+            <ComboBox fx:id="filterCaseCombo"
+                      onAction="#handleFilter"
+                      prefWidth="150" promptText="Filter by Case"
+                      styleClass="filter-combo" />
+            <ComboBox fx:id="filterTypeCombo"
+                      onAction="#handleFilter"
+                      prefWidth="140" promptText="Evidence Type"
+                      styleClass="filter-combo" />
+            <Button onAction="#handleClearFilters"
+                    styleClass="btn-clear-filters" text="✕ Clear" />
+        </HBox>
+
+        <!-- ── Table Header ── -->
+        <HBox fx:id="tableHeader" spacing="0" styleClass="table-header">
+            <padding><Insets bottom="10" left="24" right="24" top="10" /></padding>
+            <Label prefWidth="200" styleClass="col-header" text="SOURCE EVIDENCE" />
+            <Label prefWidth="160" styleClass="col-header" text="SOURCE CASE" />
+            <Label prefWidth="60"  styleClass="col-header" text="" />
+            <Label prefWidth="200" styleClass="col-header" text="TARGET EVIDENCE" />
+            <Label prefWidth="160" styleClass="col-header" text="TARGET CASE" />
+            <Label styleClass="col-header" text="LINKED BY / DATE"
+                   HBox.hgrow="ALWAYS" />
+        </HBox>
+
+        <!-- ── Scrollable area ── -->
+        <ScrollPane fx:id="mainScroll"
+                    fitToWidth="true"
+                    styleClass="cases-scroll"
+                    VBox.vgrow="ALWAYS">
+
+            <VBox fx:id="scrollContent" spacing="0">
+
+                <!-- VIEW A — Existing Links List -->
+                <VBox fx:id="viewLinksList" spacing="0" styleClass="case-list">
+
+                    <VBox fx:id="emptyState"
+                          alignment="CENTER" spacing="12"
+                          styleClass="empty-state">
+                        <padding><Insets top="80" /></padding>
+                        <ImageView fitHeight="64" fitWidth="64"
+                                   pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@Assets/icons8-link-100.png" />
+                            </image>
+                        </ImageView>
+                        <Label styleClass="empty-title"
+                               text="No correlations yet." />
+                        <Label styleClass="empty-sub"
+                               text="Link evidence across cases to map cross-case patterns." />
+                        <Button onAction="#handleNewLink"
+                                styleClass="btn-new-case" text="+ New Link" />
+                    </VBox>
+
+                </VBox>
+
+                <!-- VIEW B — Wizard -->
+                <VBox fx:id="viewWizard"
+                      managed="false" visible="false"
+                      spacing="0" styleClass="case-list">
+
+                    <!-- Breadcrumb -->
+                    <HBox alignment="CENTER_LEFT" spacing="8"
+                          styleClass="wizard-breadcrumb">
+                        <padding>
+                            <Insets bottom="12" left="24" right="24" top="16" />
+                        </padding>
+                        <Label fx:id="stepOne"
+                               styleClass="step-chip,step-active"
+                               text="1  Source" />
+                        <Label styleClass="step-arrow" text="›" />
+                        <Label fx:id="stepTwo"
+                               styleClass="step-chip,step-inactive"
+                               text="2  Target Case" />
+                        <Label styleClass="step-arrow" text="›" />
+                        <Label fx:id="stepThree"
+                               styleClass="step-chip,step-inactive"
+                               text="3  Target Evidence" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button onAction="#handleCancelWizard"
+                                styleClass="btn-clear-filters" text="✕ Cancel" />
+                    </HBox>
+
+                    <!-- Two-panel body -->
+                    <HBox spacing="0" VBox.vgrow="ALWAYS">
+
+                        <!-- LEFT PANEL — Source -->
+                        <VBox fx:id="panelSource"
+                              prefWidth="420" spacing="0"
+                              styleClass="wizard-panel"
+                              HBox.hgrow="ALWAYS">
+
+                            <HBox alignment="CENTER_LEFT" spacing="8"
+                                  styleClass="wizard-panel-header">
+                                <padding>
+                                    <Insets bottom="10" left="16" right="16" top="12" />
+                                </padding>
+                                <Label styleClass="wizard-panel-title"
+                                       text="Source Evidence" />
+                            </HBox>
+
+                            <VBox spacing="6" styleClass="wizard-panel-section">
+                                <padding>
+                                    <Insets bottom="12" left="16" right="16" top="12" />
+                                </padding>
+                                <Label styleClass="form-label"
+                                       text="SELECT SOURCE CASE" />
+                                <ComboBox fx:id="sourceCaseCombo"
+                                          onAction="#handleSourceCaseSelected"
+                                          prefWidth="388"
+                                          promptText="Choose a case..."
+                                          styleClass="filter-combo" />
+                            </VBox>
+
+                            <ScrollPane fitToWidth="true"
+                                        prefHeight="340"
+                                        styleClass="cases-scroll">
+                                <VBox fx:id="sourceEvidenceList"
+                                      spacing="0"
+                                      styleClass="evidence-pick-list">
+                                    <VBox fx:id="sourceEmptyHint"
+                                          alignment="CENTER" spacing="8">
+                                        <padding><Insets top="40" /></padding>
+                                        <Label styleClass="empty-sub"
+                                               text="Select a case to browse its evidence." />
+                                    </VBox>
+                                </VBox>
+                            </ScrollPane>
+
+                        </VBox>
+
+                        <!-- DIVIDER -->
+                        <Region prefWidth="1" styleClass="panel-divider" />
+
+                        <!-- RIGHT PANEL — Target -->
+                        <VBox fx:id="panelTarget"
+                              prefWidth="420" spacing="0"
+                              styleClass="wizard-panel"
+                              HBox.hgrow="ALWAYS">
+
+                            <HBox alignment="CENTER_LEFT" spacing="8"
+                                  styleClass="wizard-panel-header">
+                                <padding>
+                                    <Insets bottom="10" left="16" right="16" top="12" />
+                                </padding>
+                                <Label styleClass="wizard-panel-title"
+                                       text="Target Evidence" />
+                            </HBox>
+
+                            <VBox spacing="6" styleClass="wizard-panel-section">
+                                <padding>
+                                    <Insets bottom="12" left="16" right="16" top="12" />
+                                </padding>
+                                <Label styleClass="form-label"
+                                       text="SEARCH TARGET CASE" />
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <TextField fx:id="targetCaseSearch"
+                                               onKeyReleased="#handleTargetCaseSearch"
+                                               prefWidth="310"
+                                               promptText="Case ID or title..."
+                                               styleClass="search-field,search-box" />
+                                    <Button onAction="#handleTargetCaseSearch"
+                                            styleClass="btn-open" text="Search" />
+                                </HBox>
+                                <VBox fx:id="targetCaseResults"
+                                      managed="false" visible="false"
+                                      spacing="4"
+                                      styleClass="case-results-list" />
+                            </VBox>
+
+                            <ScrollPane fitToWidth="true"
+                                        prefHeight="260"
+                                        styleClass="cases-scroll">
+                                <VBox fx:id="targetEvidenceList"
+                                      spacing="0"
+                                      styleClass="evidence-pick-list">
+                                    <VBox fx:id="targetEmptyHint"
+                                          alignment="CENTER" spacing="8">
+                                        <padding><Insets top="40" /></padding>
+                                        <Label styleClass="empty-sub"
+                                               text="Search and select a target case first." />
+                                    </VBox>
+                                </VBox>
+                            </ScrollPane>
+
+                        </VBox>
+
+                    </HBox>
+
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+
+        <!-- ── Link Preview Bar ── -->
+        <HBox fx:id="linkPreviewBar"
+              alignment="CENTER"
+              managed="false" visible="false"
+              spacing="20"
+              styleClass="link-preview-bar">
+            <padding><Insets bottom="16" left="24" right="24" top="16" /></padding>
+
+            <VBox fx:id="previewSourceBox"
+                  alignment="CENTER_LEFT" spacing="4"
+                  styleClass="preview-evidence-chip">
+                <padding><Insets bottom="10" left="14" right="14" top="10" /></padding>
+                <Label fx:id="previewSourceName"
+                       styleClass="preview-ev-name" text="—" />
+                <Label fx:id="previewSourceCase"
+                       styleClass="preview-ev-case" text="—" />
+            </VBox>
+
+            <HBox alignment="CENTER" spacing="4">
+                <Region prefHeight="2" prefWidth="40"
+                        styleClass="connector-dash" HBox.hgrow="ALWAYS" />
+                <Label styleClass="connector-icon" text="⇄" />
+                <Region prefHeight="2" prefWidth="40"
+                        styleClass="connector-dash" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <VBox fx:id="previewTargetBox"
+                  alignment="CENTER_LEFT" spacing="4"
+                  styleClass="preview-evidence-chip">
+                <padding><Insets bottom="10" left="14" right="14" top="10" /></padding>
+                <Label fx:id="previewTargetName"
+                       styleClass="preview-ev-name" text="—" />
+                <Label fx:id="previewTargetCase"
+                       styleClass="preview-ev-case" text="—" />
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Label fx:id="lblConflict"
+                   managed="false" visible="false"
+                   styleClass="conflict-warning"
+                   text="⚠  Link already exists." />
+
+            <Button fx:id="btnCreateLink"
+                    disable="true"
+                    onAction="#handleCreateLink"
+                    styleClass="btn-new-case" text="Create Link" />
+        </HBox>
+
+    </VBox>
+
+    <!-- ══════════════════════════════════════════
+         LAYER 2 — DELETE CONFIRM MODAL
+         ══════════════════════════════════════════ -->
+    <StackPane fx:id="modalOverlay"
+               alignment="CENTER"
+               managed="false" visible="false"
+               styleClass="modal-overlay">
+
+        <VBox alignment="TOP_CENTER" maxWidth="420"
+              spacing="16" styleClass="modal-box">
+            <padding><Insets bottom="28" left="32" right="32" top="28" /></padding>
+
+            <HBox alignment="CENTER_LEFT">
+                <Label styleClass="modal-title"
+                       text="Remove Link" HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleCloseModal"
+                        styleClass="modal-close-btn" text="✕" />
+            </HBox>
+
+            <Label styleClass="form-label"
+                   text="Are you sure you want to remove this correlation link? This action is logged but cannot be undone."
+                   wrapText="true" />
+
+            <Label fx:id="modalLinkSummary"
+                   styleClass="case-id" text="" wrapText="true" />
+
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button onAction="#handleCloseModal"
+                        styleClass="btn-cancel" text="Cancel" />
+                <Button fx:id="btnConfirmDelete"
+                        onAction="#handleConfirmDelete"
+                        styleClass="btn-delete" text="Remove Link" />
+            </HBox>
+
+        </VBox>
+    </StackPane>
+
+</fx:root>
