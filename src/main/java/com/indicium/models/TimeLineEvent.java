@@ -8,8 +8,7 @@ public class TimeLineEvent {
     private String description; // Small 'd' is standard Java naming
     private int linkedEvidenceID;
 
-    // Keep the private constructor for internal assignment
-    private TimeLineEvent(LocalDateTime timestamp, String description, int linkedEvidenceID) {
+    public TimeLineEvent(LocalDateTime timestamp, String description, int linkedEvidenceID) {
         this.timestamp = timestamp;
         this.description = description;
         this.linkedEvidenceID = linkedEvidenceID;
