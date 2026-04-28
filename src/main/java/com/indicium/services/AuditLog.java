@@ -1,9 +1,5 @@
 package com.indicium.services;
-
 import com.indicium.repository.LogsRepo;
-import com.mysql.cj.log.NullLogger;
-
-import javax.swing.*;
 
 public class AuditLog {
     LogsRepo logsRepo;
