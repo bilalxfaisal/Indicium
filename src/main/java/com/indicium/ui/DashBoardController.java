@@ -200,7 +200,12 @@ public class DashBoardController extends BorderPane {
 
     }
     @FXML private void handleSideSettings()    { setActiveSideNav(sideSettings);  /* TODO */ }
-    @FXML private void handleSideIntegrity()   { setActiveSideNav(sideIntegrity); /* TODO */ }
+    @FXML private void handleSideIntegrity()
+    {
+        setActiveSideNav(sideIntegrity);
+        navigateTo(new IntegrityManagerDashboardController());
+
+    }
     @FXML private void handleSideUserManager() { setActiveSideNav(sideUserMgr);   /* TODO */ }
 
     // ── Active state helpers ──
