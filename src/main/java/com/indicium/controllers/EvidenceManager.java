@@ -2,6 +2,7 @@ package com.indicium.controllers;
 import com.indicium.models.Evidence;
 import com.indicium.models.Case;
 import com.indicium.services.AuditLog;
+import com.indicium.services.AuditCategory;
 import com.indicium.services.HashGenerator;
 import com.indicium.repository.EvidenceRepo;
 import com.indicium.ui.EvidenceDashBoardController;
@@ -13,8 +14,7 @@ import com.indicium.models.EvidenceStatus;
 
 public class EvidenceManager
 {
-    AuditLog auditLog = new AuditLog();
-    public Evidence ingestEvidence(int caseID, String caseTitle, File file)
+    public Evidence ingestEvidence(int userID, int caseID, String caseTitle, File file)
     {
         if (file == null || !file.exists())
         {
@@ -52,14 +52,15 @@ public class EvidenceManager
         // Step 6: Save to repository (UC5 - AddEvidence)
         EvidenceRepo.add(evidence, caseID);
 
+        AuditLog audit = new AuditLog();
         // Step 7: Log the event (UC5 - AddEvidenceLog(fileHash, Case))
-//        auditLog.logEvidenceEvent("INGEST", evidence.getEvidenceID(), caseID, fileHash);
+        audit.logEvent(userID, "INGEST", AuditCategory.EVIDENCE, caseID, evidence.getEvidenceID());
 
         System.out.println("[EvidenceManager] Evidence ingested successfully: ID=" + evidence.getEvidenceID());
         return evidence;
     }
 
-    public void requestMedia(String actionType, int evidenceID, int userID)
+    public void requestMedia(String actionType, int evidenceID, int caseID, int userID)
     {
         // Step # 1: Get Evidence Details
         Evidence evidence = EvidenceRepo.getEvidence(evidenceID);
@@ -78,14 +79,15 @@ public class EvidenceManager
             return;
         }
 
+        AuditLog audit = new AuditLog();
         if (actionType.equals("View"))
         {
-            AuditLog.createLog("View", evidenceID, userID);
+            audit.logEvent(userID, "View", AuditCategory.EVIDENCE, caseID, evidenceID);
             EvidenceDashBoardController.openOnlinePlayer(file);
         }
         else if (actionType.equals("Download"))
         {
-            AuditLog.createLog("Download", evidenceID);
+            audit.logEvent(userID, "Download", AuditCategory.EVIDENCE, caseID, evidenceID);
             EvidenceDashBoardController.askForConfirmation();
         }
     }

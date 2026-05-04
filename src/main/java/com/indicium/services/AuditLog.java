@@ -1,5 +1,6 @@
 package com.indicium.services;
 import com.indicium.repository.LogsRepo;
+import com.indicium.services.AuditCategory;
 
 public class AuditLog {
     LogsRepo logsRepo;

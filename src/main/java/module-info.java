@@ -5,6 +5,7 @@ module com.indicium {
     requires java.sql;
     requires java.desktop;
     requires mysql.connector.j;
+    requires itextpdf;
 
     // This allows JavaFX to "see" your UI classes to render them
     opens com.indicium.ui to javafx.fxml;

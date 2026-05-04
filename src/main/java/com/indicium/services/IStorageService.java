@@ -1,4 +1,10 @@
 package com.indicium.services;
 
-public interface IStorageService {
+import java.io.File;
+
+public interface IStorageService
+{
+    String saveFile(String filePath);
+    boolean moveToArchive(String filePath);
+    File retrieveFromArchive(String filePath);
 }

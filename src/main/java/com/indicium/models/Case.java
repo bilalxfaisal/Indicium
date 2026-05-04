@@ -2,7 +2,9 @@ package com.indicium.models;
 
 import com.indicium.repository.CaseRepository;
 import com.indicium.services.AccessManager;
-
+import com.indicium.models.Evidence;
+import com.indicium.models.CaseStatus;
+import com.indicium.models.TimeLineEvent;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -16,7 +18,6 @@ public class Case {
     // Evidence List
     private ArrayList<Evidence> evidenceList;
     private ArrayList<TimeLineEvent> timeLineEventsList;
-
 
     public int getCaseID() {return caseID;}
     //public void setCaseID(int caseID) {this.caseID = caseID;}
@@ -74,10 +75,10 @@ public class Case {
     }
 
     public boolean verifyStandardViewingPrivileges(int investigatorID){
-//       if (AccessManager.isLockDownActive()){
-//           System.out.println("[SECURITY] Access Denied. LockDown is Active.");
-//           return false;
-//       }
+       if (AccessManager.isLockdownActive()){
+           System.out.println("[SECURITY] Access Denied. LockDown is Active.");
+           return false;
+       }
 
         // if case is archived, standard investigators cannot view it
         if(this.status == CaseStatus.ARCHIVED){

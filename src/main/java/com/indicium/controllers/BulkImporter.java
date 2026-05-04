@@ -3,6 +3,7 @@ package com.indicium.controllers;
 import com.indicium.models.Evidence;
 import com.indicium.repository.EvidenceRepo;
 import com.indicium.services.AuditLog;
+import com.indicium.services.AuditCategory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,12 +65,13 @@ public class BulkImporter
         }
     }
 
-//    public String confirmImport(int userID)
-//    {
-//        int count = this.pendingImportBuffer.size();
-//
-//        String report = AuditLog.record("BulkImportEvent", userID, count);
-//
-//        return report;
-//    }
+    public String confirmImport(int userID)
+    {
+        int count = this.pendingImportBuffer.size();
+
+        AuditLog audit = new AuditLog();
+        String report = audit.logEvent(userID, "BulkImportEvent", AuditCategory.USER);
+
+        return report;
+    }
 }
