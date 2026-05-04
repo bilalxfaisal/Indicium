@@ -26,6 +26,20 @@ public class HashGenerator {
         }
     }
 
+    public static String generateSHA256FromString(String content){
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(content.getBytes("UTF-8"));
+            return bytesToHex(hashBytes);
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("SHA-256 Algorithm not available: " + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            System.err.println("String Hash Generation Failed: " + e.getMessage());
+            return null;
+        }
+    }
+
     // Helper method to keep the main logic clean
     private static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);
