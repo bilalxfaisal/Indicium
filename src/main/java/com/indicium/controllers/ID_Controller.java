@@ -4,62 +4,49 @@ import com.indicium.models.SystemUser;
 import com.indicium.models.UserRole;
 import com.indicium.services.AuditLog;
 import com.indicium.services.AuditCategory;
-import com.indicium.repository.UserDirectory;
 
-/**
- * ID_Controller manages the lifecycle of user identities.
- * It coordinates between the UI and the UserRepository to create and modify profiles.
- *
- */
-public class ID_Controller {
+public class IdentityController
+{
 
     private AuditLog auditLog;
-    private UserDirectory userRepo;
 
-    public ID_Controller() {
+    public IdentityController()
+    {
         this.auditLog = new AuditLog();
-        this.userRepo = new UserDirectory();
     }
 
     /**
-     * UC1: Manage User Identity
-     * Validates input and updates the system database.
+     * Call #6 in UC1 Diagram: submitChanges(details)
      */
-    public String manageIdentity(int adminID, int targetUserID, String name, String email, UserRole role, String credentials) {
-
-        // 1. Validation: Check if email is unique for new/modified accounts
-        //
-        if (!userRepo.isEmailUnique(email)) {
-            // Extension 2a: Duplicate ID conflict
-            return "Error: Duplicate ID conflict. The email " + email + " is already registered.";
+    public String submitChanges(int adminID, int targetUserID, String name, String email, UserRole role, String credentials)
+    {
+        // Call #7: validateUniqueEmail(email) -> :User
+        if (!SystemUser.validateUniqueEmail(email))
+        {
+            return "Error: Email already exists.";
         }
 
-        // 2. Validation: Ensure a valid role is assigned
-        //
-        if (role == null) {
-            return "Security Policy Violation: Role assignment rejected.";
+        // Call #9: checkValidRole(role) -> :User
+        if (!SystemUser.checkValidRole(role))
+        {
+            return "Error: Invalid role assignment.";
         }
 
-        // 3. Update Database
-        // Creating the profile object to be saved
-        // Note: If SystemUser remains abstract, this line will require a concrete subclass.
-        SystemUser profile = new SystemUser(targetUserID, name, email, credentials, role) {};
+        // Create the object instance
+        SystemUser profile = new SystemUser(targetUserID, name, email, credentials, role, true);
 
-        boolean isSaved = userRepo.save(profile);
+        // Call #11: saveUserRecord(details) -> :User
+        boolean isSaved = profile.saveUserRecord();
 
-        if (!isSaved) {
-            // Extension 4a: Database Connectivity Failure
-            return "System Error: Database connectivity failure. Please try again later.";
+        if (isSaved)
+        {
+            // Call #13: recordTransaction -> :AuditLog
+            auditLog.logEvent(adminID, "User Created: " + name, AuditCategory.USER);
+
+            // Call #15: actionComplete
+            return "Success: User profile updated.";
         }
 
-        // 4. Record the transaction in the audit log
-        //
-        auditLog.logEvent(
-                adminID,
-                "Updated identity for user: " + name + " (Role: " + role + ")",
-                AuditCategory.USER
-        );
-
-        return "Success: User identity for " + name + " has been updated and logged.";
+        return "Database Error: Could not save record.";
     }
 }
