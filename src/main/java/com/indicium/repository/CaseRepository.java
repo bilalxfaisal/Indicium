@@ -100,6 +100,27 @@ public class CaseRepository {
         }
         return cases;
     }
+    public List<Case> findByFilter(String condition)
+    {
+        List<Case> cases = new ArrayList<>();
+
+        // Append the dynamically built condition to the base SELECT statement
+        String sql = "SELECT * FROM Cases WHERE " + condition;
+
+        try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                // Assuming you already have this helper method in your class
+                cases.add(extractCaseFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("[CaseRepo] ERROR executing dynamic filter query: " + e.getMessage());
+        }
+
+        return cases;
+    }
 
     // Overload for dynamic search queries (from openCaseSearchPanel)
     public List<Case> findByFilter(String customQuery) {
