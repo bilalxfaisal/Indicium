@@ -80,26 +80,6 @@ public class CaseRepository {
         return null;
     }
 
-    // Overload for searching by specific status (e.g., CLOSED)
-    public List<Case> findByFilter(CaseStatus status) {
-        List<Case> cases = new ArrayList<>();
-        String sql = "SELECT * FROM Cases WHERE Status = ?";
-
-        try (Connection con = DriverManager.getConnection(URL, USER, PASS);
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            stmt.setString(1, status.name());
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    cases.add(extractCaseFromResultSet(rs));
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("[CaseRepo] ERROR filtering cases by status: " + e.getMessage());
-        }
-        return cases;
-    }
     public List<Case> findByFilter(String condition)
     {
         List<Case> cases = new ArrayList<>();
@@ -119,25 +99,6 @@ public class CaseRepository {
             System.err.println("[CaseRepo] ERROR executing dynamic filter query: " + e.getMessage());
         }
 
-        return cases;
-    }
-
-    // Overload for dynamic search queries (from openCaseSearchPanel)
-    public List<Case> findByFilter(String customQuery) {
-        List<Case> cases = new ArrayList<>();
-        // Note: Assuming customQuery is a valid SQL string built by CaseFilter
-        String sql = "SELECT * FROM Cases WHERE " + customQuery;
-
-        try (Connection con = DriverManager.getConnection(URL, USER, PASS);
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                cases.add(extractCaseFromResultSet(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("[CaseRepo] ERROR executing custom filter: " + e.getMessage());
-        }
         return cases;
     }
 

@@ -1,5 +1,6 @@
 package com.indicium.models;
 import com.indicium.models.UserRole;
+import com.indicium.models.UserAuth;
 
 public abstract class SystemUser
 {
