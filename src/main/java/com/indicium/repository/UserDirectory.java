@@ -1,6 +1,8 @@
 package com.indicium.repository;
 
 import com.indicium.models.SystemUser;
+import com.indicium.models.UserRole; // Make sure to import the enum!
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -36,7 +38,7 @@ public class UserDirectory {
     }
 
     // ===================================================================================
-    // CORE FUNCTIONS (From Sequence/Class Diagrams)
+    // CORE FUNCTIONS
     // ===================================================================================
 
     public static SystemUser findUser(int userID) {
@@ -58,7 +60,6 @@ public class UserDirectory {
     }
 
     public static SystemUser authenticate(String email, String hashedInputPassword) {
-        // Only allows active users to log in
         String sql = "SELECT * FROM Users WHERE Email = ? AND PasswordHash = ? AND IsActive = TRUE";
 
         try (Connection con = DriverManager.getConnection(URL, USER, PASS);
@@ -75,7 +76,7 @@ public class UserDirectory {
         } catch (SQLException e) {
             System.err.println("[UserDirectory] ERROR authenticating: " + e.getMessage());
         }
-        return null; // Login failed (wrong email, password, or account deactivated)
+        return null;
     }
 
     // ===================================================================================
@@ -84,8 +85,9 @@ public class UserDirectory {
 
     /**
      * Registers a new investigator/admin in the system.
+     * UPDATED: Now accepts UserRole enum.
      */
-    public static boolean addUser(String fullName, String email, String passwordHash, String role) {
+    public static boolean addUser(String fullName, String email, String passwordHash, UserRole role) {
         String sql = "INSERT INTO Users (FullName, Email, PasswordHash, Role) VALUES (?, ?, ?, ?)";
 
         try (Connection con = DriverManager.getConnection(URL, USER, PASS);
@@ -94,7 +96,8 @@ public class UserDirectory {
             stmt.setString(1, fullName);
             stmt.setString(2, email);
             stmt.setString(3, passwordHash);
-            stmt.setString(4, role);
+            // Convert Enum to String for the database
+            stmt.setString(4, role.name());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -103,10 +106,6 @@ public class UserDirectory {
         }
     }
 
-    /**
-     * Soft-deletes a user (prevents login but keeps their audit logs intact).
-     * In forensics, you NEVER physically delete a user from the database.
-     */
     public static boolean deactivateUser(int userID) {
         String sql = "UPDATE Users SET IsActive = FALSE WHERE UserID = ?";
 
@@ -122,15 +121,17 @@ public class UserDirectory {
     }
 
     /**
-     * Updates an investigator's role (e.g., promoting them to ADMIN).
+     * Updates an investigator's role.
+     * UPDATED: Now accepts UserRole enum.
      */
-    public static boolean updateRole(int userID, String newRole) {
+    public static boolean updateRole(int userID, UserRole newRole) {
         String sql = "UPDATE Users SET Role = ? WHERE UserID = ?";
 
         try (Connection con = DriverManager.getConnection(URL, USER, PASS);
              PreparedStatement stmt = con.prepareStatement(sql)) {
 
-            stmt.setString(1, newRole);
+            // Convert Enum to String for the database
+            stmt.setString(1, newRole.name());
             stmt.setInt(2, userID);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -139,9 +140,6 @@ public class UserDirectory {
         }
     }
 
-    /**
-     * Fetches all active users (useful for populating assignment dropdowns in the UI).
-     */
     public static List<SystemUser> getAllActiveUsers() {
         List<SystemUser> activeUsers = new ArrayList<>();
         String sql = "SELECT * FROM Users WHERE IsActive = TRUE";
@@ -163,14 +161,25 @@ public class UserDirectory {
     // HELPER METHOD
     // ===================================================================================
     private static SystemUser extractUserFromResultSet(ResultSet rs) throws SQLException {
-        // Adjust these variables based on your actual SystemUser.java constructor
         int id = rs.getInt("UserID");
         String name = rs.getString("FullName");
         String email = rs.getString("Email");
         String hash = rs.getString("PasswordHash");
-        String role = rs.getString("Role");
         boolean isActive = rs.getBoolean("IsActive");
 
-        return new SystemUser(id, name, email, hash, role, isActive);
+        // Fetch the role string from the database
+        String roleString = rs.getString("Role");
+        UserRole uRole;
+
+        // Convert the string to the Enum safely
+        try {
+            // .toUpperCase() ensures it matches the enum exactly, even if DB has "admin"
+            uRole = UserRole.valueOf(roleString.toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            System.err.println("Warning: Unknown role found in DB. Defaulting to INVESTIGATOR.");
+            uRole = UserRole.INVESTIGATOR; // Fallback to prevent application crashes
+        }
+
+        return new SystemUser(id, name, email, hash, uRole, isActive);
     }
 }

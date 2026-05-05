@@ -1,4 +1,4 @@
-package main.java.com.indicium.controllers;
+package com.indicium.controllers;
 
 public enum FilterType
 {
