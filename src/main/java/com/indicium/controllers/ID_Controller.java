@@ -5,12 +5,12 @@ import com.indicium.models.UserRole;
 import com.indicium.services.AuditLog;
 import com.indicium.services.AuditCategory;
 
-public class IdentityController
+public class ID_Controller
 {
 
     private AuditLog auditLog;
 
-    public IdentityController()
+    public ID_Controller()
     {
         this.auditLog = new AuditLog();
     }

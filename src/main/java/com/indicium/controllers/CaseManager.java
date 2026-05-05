@@ -32,16 +32,16 @@ public class CaseManager {
         this.hashGenerator = new HashGenerator();
     }
 
-    public int initializeCase(String title, LocalDateTime datetime) {
+    public int initializeCase(String title, LocalDateTime datetime , int investigatorID) {
         Case newCase = new Case(title, datetime);
         caseRepo.save(newCase);
-        auditLog.logEvent("New Case Created", newCase.getCaseID());
+        auditLog.logEvent(investigatorID,"Case Initialized", AuditCategory.CASE );
         return newCase.getCaseID();
     }
 
     public Case getCase(int caseID, int investigatorID) {
         if (!accessManager.verifyPrivileges(investigatorID, caseID)) {
-            auditLog.logEvent("Unauthorized Access Attempt", caseID);
+            auditLog.logEvent(investigatorID, "Unauthorized Access Attempt", AuditCategory.SECURITY, caseID);
             throw new SecurityException("Access Denied");
         }
         return caseRepo.findById(caseID);
@@ -49,7 +49,7 @@ public class CaseManager {
 
     public boolean startNewInvestigation(int investigatorID) {
         if (!userAuth.verifyUserPermissions(investigatorID)) {
-            auditLog.logEvent("Unauthorized Investigation Start Attempt", investigatorID);
+            auditLog.logEvent(investigatorID, "Unauthorized Investigation Start Attempt", AuditCategory.SECURITY);
             return false;
         }
         return true;
@@ -63,7 +63,7 @@ public class CaseManager {
      * UC-12: Integrity Verification
      * Compares the DB hash (original) vs the Disk hash (current).
      */
-    public boolean verifyDigitalFootprints(int[] caseIDs) {
+    public boolean verifyDigitalFootprints(int investigatorID, int[] caseIDs) {
         boolean allIntact = true;
 
         for (int id : caseIDs) {
@@ -73,7 +73,7 @@ public class CaseManager {
                 String currentPhysicalHash = HashGenerator.generateSHA256(e.getFilePath());
 
                 if (!e.verifyIntegrity(currentPhysicalHash)) {
-                    auditLog.logEvent("FORENSIC ALERT: Integrity Violation for Evidence " + e.getEvidenceID(), id);
+                    auditLog.logEvent(investigatorID, "FORENSIC ALERT: Integrity Violation for Evidence " + e.getEvidenceID(), AuditCategory.EVIDENCE, id);
                     allIntact = false;
                 }
             }
@@ -84,12 +84,12 @@ public class CaseManager {
     /**
      * UC-12: Archiving Logic
      */
-    public int removeFromActiveSpace(int[] caseIDs) {
+    public int removeFromActiveSpace(int investigatorID, int[] caseIDs) {
         int count = 0;
         for (int id : caseIDs) {
             try {
-                if (!verifyDigitalFootprints(new int[]{id})) {
-                    auditLog.logEvent("Archive Aborted: Integrity check failed for Case " + id, id);
+                if (!verifyDigitalFootprints(investigatorID, new int[]{id})) {
+                    auditLog.logEvent(investigatorID, "Archive Aborted: Integrity check failed for Case " + id, AuditCategory.CASE, id);
                     continue;
                 }
 
@@ -101,12 +101,12 @@ public class CaseManager {
                     boolean moved = storageService.moveToArchive("data/cases/" + id);
 
                     if (moved) {
-                        auditLog.logEvent("Case Archived and Moved to Long Term Storage", id);
+                        auditLog.logEvent(investigatorID, "Case Archived and Moved to Long Term Storage", AuditCategory.CASE, id);
                         count++;
                     }
                 }
             } catch (Exception e) {
-                auditLog.logEvent("Archiving Failed for Case: " + id, id);
+                auditLog.logEvent(investigatorID, "Archiving Failed for Case: " + id, AuditCategory.CASE, id);
             }
         }
         return count;
@@ -126,12 +126,12 @@ public class CaseManager {
     /**
      * 2. Validates the search criteria entered by the user
      */
-    public boolean selectFilter(String criteria) {
+    public boolean selectFilter(int investigatorID, String criteria) {
         CaseFilter filter = new CaseFilter();
         boolean isValid = filter.validate(criteria);
 
         if (!isValid) {
-            auditLog.logEvent("Invalid Filter Criteria Attempted", -1);
+            auditLog.logEvent(investigatorID, "Invalid Filter Criteria Attempted", AuditCategory.SECURITY);
         }
         return isValid;
     }
@@ -139,14 +139,14 @@ public class CaseManager {
     /**
      * 3. Builds the query and fetches the data from the repository
      */
-    public List<Case> applyFilter(String criteria) {
+    public List<Case> applyFilter(int investigatorID, String criteria) {
         CaseFilter filter = new CaseFilter();
 
         // Fixed: Passed the 'criteria' into buildQuery so it knows what to search
         String query = filter.buildQuery(criteria);
 
         List<Case> matchingCases = caseRepo.findByFilter(query);
-        auditLog.logEvent("Filtered Case Search Performed", -1);
+        auditLog.logEvent(investigatorID, "Filtered Case Search Performed", AuditCategory.CASE);
 
         return matchingCases;
     }

@@ -77,6 +77,7 @@ public class CaseFilter
         }
 
         this.validatedCriteria = new FilterCriteria(type, value);
+        return  false;
     }
 
     private class FilterCriteria
