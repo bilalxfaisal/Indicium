@@ -1,0 +1,201 @@
+/* ═══════════════════════════════════════════════════════════
+   INDICIUM — SettingsDashboard.css
+   ═══════════════════════════════════════════════════════════ */
+
+.root {
+    -fx-background-color: #0D1B1E;
+    -fx-font-family: "Segoe UI";
+}
+
+.corr-content { -fx-background-color: #F5F5F5; }
+.report-body  { -fx-background-color: #F5F5F5; }
+
+.report-subtitle {
+    -fx-text-fill: #4A6B70;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION CARDS  (same pattern as ReportGen / Integrity)
+   ═══════════════════════════════════════════════════════════ */
+
+.report-section {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 6, 0, 0, 2);
+}
+
+.report-section-num {
+    -fx-text-fill: #00BCD4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #E0F2F1;
+    -fx-background-radius: 6;
+    -fx-padding: 2 8 2 8;
+}
+.report-section-title {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.section-description {
+    -fx-text-fill: #4A6B70;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ═══════════════════════════════════════════════════════════
+   AVATAR
+   ═══════════════════════════════════════════════════════════ */
+
+.avatar-circle {
+    -fx-background-color: #0D1B1E;
+    -fx-background-radius: 50;
+    -fx-min-width: 80;
+    -fx-min-height: 80;
+    -fx-max-width: 80;
+    -fx-max-height: 80;
+}
+.avatar-initials {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.avatar-name {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+
+/* Role chip */
+.settings-role-chip {
+    -fx-background-color: #E0F2F1;
+    -fx-text-fill: #00695C;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 20;
+}
+.settings-user-id {
+    -fx-text-fill: #90A4AE;
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FORM FIELDS
+   ═══════════════════════════════════════════════════════════ */
+
+.form-field {
+    -fx-background-color: #FAFAFA;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 10 12 10 12;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-text-fill: #0D1B1E;
+}
+.form-field:focused {
+    -fx-border-color: #00BCD4;
+    -fx-background-color: #FFFFFF;
+}
+.field-readonly {
+    -fx-background-color: #ECEFF1;
+    -fx-text-fill: #90A4AE;
+    -fx-border-color: #E0E0E0;
+}
+.field-readonly:focused {
+    -fx-border-color: #E0E0E0;
+    -fx-background-color: #ECEFF1;
+}
+.field-error-border {
+    -fx-border-color: #EF5350;
+}
+.field-error {
+    -fx-text-fill: #EF5350;
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PASSWORD STRENGTH BAR
+   ═══════════════════════════════════════════════════════════ */
+
+.progress-track {
+    -fx-background-color: #ECEFF1;
+    -fx-background-radius: 4;
+    -fx-pref-height: 6;
+    -fx-min-height: 6;
+    -fx-max-height: 6;
+}
+
+/* Strength fills */
+.strength-fill-weak   { -fx-background-color: #EF5350; -fx-background-radius: 4; -fx-pref-width: 80;  -fx-pref-height: 6; -fx-min-height: 6; -fx-max-height: 6; }
+.strength-fill-medium { -fx-background-color: #FFA726; -fx-background-radius: 4; -fx-pref-width: 160; -fx-pref-height: 6; -fx-min-height: 6; -fx-max-height: 6; }
+.strength-fill-strong { -fx-background-color: #43A047; -fx-background-radius: 4; -fx-pref-width: 280; -fx-pref-height: 6; -fx-min-height: 6; -fx-max-height: 6; }
+
+/* Strength labels */
+.strength-label-weak   { -fx-text-fill: #EF5350; -fx-font-size: 11px; -fx-font-weight: bold; -fx-font-family: "Segoe UI"; }
+.strength-label-medium { -fx-text-fill: #FFA726; -fx-font-size: 11px; -fx-font-weight: bold; -fx-font-family: "Segoe UI"; }
+.strength-label-strong { -fx-text-fill: #43A047; -fx-font-size: 11px; -fx-font-weight: bold; -fx-font-family: "Segoe UI"; }
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════════════ */
+
+.toast-content {
+    -fx-background-color: #0D1B1E;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.20), 12, 0, 0, 4);
+}
+.toast-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-font-weight: bold;
+}
+.cases-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.cases-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.cases-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8px;
+}
+
+.cases-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #B0BEC5;
+    -fx-background-radius: 4;
+}
+
+.cases-scroll .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.cases-scroll .scroll-bar:vertical .increment-button,
+.cases-scroll .scroll-bar:vertical .decrement-button {
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+    -fx-max-height: 0;
+    -fx-opacity: 0;
+}
+

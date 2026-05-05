@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -24,9 +25,7 @@ public class DashBoardController extends BorderPane {
     // ── Top nav ──
     @FXML private Button navDashboard;
     @FXML private Button navNotes;
-    @FXML private Button navVideos;
-    @FXML private Button navTools;
-    @FXML private Button navForum;
+    @FXML private Button navSearch;      // search icon button
 
     // ── Sidebar ──
     @FXML private VBox   sideNavBar;
@@ -51,12 +50,21 @@ public class DashBoardController extends BorderPane {
     private Map<Button, String> sideLabels;
 
     // ── Sidebar state ──
-    private boolean sidebarExpanded    = true;
-    private static final double EXPANDED   = 210.0;
-    private static final double COLLAPSED  = 56.0;
-    private static final double ANIM_MS    = 180.0;
+    private boolean sidebarExpanded   = true;
+    private static final double EXPANDED  = 210.0;
+    private static final double COLLAPSED = 56.0;
+    private static final double ANIM_MS   = 180.0;
 
-    // ── Constructor ──
+    // ── Global search overlay ──
+    private GlobalSearchController globalSearch;
+
+
+
+
+    // ══════════════════════════════════════════
+    //  Constructor
+    // ══════════════════════════════════════════
+
     public DashBoardController() {
         URL fxmlUrl = getClass().getResource("/com/indicium/ui/DashBoard.fxml");
         if (fxmlUrl == null)
@@ -74,23 +82,36 @@ public class DashBoardController extends BorderPane {
         }
     }
 
-    @FXML
-    public void initialize()
-    {
-        topNavButtons = List.of(navDashboard, navNotes, navVideos, navTools, navForum);
-        sideNavButtons = List.of(sideHome, sideCases, sideEvidence, sideTimeline, sideCorrelation,
-                sideAuditLog, sideReport, sideSettings, sideIntegrity, sideUserMgr);
+    // ══════════════════════════════════════════
+    //  Initialize
+    // ══════════════════════════════════════════
 
-        // Store original labels so we can restore them after expand
+    @FXML
+    public void initialize() {
+        topNavButtons  = List.of(navDashboard, navNotes);
+        sideNavButtons = List.of(sideHome, sideCases, sideEvidence, sideTimeline,
+                sideCorrelation, sideAuditLog, sideReport, sideSettings,
+                sideIntegrity, sideUserMgr);
+
         sideLabels = new LinkedHashMap<>();
         sideNavButtons.forEach(btn -> sideLabels.put(btn, btn.getText()));
+
+        globalSearch = new GlobalSearchController();
+
+
 
         setActiveTopNav(navDashboard);
         setActiveSideNav(sideHome);
         navigateTo(new HomeController());
     }
 
-    // ── Core swap ──
+    public GlobalSearchController getGlobalSearch() {
+        return globalSearch;
+    }
+    // ══════════════════════════════════════════
+    //  Core swap
+    // ══════════════════════════════════════════
+
     private void navigateTo(Node target) {
         this.setCenter(target);
     }
@@ -101,19 +122,14 @@ public class DashBoardController extends BorderPane {
 
     @FXML
     private void handleMenuToggle() {
-        if (sidebarExpanded) {
-            collapseSidebar();
-        } else {
-            expandSidebar();
-        }
+        if (sidebarExpanded) collapseSidebar();
+        else                 expandSidebar();
         sidebarExpanded = !sidebarExpanded;
     }
 
     private void collapseSidebar() {
-        // Clear text immediately — icons stay because they're graphics, not text
         sideNavButtons.forEach(btn -> btn.setText(""));
         sideNavBar.getStyleClass().add("side-nav-bar-collapsed");
-
         animateSidebar(EXPANDED, COLLAPSED);
     }
 
@@ -121,8 +137,6 @@ public class DashBoardController extends BorderPane {
         sideNavBar.getStyleClass().remove("side-nav-bar-collapsed");
         animateSidebar(COLLAPSED, EXPANDED);
 
-        // Restore text only after the animation finishes so it doesn't
-        // flash in while the sidebar is still narrow
         PauseTransition wait = new PauseTransition(Duration.millis(ANIM_MS));
         wait.setOnFinished(e ->
                 sideNavButtons.forEach(btn -> btn.setText(sideLabels.get(btn)))
@@ -132,8 +146,10 @@ public class DashBoardController extends BorderPane {
 
     private void animateSidebar(double from, double to) {
         Timeline anim = new Timeline(
-                new KeyFrame(Duration.ZERO,   new KeyValue(sideNavBar.prefWidthProperty() , from, Interpolator.EASE_BOTH) ),
-                new KeyFrame(Duration.millis(ANIM_MS), new KeyValue(sideNavBar.prefWidthProperty(), to, Interpolator.EASE_BOTH))
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(sideNavBar.prefWidthProperty(), from, Interpolator.EASE_BOTH)),
+                new KeyFrame(Duration.millis(ANIM_MS),
+                        new KeyValue(sideNavBar.prefWidthProperty(), to, Interpolator.EASE_BOTH))
         );
         anim.play();
     }
@@ -149,10 +165,25 @@ public class DashBoardController extends BorderPane {
         navigateTo(new HomeController());
     }
 
-    @FXML private void handleNavNotes()  { setActiveTopNav(navNotes);  /* TODO */ }
-    @FXML private void handleNavVideos() { setActiveTopNav(navVideos); /* TODO */ }
-    @FXML private void handleNavTools()  { setActiveTopNav(navTools);  /* TODO */ }
-    @FXML private void handleNavForum()  { setActiveTopNav(navForum);  /* TODO */ }
+    @FXML
+    private void handleNavNotes() {
+        setActiveTopNav(navNotes);
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/indicium/ui/NotesPanel.fxml")
+            );
+            Node notes = loader.load();
+            navigateTo(notes);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load NotesPanel.fxml", e);
+        }
+    }
+
+
+    @FXML
+    private void handleNavSearch() {
+        globalSearch.show();
+    }
 
     // ══════════════════════════════════════════
     //  SIDEBAR HANDLERS
@@ -175,40 +206,51 @@ public class DashBoardController extends BorderPane {
         setActiveSideNav(sideTimeline);
         navigateTo(new TimelineController());
     }
-
-
+    @FXML
     public void navigateToTimeline(String caseId) {
         setActiveSideNav(sideTimeline);
         navigateTo(new TimelineController(caseId));
     }
-    public void HandleSideCorrelation() {
+    @FXML
+    public void handleSideCorrelation() {
         setActiveSideNav(sideCorrelation);
         navigateTo(new CorrelationDashBoardController());
     }
 
-    @FXML private void handleSideAuditLog()
-    {
+    @FXML
+    private void handleSideAuditLog() {
         setActiveSideNav(sideAuditLog);
         navigateTo(new AuditLogController());
+    }
 
-       }
-    @FXML private void handleSideReport()
-    {
+    @FXML
+    private void handleSideReport() {
         setActiveSideNav(sideReport);
         navigateTo(new ReportGenController());
-
-
     }
-    @FXML private void handleSideSettings()    { setActiveSideNav(sideSettings);  /* TODO */ }
-    @FXML private void handleSideIntegrity()
-    {
+
+    @FXML
+    private void handleSideSettings() {
+        setActiveSideNav(sideSettings);
+        navigateTo(new SettingsController());
+    }
+
+    @FXML
+    private void handleSideIntegrity() {
         setActiveSideNav(sideIntegrity);
         navigateTo(new IntegrityManagerDashboardController());
-
     }
-    @FXML private void handleSideUserManager() { setActiveSideNav(sideUserMgr);   /* TODO */ }
 
-    // ── Active state helpers ──
+    @FXML
+    private void handleSideUserManager() {
+        setActiveSideNav(sideUserMgr);
+        navigateTo(new IdentityManagerDashboardController());
+    }
+
+    // ══════════════════════════════════════════
+    //  Active state helpers
+    // ══════════════════════════════════════════
+
     private void setActiveTopNav(Button target) {
         topNavButtons.forEach(b -> b.getStyleClass().remove("active"));
         target.getStyleClass().add("active");

@@ -1,0 +1,328 @@
+/* ═══════════════════════════════════════════
+   INDICIUM – Identity Manager  (Light Theme)
+═══════════════════════════════════════════ */
+
+/* ── Root ── */
+.id-root {
+    -fx-background-color: #F4F6F8;
+}
+
+/* ── Top bar ── */
+.id-topbar {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #E0E6EA transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.id-page-title {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.id-page-sub {
+    -fx-text-fill: #9EADB5;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ── Search box ── */
+.id-search-box {
+    -fx-background-color: #F4F6F8;
+    -fx-background-radius: 8;
+    -fx-border-color: #D0D9DE;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+.id-search-input {
+    -fx-background-color: transparent;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-prompt-text-fill: #9EADB5;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+    -fx-pref-width: 180;
+}
+.id-search-input:focused {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+/* ── ComboBox ── */
+.id-combo, .id-field-combo {
+    -fx-background-color: #F4F6F8;
+    -fx-border-color: #D0D9DE;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+    -fx-padding: 4 10 4 10;
+    -fx-cursor: hand;
+}
+.id-combo .list-cell, .id-field-combo .list-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-family: "Segoe UI";
+}
+.id-combo .list-cell:hover, .id-field-combo .list-cell:hover {
+    -fx-background-color: #E8F4F6;
+}
+.id-combo .arrow-button, .id-field-combo .arrow-button {
+    -fx-background-color: transparent;
+}
+.id-combo .arrow, .id-field-combo .arrow {
+    -fx-background-color: #9EADB5;
+}
+
+/* ── Buttons ── */
+.id-btn-primary {
+    -fx-background-color: #00BCD4;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-background-radius: 8;
+    -fx-padding: 8 18 8 18;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+.id-btn-primary:hover { -fx-background-color: #00ACC1; }
+
+.id-btn-secondary {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-background-radius: 8;
+    -fx-padding: 8 18 8 18;
+    -fx-cursor: hand;
+    -fx-border-color: #D0D9DE;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+.id-btn-secondary:hover { -fx-background-color: #F4F6F8; }
+
+.id-btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9EADB5;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-background-radius: 8;
+    -fx-padding: 8 14 8 14;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+.id-btn-ghost:hover { -fx-text-fill: #0D1B1E; }
+
+.id-btn-danger {
+    -fx-background-color: #FFF0F0;
+    -fx-text-fill: #C62828;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-background-radius: 8;
+    -fx-padding: 8 18 8 18;
+    -fx-cursor: hand;
+    -fx-border-color: #FFCDD2;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+.id-btn-danger:hover { -fx-background-color: #FFEBEE; }
+
+/* ── Split pane ── */
+.id-split {
+    -fx-background-color: #F4F6F8;
+    -fx-padding: 0;
+}
+.id-split > .split-pane-divider {
+    -fx-background-color: #E0E6EA;
+    -fx-padding: 0 1 0 1;
+}
+
+/* ── Left panel ── */
+.id-panel {
+    -fx-background-color: #F4F6F8;
+}
+
+/* ── Stats row ── */
+.id-stats-row {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #E0E6EA transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.id-stat-card {
+    -fx-background-color: #F4F6F8;
+    -fx-background-radius: 10;
+    -fx-border-color: #E0E6EA;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 12 16 12 16;
+    -fx-alignment: CENTER;
+}
+.id-stat-number {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.id-stat-green  { -fx-text-fill: #2E7D32; }
+.id-stat-cyan   { -fx-text-fill: #00838F; }
+.id-stat-orange { -fx-text-fill: #E65100; }
+.id-stat-label {
+    -fx-text-fill: #9EADB5;
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI";
+    -fx-alignment: CENTER;
+}
+
+/* ── Table ── */
+.id-table {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent;
+    -fx-table-cell-border-color: #EEF2F5;
+}
+.id-table .column-header-background {
+    -fx-background-color: #EEF2F5;
+}
+.id-table .column-header, .id-table .filler {
+    -fx-background-color: #EEF2F5;
+    -fx-border-color: transparent transparent #D0D9DE transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-size: 38;
+}
+.id-table .column-header .label {
+    -fx-text-fill: #7A9BAA;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-alignment: CENTER_LEFT;
+}
+.id-table .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #EEF2F5 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-table-cell-border-color: transparent;
+}
+.id-table .table-row-cell:hover    { -fx-background-color: #F0F7FA; }
+.id-table .table-row-cell:selected { -fx-background-color: #E0F7FA; }
+.id-table .table-cell {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 12 10 12;
+    -fx-border-color: transparent;
+}
+.id-table .scroll-bar:vertical {
+    -fx-pref-width: 6px;
+    -fx-background-color: transparent;
+}
+.id-table .scroll-bar:vertical .thumb {
+    -fx-background-color: #C8D6DC;
+    -fx-background-radius: 3;
+}
+.id-table .scroll-bar:vertical .track,
+.id-table .scroll-bar:vertical .increment-button,
+.id-table .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+}
+
+/* ── Empty state ── */
+.id-empty-text {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.id-empty-sub {
+    -fx-text-fill: #9EADB5;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ── Detail panel ── */
+.id-detail-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent transparent #E0E6EA;
+    -fx-border-width: 0 0 0 1;
+}
+.id-detail-header {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #E0E6EA transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.id-detail-title {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ── Avatar ── */
+.id-avatar-lg {
+    -fx-background-color: #00BCD4;
+    -fx-background-radius: 50;
+    -fx-min-width: 56;
+    -fx-min-height: 56;
+    -fx-max-width: 56;
+    -fx-max-height: 56;
+}
+.id-avatar-lg-text {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.id-detail-name {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.id-role-badge {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-background-radius: 10;
+    -fx-padding: 2 10 2 10;
+}
+
+/* ── Form fields ── */
+.id-field-label {
+    -fx-text-fill: #7A9BAA;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.id-field {
+    -fx-background-color: #F4F6F8;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-border-color: #D0D9DE;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 8 12 8 12;
+}
+.id-field:focused {
+    -fx-border-color: #00BCD4;
+    -fx-background-color: #FFFFFF;
+}
+
+/* ── Scroll ── */
+.id-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+.id-scroll > .viewport { -fx-background-color: #FFFFFF; }
+
+/* ── Divider ── */
+.id-divider {
+    -fx-background-color: #E0E6EA;
+    -fx-padding: 0;
+}

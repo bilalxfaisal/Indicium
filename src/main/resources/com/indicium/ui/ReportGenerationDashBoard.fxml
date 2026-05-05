@@ -65,7 +65,7 @@
                             </padding>
                             <ImageView fitHeight="28" fitWidth="28" pickOnBounds="true" preserveRatio="true">
                                 <image>
-                                    <Image url="@Assets/icons8-report-100.png" />
+                                    <Image url="@Assets/icons8-report-100_black.png" />
                                 </image>
                             </ImageView>
                             <Label styleClass="card-type-title" text="Case Summary" />
@@ -78,7 +78,7 @@
                             </padding>
                             <ImageView fitHeight="28" fitWidth="28" pickOnBounds="true" preserveRatio="true">
                                 <image>
-                                    <Image url="@Assets/icons8-audit-100.png" />
+                                    <Image url="@Assets/icons8-audit-100_black.png" />
                                 </image>
                             </ImageView>
                             <Label styleClass="card-type-title" text="System Audit Log" />

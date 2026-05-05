@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -35,19 +36,22 @@
             <HBox HBox.hgrow="ALWAYS" />
 
             <!-- Top nav buttons -->
-            <Button fx:id="navDashboard" onAction="#handleNavDashboard" styleClass="top-nav-btn" text="Dashboard" />
-            <Button fx:id="navNotes" onAction="#handleNavNotes" styleClass="top-nav-btn" text="Tools" />
-            <Button fx:id="navVideos" onAction="#handleNavVideos" styleClass="top-nav-btn" text="Search" />
-            <Button fx:id="navTools" onAction="#handleNavTools" styleClass="top-nav-btn" text="Notes" />
-            <Button fx:id="navForum" onAction="#handleNavForum" styleClass="top-nav-btn">
+            <Button fx:id="navDashboard" onAction="#handleNavDashboard" styleClass="top-nav-btn,active" text="Dashboard" />
+            <Button fx:id="navNotes" onAction="#handleNavNotes" styleClass="top-nav-btn" text="Notes" />
+
+            <!-- Search icon — opens overlay, no active state needed -->
+            <Button fx:id="navSearch" onAction="#handleNavSearch" styleClass="top-nav-icon-btn">
                 <graphic>
-                    <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                        <image>
-                            <Image url="@Assets/icons8-notification-100%20(1).png" />
-                        </image>
+                    <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+                        <image><Image url="@Assets/icons8-search-100white.png" /></image>
+                  <styleClass>
+                     <String fx:value="top-nav-btn" />
+                     <String fx:value="top-nav-btn" />
+                  </styleClass>
                     </ImageView>
                 </graphic>
             </Button>
+
 
             <!-- User avatar -->
             <StackPane styleClass="avatar-circle">
@@ -108,7 +112,7 @@
                     </ImageView>
                 </graphic>
             </Button>
-         <Button fx:id="sideCorrelation" mnemonicParsing="false" onAction="#HandleSideCorrelation" styleClass="side-nav-btn" stylesheets="@Dashboard.css" text="Correlation">
+         <Button fx:id="sideCorrelation" mnemonicParsing="false" onAction="#handleSideCorrelation" styleClass="side-nav-btn" stylesheets="@Dashboard.css" text="Correlation">
             <graphic>
                <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                   <image>

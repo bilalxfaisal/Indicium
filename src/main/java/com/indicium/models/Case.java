@@ -85,8 +85,8 @@ public class Case {
             System.out.println("[SECURITY] Access Denied. Case is Archived.");
             return false;
         }
-
-       return CaseRepository.isUserAssignedToCase(investigatorID, this.caseID);
+        return false; //STUB FIX IT
+//       return CaseRepository.isUserAssignedToCase(investigatorID, this.caseID);
     }
 
     public Case gatherRelevantData(){

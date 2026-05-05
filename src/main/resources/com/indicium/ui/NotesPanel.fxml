@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="Infinity" maxWidth="Infinity" spacing="0" styleClass="notes-root" stylesheets="@NotesPanel.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.indicium.ui.NotesPanelController">
+
+    <!-- ── Header ── -->
+    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="notes-header">
+        <padding><Insets bottom="18" left="20" right="16" top="18" /></padding>
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label styleClass="notes-title" text="Notes &amp; Tasks" />
+            <Label fx:id="noteCountLabel" styleClass="notes-subtitle" text="0 notes · 0 tasks" />
+        </VBox>
+        <Button onAction="#handleClose" styleClass="notes-close-btn">
+            <graphic>
+                <ImageView fitHeight="12" fitWidth="12" preserveRatio="true">
+                    <image><Image url="@Assets/icons8-close-100.png" /></image>
+                </ImageView>
+            </graphic>
+        </Button>
+    </HBox>
+
+    <!-- ── Tab switcher ── -->
+    <HBox spacing="0" styleClass="notes-tabs">
+        <Button fx:id="tabNotes" maxWidth="Infinity" onAction="#switchToNotes" styleClass="notes-tab,tab-active" HBox.hgrow="ALWAYS">
+            <graphic>
+                <HBox alignment="CENTER" spacing="7">
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+                        <image><Image url="@Assets/icons8-note-100.png" /></image>
+                    </ImageView>
+                    <Label mouseTransparent="true" styleClass="tab-label" text="Notes" />
+                </HBox>
+            </graphic>
+        </Button>
+        <Button fx:id="tabTasks" maxWidth="Infinity" onAction="#switchToTasks" styleClass="notes-tab" HBox.hgrow="ALWAYS">
+            <graphic>
+                <HBox alignment="CENTER" spacing="7">
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+                        <image><Image url="@Assets/icons8-task-100.png" /></image>
+                    </ImageView>
+                    <Label mouseTransparent="true" styleClass="tab-label" text="Tasks" />
+                </HBox>
+            </graphic>
+        </Button>
+    </HBox>
+
+    <!-- ══ NOTES PANE ══ -->
+    <VBox fx:id="notesPane" spacing="0" VBox.vgrow="ALWAYS">
+        <VBox spacing="8" styleClass="notes-compose">
+            <padding><Insets bottom="14" left="16" right="16" top="14" /></padding>
+            <TextField fx:id="noteTitleInput" promptText="Note title…" styleClass="compose-title-field" />
+            <TextArea fx:id="noteBodyInput" prefHeight="72" promptText="Write something…" styleClass="compose-body-field" wrapText="true" />
+            <HBox alignment="CENTER_RIGHT" spacing="8">
+                <ComboBox fx:id="noteTagCombo" promptText="Tag" styleClass="compose-tag-combo" />
+                <Button onAction="#handleAddNote" prefHeight="39.0" prefWidth="126.0" styleClass="notes-btn-add">
+                    <graphic>
+                        <HBox alignment="CENTER" prefHeight="11.0" prefWidth="8.0" spacing="6">
+                            <ImageView fitHeight="31.0" fitWidth="44.0" preserveRatio="true">
+                                <image>
+                           <Image url="@Assets/icons8-add-100_white.png" />
+                        </image>
+                            </ImageView>
+                            <Label mouseTransparent="true" styleClass="btn-label" text="Add Note" />
+                        </HBox>
+                    </graphic>
+                </Button>
+            </HBox>
+        </VBox>
+
+        <Separator styleClass="notes-sep" />
+
+        <ScrollPane fitToWidth="true" styleClass="notes-scroll" VBox.vgrow="ALWAYS">
+            <VBox fx:id="notesList" spacing="8" styleClass="notes-list">
+                <padding><Insets bottom="12" left="12" right="12" top="12" /></padding>
+                <VBox fx:id="notesEmpty" alignment="CENTER" spacing="8" styleClass="notes-empty">
+                    <padding><Insets top="40" /></padding>
+                    <ImageView fitHeight="36" fitWidth="36" opacity="0.3" preserveRatio="true">
+                        <image><Image url="@Assets/icons8-note-100.png" /></image>
+                    </ImageView>
+                    <Label styleClass="empty-title" text="No notes yet" />
+                    <Label styleClass="empty-sub" text="Add your first note above" />
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </VBox>
+
+    <!-- ══ TASKS PANE ══ -->
+    <VBox fx:id="tasksPane" managed="false" spacing="0" visible="false" VBox.vgrow="ALWAYS">
+        <HBox alignment="CENTER" spacing="8" styleClass="task-compose">
+            <padding><Insets bottom="14" left="16" right="16" top="14" /></padding>
+            <TextField fx:id="taskInput" onAction="#handleAddTask" promptText="New task…" styleClass="compose-title-field" HBox.hgrow="ALWAYS" />
+            <ComboBox fx:id="taskPriorityCombo" promptText="Priority" styleClass="compose-tag-combo" />
+            <Button onAction="#handleAddTask" styleClass="notes-btn-add-icon">
+                <graphic>
+                    <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
+                        <image><Image url="@Assets/icons8-add-100.png" /></image>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+
+        <Separator styleClass="notes-sep" />
+
+        <HBox alignment="CENTER_LEFT" spacing="6" styleClass="task-filter-row">
+            <padding><Insets bottom="10" left="14" right="14" top="10" /></padding>
+            <Button fx:id="filterAll" onAction="#filterTasks" styleClass="task-pill,pill-active" text="All" />
+            <Button fx:id="filterOpen" onAction="#filterTasks" styleClass="task-pill" text="Open" />
+            <Button fx:id="filterDone" onAction="#filterTasks" styleClass="task-pill" text="Done" />
+        </HBox>
+
+        <ScrollPane fitToWidth="true" styleClass="notes-scroll" VBox.vgrow="ALWAYS">
+            <VBox fx:id="tasksList" spacing="6" styleClass="notes-list">
+                <padding><Insets bottom="12" left="12" right="12" top="8" /></padding>
+                <VBox fx:id="tasksEmpty" alignment="CENTER" spacing="8" styleClass="notes-empty">
+                    <padding><Insets top="40" /></padding>
+                    <ImageView fitHeight="36" fitWidth="36" opacity="0.3" preserveRatio="true">
+                        <image><Image url="@Assets/icons8-task-100.png" /></image>
+                    </ImageView>
+                    <Label styleClass="empty-title" text="No tasks yet" />
+                    <Label styleClass="empty-sub" text="Add your first task above" />
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </VBox>
+
+</VBox>

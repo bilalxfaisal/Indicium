@@ -1,0 +1,174 @@
+/* ═══════════════════════════════════════════
+   INDICIUM – Global Search Overlay
+═══════════════════════════════════════════ */
+
+/* ── Backdrop ── */
+.search-backdrop {
+    -fx-background-color: rgba(0, 0, 0, 0.55);
+}
+
+/* ── Panel ── */
+.search-panel {
+    -fx-background-color: #132226;
+    -fx-background-radius: 14;
+    -fx-border-color: #1E3A40;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 32, 0, 0, 8);
+}
+
+/* ── Input row ── */
+.search-input-row {
+    -fx-background-color: transparent;
+}
+
+.search-input {
+    -fx-background-color: transparent;
+    -fx-text-fill: #EEF9FA;
+    -fx-font-size: 16px;
+    -fx-font-family: "Segoe UI";
+    -fx-prompt-text-fill: #4A6670;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+.search-input:focused {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.search-kbd {
+    -fx-text-fill: #4A6670;
+    -fx-font-size: 11px;
+    -fx-background-color: #1A2F34;
+    -fx-background-radius: 4;
+    -fx-padding: 2 6 2 6;
+    -fx-border-color: #2A4A52;
+    -fx-border-radius: 4;
+    -fx-border-width: 1;
+}
+
+/* ── Divider ── */
+.search-divider {
+    -fx-background-color: #1E3A40;
+    -fx-padding: 0;
+}
+
+/* ── Filter chips ── */
+.search-filter-row {
+    -fx-background-color: transparent;
+}
+
+.search-chip {
+    -fx-background-color: #1A2F34;
+    -fx-text-fill: #90A4AE;
+    -fx-font-size: 12px;
+    -fx-padding: 4 12 4 12;
+    -fx-background-radius: 20;
+    -fx-border-color: #2A4A52;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+.search-chip:hover {
+    -fx-background-color: #1E3A40;
+    -fx-text-fill: #EEF9FA;
+}
+.search-chip.chip-active {
+    -fx-background-color: #00BCD4;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-weight: bold;
+    -fx-border-color: #00BCD4;
+}
+
+/* ── Results scroll ── */
+.search-results-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+.search-results-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+.search-results-scroll .scroll-bar:vertical {
+    -fx-pref-width: 6px;
+    -fx-background-color: transparent;
+}
+.search-results-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #2A4A52;
+    -fx-background-radius: 3;
+}
+.search-results-scroll .scroll-bar:vertical .track,
+.search-results-scroll .scroll-bar:vertical .increment-button,
+.search-results-scroll .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+}
+
+/* ── Result group header ── */
+.search-group-header {
+    -fx-text-fill: #4A6670;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 8 4 8;
+}
+
+/* ── Result row ── */
+.search-result-row {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-padding: 10 12 10 12;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+}
+.search-result-row:hover {
+    -fx-background-color: #1A2F34;
+}
+.search-result-row.result-focused {
+    -fx-background-color: #1E3A40;
+    -fx-border-color: #00BCD4;
+    -fx-border-width: 1;
+}
+
+.result-title {
+    -fx-text-fill: #EEF9FA;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.result-subtitle {
+    -fx-text-fill: #607D8B;
+    -fx-font-size: 11px;
+}
+.result-badge {
+    -fx-font-size: 10px;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 10;
+    -fx-font-weight: bold;
+}
+.badge-case     { -fx-background-color: #00BCD4; -fx-text-fill: #0D1B1E; }
+.badge-evidence { -fx-background-color: #FF9800; -fx-text-fill: #0D1B1E; }
+.badge-suspect  { -fx-background-color: #E91E63; -fx-text-fill: #ffffff; }
+
+/* ── Empty state ── */
+.search-empty-state { -fx-background-color: transparent; }
+.search-empty-icon  { -fx-font-size: 32px; }
+.search-empty-text  { -fx-text-fill: #EEF9FA; -fx-font-size: 14px; -fx-font-weight: bold; }
+.search-empty-sub   { -fx-text-fill: #4A6670; -fx-font-size: 12px; }
+
+/* ── Footer ── */
+.search-footer {
+    -fx-background-color: #0D1B1E;
+    -fx-background-radius: 0 0 14 14;
+    -fx-border-color: #1E3A40 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+.search-footer-hint {
+    -fx-text-fill: #4A6670;
+    -fx-font-size: 11px;
+}
+.search-result-count {
+    -fx-text-fill: #4A6670;
+    -fx-font-size: 11px;
+}

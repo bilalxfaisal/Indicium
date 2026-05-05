@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<fx:root type="StackPane"
+         xmlns="http://javafx.com/javafx/25"
+         xmlns:fx="http://javafx.com/fxml/1"
+         styleClass="search-overlay-root"
+         stylesheets="@GlobalSearch.css"
+         pickOnBounds="false">
+
+    <!-- ── Dim backdrop ── -->
+    <StackPane fx:id="backdrop"
+               styleClass="search-backdrop"
+               onMouseClicked="#handleBackdropClick"
+               pickOnBounds="true" />
+
+    <!-- ── Search panel ── -->
+    <VBox fx:id="searchPanel"
+          styleClass="search-panel"
+          maxWidth="620"
+          maxHeight="520"
+          StackPane.alignment="TOP_CENTER">
+
+        <StackPane.margin>
+            <Insets top="70" />
+        </StackPane.margin>
+
+        <!-- Search input row -->
+        <HBox styleClass="search-input-row" alignment="CENTER_LEFT" spacing="10">
+            <padding><Insets top="14" bottom="14" left="18" right="18" /></padding>
+
+            <ImageView fitHeight="18" fitWidth="18"
+                       pickOnBounds="true" preserveRatio="true">
+                <image><Image url="@Assets/icons8-search-100.png" /></image>
+            </ImageView>
+
+            <TextField fx:id="searchField"
+                       styleClass="search-input"
+                       promptText="Search cases, evidence, suspects…"
+                       HBox.hgrow="ALWAYS" />
+
+            <Label styleClass="search-kbd" text="ESC" />
+        </HBox>
+
+        <!-- Divider -->
+        <Separator styleClass="search-divider" />
+
+        <!-- Filter chips -->
+        <HBox fx:id="filterRow"
+              styleClass="search-filter-row"
+              spacing="8" alignment="CENTER_LEFT">
+            <padding><Insets top="10" bottom="10" left="18" right="18" /></padding>
+
+            <Button fx:id="chipAll"      styleClass="search-chip,chip-active" text="All"      onAction="#handleChipAll" />
+            <Button fx:id="chipCases"    styleClass="search-chip"             text="Cases"    onAction="#handleChipCases" />
+            <Button fx:id="chipEvidence" styleClass="search-chip"             text="Evidence" onAction="#handleChipEvidence" />
+            <Button fx:id="chipSuspects" styleClass="search-chip"             text="Suspects" onAction="#handleChipSuspects" />
+        </HBox>
+
+        <Separator styleClass="search-divider" />
+
+        <!-- Results scroll area -->
+        <ScrollPane fx:id="resultsScroll"
+                    styleClass="search-results-scroll"
+                    fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="AS_NEEDED"
+                    VBox.vgrow="ALWAYS">
+
+            <VBox fx:id="resultsContainer"
+                  styleClass="search-results-container"
+                  spacing="2">
+                <padding><Insets top="8" bottom="8" left="10" right="10" /></padding>
+            </VBox>
+        </ScrollPane>
+
+        <!-- Empty state — icon replaces emoji -->
+        <VBox fx:id="emptyState"
+              styleClass="search-empty-state"
+              alignment="CENTER" spacing="10"
+              managed="false" visible="false">
+            <padding><Insets top="30" bottom="30" /></padding>
+
+            <!-- No-results icon -->
+            <StackPane alignment="CENTER">
+                <ImageView fitHeight="48" fitWidth="48"
+                           pickOnBounds="true" preserveRatio="true"
+                           styleClass="search-empty-icon-img"
+                           opacity="0.35">
+                    <image><Image url="@Assets/icons8-search-100.png" /></image>
+                </ImageView>
+            </StackPane>
+
+            <Label fx:id="emptyLabel"
+                   styleClass="search-empty-text"
+                   text="No results found" />
+            <Label styleClass="search-empty-sub"
+                   text="Try a different keyword or filter" />
+        </VBox>
+
+        <!-- Footer -->
+        <HBox styleClass="search-footer" alignment="CENTER_LEFT" spacing="16">
+            <padding><Insets top="10" bottom="10" left="18" right="18" /></padding>
+
+            <!-- ↑↓ icon -->
+            <ImageView fitHeight="14" fitWidth="14" preserveRatio="true" opacity="0.5">
+                <image><Image url="@Assets/icons8-sort-100.png" /></image>
+            </ImageView>
+            <Label styleClass="search-footer-hint" text="navigate" />
+
+            <!-- Enter icon -->
+            <ImageView fitHeight="14" fitWidth="14" preserveRatio="true" opacity="0.5">
+                <image><Image url="@Assets/icons8-enter-100.png" /></image>
+            </ImageView>
+            <Label styleClass="search-footer-hint" text="open" />
+
+            <!-- ESC badge — kept as text, it's a key label not an emoji -->
+            <Label styleClass="search-kbd" text="ESC" />
+            <Label styleClass="search-footer-hint" text="close" />
+
+            <HBox HBox.hgrow="ALWAYS" />
+            <Label fx:id="resultCount" styleClass="search-result-count" text="" />
+        </HBox>
+
+    </VBox>
+</fx:root>

@@ -117,3 +117,16 @@
     -fx-alignment: CENTER;
     -fx-padding: 10 0 10 0;
 }
+/* Search icon button — match the flat icon style */
+#navSearch {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 6;
+    -fx-cursor: hand;
+    -fx-background-radius: 50;
+}
+
+#navSearch:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 50;
+}

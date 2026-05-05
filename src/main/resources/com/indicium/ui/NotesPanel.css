@@ -1,0 +1,334 @@
+/* ═══════════════════════════════════════════
+   INDICIUM – Notes & Tasks Panel
+═══════════════════════════════════════════ */
+
+.notes-root {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E0E6EA transparent transparent transparent;
+    -fx-border-width: 0 0 0 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 20, 0, -4, 0);
+}
+
+/* ── Header ── */
+.notes-header {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #E0E6EA transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.notes-title {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.notes-subtitle {
+    -fx-text-fill: #9EADB5;
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI";
+}
+.notes-close-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9EADB5;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 4 8 4 8;
+    -fx-background-radius: 6;
+}
+.notes-close-btn:hover {
+    -fx-text-fill: #C62828;
+    -fx-background-color: #FFF0F0;
+}
+
+/* ── Tabs ── */
+.notes-tabs {
+    -fx-background-color: #F4F6F8;
+    -fx-border-color: transparent transparent #E0E6EA transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.notes-tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9EADB5;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-font-weight: bold;
+    -fx-padding: 12 0 12 0;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+}
+.notes-tab:hover {
+    -fx-text-fill: #0D1B1E;
+    -fx-background-color: #EAEEF1;
+}
+.tab-active {
+    -fx-text-fill: #00838F;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #00BCD4 transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+/* ── Compose area ── */
+.notes-compose, .task-compose {
+    -fx-background-color: #F4F6F8;
+    -fx-border-color: transparent transparent #E0E6EA transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.compose-title-field {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-border-color: #D0D9DE;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 8 12 8 12;
+    -fx-prompt-text-fill: #9EADB5;
+}
+.compose-title-field:focused {
+    -fx-border-color: #00BCD4;
+    -fx-background-color: #FFFFFF;
+}
+.compose-body-field {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI";
+    -fx-border-color: #D0D9DE;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 8 12 8 12;
+    -fx-prompt-text-fill: #9EADB5;
+}
+.compose-body-field:focused {
+    -fx-border-color: #00BCD4;
+}
+.compose-body-field .content {
+    -fx-background-color: transparent;
+}
+.compose-tag-combo {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D0D9DE;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 12px;
+    -fx-pref-width: 100;
+    -fx-cursor: hand;
+}
+.compose-tag-combo .list-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #0D1B1E;
+    -fx-font-family: "Segoe UI";
+}
+.compose-tag-combo .list-cell:hover { -fx-background-color: #E8F4F6; }
+.compose-tag-combo .arrow-button    { -fx-background-color: transparent; }
+.compose-tag-combo .arrow           { -fx-background-color: #9EADB5; }
+
+/* ── Add buttons ── */
+.notes-btn-add {
+    -fx-background-color: #00BCD4;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-background-radius: 8;
+    -fx-padding: 7 16 7 16;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+.notes-btn-add:hover { -fx-background-color: #00ACC1; }
+
+.notes-btn-add-icon {
+    -fx-background-color: #00BCD4;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-max-width: 36;
+    -fx-max-height: 36;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+.notes-btn-add-icon:hover { -fx-background-color: #00ACC1; }
+
+/* ── Separator ── */
+.notes-sep {
+    -fx-background-color: #E0E6EA;
+    -fx-padding: 0;
+}
+
+/* ── Scroll ── */
+.notes-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+.notes-scroll > .viewport { -fx-background-color: transparent; }
+.notes-scroll .scroll-bar:vertical {
+    -fx-pref-width: 5px;
+    -fx-background-color: transparent;
+}
+.notes-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #C8D6DC;
+    -fx-background-radius: 3;
+}
+.notes-scroll .scroll-bar:vertical .track,
+.notes-scroll .scroll-bar:vertical .increment-button,
+.notes-scroll .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+}
+
+/* ── List area ── */
+.notes-list { -fx-background-color: transparent; }
+
+/* ── Note card ── */
+.note-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10;
+    -fx-border-color: #E0E6EA;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 12 14 12 14;
+    -fx-cursor: hand;
+}
+.note-card:hover {
+    -fx-border-color: #00BCD4;
+    -fx-effect: dropshadow(gaussian, rgba(0,188,212,0.10), 8, 0, 0, 2);
+}
+.note-card-title {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+}
+.note-card-body {
+    -fx-text-fill: #4A6670;
+    -fx-font-size: 12px;
+    -fx-font-family: "Segoe UI";
+    -fx-wrap-text: true;
+}
+.note-card-meta {
+    -fx-text-fill: #B0BEC5;
+    -fx-font-size: 10px;
+    -fx-font-family: "Segoe UI";
+}
+.note-delete-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #B0BEC5;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 0 4 0 4;
+}
+.note-delete-btn:hover { -fx-text-fill: #C62828; }
+
+/* ── Tag chips ── */
+.tag-chip {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-background-radius: 8;
+    -fx-padding: 2 8 2 8;
+}
+.tag-case      { -fx-background-color: #E0F7FA; -fx-text-fill: #00838F; }
+.tag-evidence  { -fx-background-color: #F3E5F5; -fx-text-fill: #7B1FA2; }
+.tag-urgent    { -fx-background-color: #FFEBEE; -fx-text-fill: #C62828; }
+.tag-general   { -fx-background-color: #F4F6F8; -fx-text-fill: #607D8B; }
+
+/* ── Task item ── */
+.task-item {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10;
+    -fx-border-color: #E0E6EA;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 10 12 10 12;
+}
+.task-item:hover { -fx-border-color: #B0BEC5; }
+.task-item-done {
+    -fx-background-color: #F9FAFB;
+    -fx-border-color: #EEF2F5;
+}
+.task-text {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+}
+.task-text-done {
+    -fx-text-fill: #B0BEC5;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI";
+    -fx-strikethrough: true;
+}
+.task-meta {
+    -fx-text-fill: #B0BEC5;
+    -fx-font-size: 10px;
+    -fx-font-family: "Segoe UI";
+}
+.task-priority-high   { -fx-background-color: #FFEBEE; -fx-text-fill: #C62828; -fx-background-radius: 6; -fx-padding: 1 7 1 7; -fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: "Segoe UI"; }
+.task-priority-medium { -fx-background-color: #FFF8E1; -fx-text-fill: #F57F17; -fx-background-radius: 6; -fx-padding: 1 7 1 7; -fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: "Segoe UI"; }
+.task-priority-low    { -fx-background-color: #E8F5E9; -fx-text-fill: #2E7D32; -fx-background-radius: 6; -fx-padding: 1 7 1 7; -fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: "Segoe UI"; }
+
+.task-delete-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #B0BEC5;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 0 4 0 4;
+}
+.task-delete-btn:hover { -fx-text-fill: #C62828; }
+
+/* ── Filter pills ── */
+.task-filter-row { -fx-background-color: #F4F6F8; }
+.task-pill {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9EADB5;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-background-radius: 20;
+    -fx-border-color: #D0D9DE;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-padding: 4 14 4 14;
+    -fx-cursor: hand;
+}
+.task-pill:hover  { -fx-border-color: #00BCD4; -fx-text-fill: #00838F; }
+.pill-active {
+    -fx-background-color: #E0F7FA;
+    -fx-text-fill: #00838F;
+    -fx-border-color: #00BCD4;
+}
+
+/* ── Empty state ── */
+.notes-empty   { -fx-background-color: transparent; }
+.empty-icon    { -fx-font-size: 30px; }
+.empty-title   { -fx-text-fill: #0D1B1E; -fx-font-size: 14px; -fx-font-weight: bold; -fx-font-family: "Segoe UI"; }
+.empty-sub     { -fx-text-fill: #9EADB5; -fx-font-size: 12px; -fx-font-family: "Segoe UI"; }
+.tab-label {
+    -fx-text-fill: inherit;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-cursor: hand;
+}
+
+.btn-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-cursor: hand;
+}

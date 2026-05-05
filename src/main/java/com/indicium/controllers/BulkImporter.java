@@ -21,7 +21,7 @@ public class BulkImporter
     {
         this.selectSourceFolder(sourcePath, targetCaseId);
 
-        this.confirmImport(userID);
+//        this.confirmImport(userID);
     }
 
     public void selectImportBulkData()
