@@ -1,5 +1,6 @@
 package com.indicium.models;
 
+import com.indicium.repository.UserDirectory;
 import java.util.Date;
 
 public class UserAuth {
@@ -38,22 +39,25 @@ public class UserAuth {
      * From Sequence Diagram: VerifyUserPermissions(UserId) -> Returns Permissions
      * The CaseController calls this to ensure the user has the right to create a case.
      */
-    public UserRole VerifyUserPermissions(int userId) {
+    public boolean verifyUserPermissions(int userId)
+    {
         // In your SDA logic, this method checks the system state or an in-memory
         // list to determine if the specific userId has ADMIN or INVESTIGATOR rights.
-
-        System.out.println("[UserAuth] Verifying permissions for User ID: " + userId);
-
-        // Example integration: Returning the enum you established earlier
-        // You would typically fetch the actual user object here and call getRole()
-        return UserRole.INVESTIGATOR;
+        UserRole role = UserDirectory.findUser(userId).role;
+        if (role == UserRole.INVESTIGATOR || role == UserRole.ADMIN)
+        {
+            System.out.println("[UserAuth] Verifying permissions for User ID: " + userId);
+            return true;
+        }
+        return false;
     }
 
     // ===================================================================================
     // GETTERS & SETTERS
     // ===================================================================================
 
-    public String getHashedPassword() {
+    public String getHashedPassword()
+    {
         return hashedPassword;
     }
 

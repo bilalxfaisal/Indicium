@@ -1,5 +1,7 @@
 package com.indicium.repository;
 
+import com.indicium.controllers.CaseFilter;
+import com.indicium.controllers.FilterCriteria;
 import com.indicium.models.Case;
 import com.indicium.models.CaseStatus;
 import java.io.FileInputStream;
@@ -80,8 +82,12 @@ public class CaseRepository {
         return null;
     }
 
-    public List<Case> findByFilter(String condition)
+    public List<Case> findByFilter(FilterCriteria criteria)
     {
+        // Build the query condition to apply
+        CaseFilter filter = new CaseFilter();
+        String condition = filter.buildQuery(criteria);
+
         List<Case> cases = new ArrayList<>();
 
         // Append the dynamically built condition to the base SELECT statement

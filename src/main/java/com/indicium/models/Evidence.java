@@ -1,6 +1,7 @@
 package com.indicium.models;
 
 import com.indicium.services.HashGenerator;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

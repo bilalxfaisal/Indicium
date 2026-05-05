@@ -52,7 +52,7 @@ public class SystemUser
     public boolean saveUserRecord()
     {
         // addUser takes String arguments. We convert the UserRole enum to its String name.
-        return UserDirectory.addUser(this.name, this.email, this.credentials, this.role.name());
+        return UserDirectory.addUser(this.name, this.email, this.credentials, this.role);
     }
 
     // =======================================================================

@@ -8,12 +8,16 @@ import com.indicium.repository.CaseRepository;
 import com.indicium.repository.EvidenceRepo;
 import com.indicium.services.IStorageService;
 import com.indicium.services.LongTermStorage;
-import com.indicium.services.*;
+import com.indicium.services.AccessManager;
+import com.indicium.services.AuditLog;
+import com.indicium.services.HashGenerator;
+import com.indicium.services.AuditCategory;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class CaseManager {
+public class CaseManager
+{
     private final CaseRepository caseRepo;
     private final EvidenceRepo evidenceRepo;
     private final AccessManager accessManager;
@@ -55,8 +59,10 @@ public class CaseManager {
         return true;
     }
 
-    public List<Case> getClosedCases() {
-        return caseRepo.findByFilter(CaseStatus.CLOSED);
+    public List<Case> getClosedCases()
+    {
+        FilterCriteria criteria = new FilterCriteria(FilterType.STATUS, CaseStatus.CLOSED.toString());
+        return caseRepo.findByFilter(criteria);
     }
 
     /**
@@ -126,7 +132,7 @@ public class CaseManager {
     /**
      * 2. Validates the search criteria entered by the user
      */
-    public boolean selectFilter(int investigatorID, String criteria) {
+    public boolean selectFilter(int investigatorID, FilterCriteria criteria) {
         CaseFilter filter = new CaseFilter();
         boolean isValid = filter.validate(criteria);
 
@@ -139,13 +145,13 @@ public class CaseManager {
     /**
      * 3. Builds the query and fetches the data from the repository
      */
-    public List<Case> applyFilter(int investigatorID, String criteria) {
+    public List<Case> applyFilter(int investigatorID, FilterCriteria criteria)
+    {
         CaseFilter filter = new CaseFilter();
 
         // Fixed: Passed the 'criteria' into buildQuery so it knows what to search
-        String query = filter.buildQuery(criteria);
+        List<Case> matchingCases = caseRepo.findByFilter(criteria);
 
-        List<Case> matchingCases = caseRepo.findByFilter(query);
         auditLog.logEvent(investigatorID, "Filtered Case Search Performed", AuditCategory.CASE);
 
         return matchingCases;

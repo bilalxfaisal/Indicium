@@ -83,12 +83,12 @@ public class EvidenceManager
         if (actionType.equals("View"))
         {
             audit.logEvent(userID, "View", AuditCategory.EVIDENCE, caseID, evidenceID);
-            EvidenceDashBoardController.openOnlinePlayer(file);
+            //EvidenceDashBoardController.openOnlinePlayer(file);
         }
         else if (actionType.equals("Download"))
         {
             audit.logEvent(userID, "Download", AuditCategory.EVIDENCE, caseID, evidenceID);
-            EvidenceDashBoardController.askForConfirmation();
+            //EvidenceDashBoardController.askForConfirmation();
         }
     }
 }

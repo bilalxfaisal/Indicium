@@ -1,6 +1,7 @@
 package com.indicium.models;
 
-public class Investigator {
+public class Investigator
+{
     private int investigatorID;
     private String name;
     private String badgeNumber;

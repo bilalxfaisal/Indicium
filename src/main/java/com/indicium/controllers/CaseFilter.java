@@ -1,8 +1,8 @@
 package com.indicium.controllers;
-import main.java.com.indicium.controllers.FilterType;
 import com.indicium.models.Case;
 import com.indicium.repository.CaseRepository;
 import com.indicium.models.CaseStatus;
+import com.indicium.controllers.FilterType;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -16,6 +16,7 @@ public class CaseFilter
 
     public CaseFilter()
     {
+        validatedCriteria = new FilterCriteria();
         caseRepo = new CaseRepository();
     }
 
@@ -80,27 +81,16 @@ public class CaseFilter
         return  false;
     }
 
-    private class FilterCriteria
+    public String buildQuery(FilterCriteria criteria)
     {
-        FilterType type; // like Category
-        String value;   // like murder in Category
-
-        public FilterCriteria(FilterType type, String value)
-        {
-            this.type = type;
-            this.value = value;
-        }
-    }
-
-    public List<Case> buildQuery()
-    {
+        this.validatedCriteria.type = criteria.type;
+        this.validatedCriteria.value = criteria.value;
         if (this.validatedCriteria == null)
         {
-            return new ArrayList<>();
+            return null;
         }
 
-        String databaseQuery = formatQueryString(validatedCriteria);
-        return caseRepo.findByFilter(databaseQuery);
+        return formatQueryString(validatedCriteria);
     }
 
     private String formatQueryString(FilterCriteria criteria)

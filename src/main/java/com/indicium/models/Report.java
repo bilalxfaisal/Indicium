@@ -4,7 +4,8 @@ import com.indicium.services.HashGenerator;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Report {
+public class Report
+{
     private static int idCounter = 1; // Acts as auto-increment until DB storage is required
 
     private int reportID;
