@@ -207,7 +207,7 @@ public class DashBoardController extends BorderPane {
         navigateTo(new TimelineController());
     }
     @FXML
-    public void navigateToTimeline(String caseId) {
+    public void navigateToTimeline(int caseId) {
         setActiveSideNav(sideTimeline);
         navigateTo(new TimelineController(caseId));
     }

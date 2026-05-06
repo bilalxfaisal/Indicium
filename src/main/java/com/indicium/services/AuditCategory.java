@@ -5,5 +5,6 @@ public enum AuditCategory {
     CASE,
     EVIDENCE,
     USER,
-    SYSTEM
+    SYSTEM,
+    TIMELINE
 }

@@ -1,6 +1,7 @@
 package com.indicium.repository;
 
 import com.indicium.models.Evidence;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,6 +38,17 @@ public class EvidenceRepo {
             System.err.println("CRITICAL: database.properties file not found!");
         }
     }
+
+
+    public List<Evidence> findByCaseId(int caseID) {
+        return findByCase(caseID);
+    }
+
+    public Evidence findById(int evidenceID) {
+        return getEvidence(evidenceID);
+    }
+
+
 
     // ===================================================================================
     // UC5: Save Evidence to Database (Replaces the static Map/List)

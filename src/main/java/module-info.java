@@ -4,7 +4,7 @@ module com.indicium {
     requires javafx.fxml;
     requires java.sql;
     requires java.desktop;
-    requires mysql.connector.j;
+
     requires itextpdf;
 
     // JavaFX needs reflective access to ALL controller/UI packages

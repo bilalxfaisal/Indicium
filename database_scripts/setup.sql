@@ -54,13 +54,17 @@ CREATE TABLE IF NOT EXISTS Evidence (
 
 -- 6. Create Timeline Events Table
 CREATE TABLE IF NOT EXISTS timeline_events (
-    event_id INT AUTO_INCREMENT PRIMARY KEY,
-    case_id INT NOT NULL,
-    description TEXT NOT NULL,
-    event_timestamp DATETIME NOT NULL,
-    linked_evidence_id INT DEFAULT NULL,
-    FOREIGN KEY (case_id) REFERENCES Cases(CaseID) ON DELETE CASCADE
-    );
+                                 event_id            INT           AUTO_INCREMENT PRIMARY KEY,
+                                 case_id             INT           NOT NULL,
+                                 title               VARCHAR(255)  NOT NULL,
+                                 description         TEXT,
+                                 event_timestamp     DATETIME      NOT NULL,
+                                 linked_evidence_id  INT           DEFAULT 0,
+                                 added_by            VARCHAR(100),
+                                 created_at          DATETIME      DEFAULT CURRENT_TIMESTAMP,
+
+                                 FOREIGN KEY (case_id) REFERENCES Cases(CaseID) ON DELETE CASCADE
+);
 
 -- 7. Create Forensic Audit Log Table
 CREATE TABLE IF NOT EXISTS ForensicAuditLog (
@@ -72,4 +76,19 @@ CREATE TABLE IF NOT EXISTS ForensicAuditLog (
     LinkedCaseID INT NULL,
     LinkedEvidenceID INT NULL,
     FOREIGN KEY (InvestigatorID) REFERENCES Users(UserID) ON DELETE SET NULL -- NEW: Links to Users
+    );
+
+CREATE TABLE IF NOT EXISTS correlation_links (
+                                                 link_id       INT      AUTO_INCREMENT PRIMARY KEY,
+                                                 source_ev_id  INT      NOT NULL,
+                                                 target_ev_id  INT      NOT NULL,
+                                                 created_by    INT,
+                                                 created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+                                                 FOREIGN KEY (source_ev_id) REFERENCES evidence(evidence_id) ON DELETE CASCADE,
+    FOREIGN KEY (target_ev_id) REFERENCES Evidence(EvidenceID) ON DELETE CASCADE,
+    FOREIGN KEY (created_by)   REFERENCES Users(UserID)         ON DELETE SET NULL,
+
+    -- Prevent duplicate links in either direction
+    UNIQUE KEY uq_link (source_ev_id, target_ev_id)
     );

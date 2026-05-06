@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
    INDICIUM — CaseDashBoard.css
-   Dark shell (nav + sidebar) | Light main content area
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Root ── */
@@ -93,11 +92,11 @@
     -fx-background-color: #0097A7;
     -fx-text-fill: #FFFFFF;
 }
-.side-nav-icon         { -fx-opacity: 0.6; }
+.side-nav-icon              { -fx-opacity: 0.6; }
 .side-active .side-nav-icon { -fx-opacity: 1.0; }
 
 /* ═══════════════════════════════════════════════════════════
-   MAIN CONTENT — NEUTRAL LIGHT ZONE
+   MAIN CONTENT
    ═══════════════════════════════════════════════════════════ */
 
 .cases-content {
@@ -188,9 +187,9 @@
     -fx-font-family: "Segoe UI";
     -fx-padding: 4 10 4 10;
 }
-.filter-combo:hover          { -fx-border-color: #00BCD4; }
-.filter-combo .arrow-button  { -fx-background-color: transparent; }
-.filter-combo .arrow         { -fx-background-color: #90A4AE; }
+.filter-combo:hover         { -fx-border-color: #00BCD4; }
+.filter-combo .arrow-button { -fx-background-color: transparent; }
+.filter-combo .arrow        { -fx-background-color: #90A4AE; }
 
 .filter-date {
     -fx-background-color: #FFFFFF;
@@ -203,11 +202,11 @@
     -fx-border-radius: 8;
     -fx-border-width: 1;
 }
-.filter-date:hover                      { -fx-border-color: #00BCD4; }
-.filter-date .arrow-button              { -fx-background-color: transparent; }
-.filter-date .arrow-button .arrow       { -fx-background-color: #90A4AE; }
-.filter-date .date-picker-popup         { -fx-background-color: #FFFFFF; -fx-border-color: #E0E0E0; }
-.filter-date .date-picker-popup > *     { -fx-background-color: #FFFFFF; }
+.filter-date:hover                { -fx-border-color: #00BCD4; }
+.filter-date .arrow-button        { -fx-background-color: transparent; }
+.filter-date .arrow-button .arrow { -fx-background-color: #90A4AE; }
+.filter-date .date-picker-popup   { -fx-background-color: #FFFFFF; -fx-border-color: #E0E0E0; }
+.filter-date .date-picker-popup > * { -fx-background-color: #FFFFFF; }
 
 .btn-clear-filters {
     -fx-background-color: transparent;
@@ -245,11 +244,11 @@
     -fx-border-color: transparent;
     -fx-padding: 0;
 }
-.cases-scroll > .viewport                  { -fx-background-color: #F5F5F5; }
-.cases-scroll .scroll-bar:vertical         { -fx-background-color: #F5F5F5; }
-.cases-scroll .scroll-bar:vertical .track  { -fx-background-color: #F5F5F5; }
-.cases-scroll .scroll-bar:vertical .thumb  { -fx-background-color: #E0E0E0; -fx-background-radius: 4; }
-.cases-scroll .corner                      { -fx-background-color: #F5F5F5; }
+.cases-scroll > .viewport                 { -fx-background-color: #F5F5F5; }
+.cases-scroll .scroll-bar:vertical        { -fx-background-color: #F5F5F5; }
+.cases-scroll .scroll-bar:vertical .track { -fx-background-color: #F5F5F5; }
+.cases-scroll .scroll-bar:vertical .thumb { -fx-background-color: #E0E0E0; -fx-background-radius: 4; }
+.cases-scroll .corner                     { -fx-background-color: #F5F5F5; }
 
 /* ── Case list container ── */
 .case-list { -fx-background-color: #F5F5F5; }
@@ -323,6 +322,25 @@
     -fx-background-color: #00BCD4;
     -fx-text-fill: #FFFFFF;
 }
+
+/* ── Open Evidence button ── */
+.btn-evidence {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4A6B70;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 12px;
+    -fx-border-color: #B0BEC5;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 4 12 4 12;
+    -fx-cursor: hand;
+}
+.btn-evidence:hover {
+    -fx-background-color: #E0F7FA;
+    -fx-text-fill: #0097A7;
+    -fx-border-color: #00BCD4;
+}
+
 .btn-overflow {
     -fx-background-color: transparent;
     -fx-text-fill: #90A4AE;
@@ -408,4 +426,41 @@
 .btn-cancel:hover {
     -fx-text-fill: #0D1B1E;
     -fx-border-color: #4A6B70;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTEXT MENU (Overflow ⋮)
+   ═══════════════════════════════════════════════════════════ */
+.context-menu {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 16, 0, 0, 4);
+    -fx-padding: 4 0 4 0;
+}
+
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-padding: 8 16 8 16;
+}
+.menu-item:hover {
+    -fx-background-color: #F0FAFB;
+    -fx-background-radius: 6;
+}
+.menu-item .label {
+    -fx-text-fill: #0D1B1E;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+}
+.menu-item:hover .label { -fx-text-fill: #00BCD4; }
+
+.menu-item-delete .label  { -fx-text-fill: #EF5350; }
+.menu-item-delete:hover   { -fx-background-color: #FFF0F0; }
+
+.context-menu .separator { -fx-padding: 2 0 2 0; }
+.context-menu .separator .line {
+    -fx-border-color: transparent transparent #F0F0F0 transparent;
+    -fx-border-width: 0 0 1 0;
 }
