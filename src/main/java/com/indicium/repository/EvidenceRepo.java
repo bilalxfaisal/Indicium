@@ -149,12 +149,29 @@ public class EvidenceRepo {
 
     public static boolean checkDuplicate(String hash)
     {
-        int len = EvidenceRepo.evidenceList.size();
-        for (int i = 0; i < len; i++)
+        String sql = "SELECT COUNT(*) FROM Evidence WHERE FileHash = ?";
+
+        try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+             PreparedStatement stmt = con.prepareStatement(sql))
         {
-            Evidence evidence = EvidenceRepo.evidenceList.get(i);
-            if(hash.equals(evidence.getHash())) return false;
+            stmt.setString(1, hash);
+
+            try (ResultSet rs = stmt.executeQuery())
+            {
+                if (rs.next())
+                {
+                    int count = rs.getInt(1);
+
+                    // If count > 0, duplicate exists
+                    return count == 0;
+                }
+            }
         }
-        return true;
+        catch (SQLException e)
+        {
+            System.err.println("[EvidenceRepo] ERROR: Failed to check duplicate - " + e.getMessage());
+        }
+
+        return false;
     }
 }

@@ -1,6 +1,8 @@
 package com.indicium.services;
 
 import com.indicium.models.SystemUser;
+import com.indicium.services.AuditLog;
+import com.indicium.services.AuditCategory;
 
 import java.time.LocalDateTime;
 

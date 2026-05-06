@@ -1,4 +1,4 @@
-package com.indicium.services;
+package com.indicium.controllers;
 
 import com.indicium.models.Evidence;
 import com.indicium.repository.CaseRepository;

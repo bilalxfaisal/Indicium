@@ -20,7 +20,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class LoginController {
+public class LoginController
+{
 
     // Note: Changed from usernameField to emailField to match your repository
     @FXML private TextField emailField;

@@ -2,8 +2,11 @@ package com.indicium.services;
 
 import com.indicium.models.Case;
 import com.indicium.repository.CaseRepository;
+import com.indicium.services.AuditLog;
+import com.indicium.services.AuditCategory;
 
-public class AccessManager {
+public class AccessManager
+{
 
     private final AuditLog auditLog;
     // Static flag for emergency system-wide lockdown
