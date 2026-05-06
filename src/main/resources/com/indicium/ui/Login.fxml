@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane styleClass="login-root" stylesheets="@Login.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.indicium.ui.LoginController">
+
+    <!-- ── Background split: left dark panel + right light panel ── -->
+    <HBox maxHeight="Infinity" maxWidth="Infinity">
+
+        <!-- LEFT — branding panel -->
+        <VBox alignment="CENTER" spacing="16" styleClass="login-brand-panel" HBox.hgrow="ALWAYS">
+            <padding><Insets bottom="60" left="50" right="50" top="60" /></padding>
+
+            <ImageView fitHeight="64" fitWidth="64" preserveRatio="true">
+                <image><Image url="@Assets/indicium-logo.png" /></image>
+            </ImageView>
+
+            <Label styleClass="brand-title" text="INDICIUM" />
+            <Label styleClass="brand-subtitle" text="Digital Forensics Platform" />
+
+            <VBox spacing="12" styleClass="brand-features">
+                <padding><Insets top="40" /></padding>
+                <Label styleClass="brand-feature" text="⬡  Case &amp; Evidence Management" />
+                <Label styleClass="brand-feature" text="⬡  Timeline &amp; Correlation Analysis" />
+                <Label styleClass="brand-feature" text="⬡  Audit Logging &amp; Integrity Checks" />
+                <Label styleClass="brand-feature" text="⬡  Identity &amp; Access Control" />
+            </VBox>
+        </VBox>
+
+        <!-- RIGHT — login form panel -->
+        <VBox alignment="CENTER" styleClass="login-form-panel" HBox.hgrow="ALWAYS">
+            <padding><Insets bottom="60" left="60" right="60" top="60" /></padding>
+
+            <!-- Card -->
+            <VBox spacing="0" styleClass="login-card">
+                <padding><Insets bottom="48" left="44" right="44" top="48" /></padding>
+
+                <!-- Header -->
+                <Label styleClass="login-heading" text="Welcome back" />
+                <Label styleClass="login-subheading" text="Sign in to your account" />
+
+                <VBox spacing="20">
+                    <padding><Insets bottom="8" top="36" /></padding>
+
+                    <!-- Email field -->
+                    <VBox spacing="6">
+                        <Label styleClass="field-label" text="UserId" />
+                        <TextField fx:id="emailField" promptText="UserID" styleClass="login-field" />
+                    </VBox>
+
+                    <!-- Password field -->
+                    <VBox spacing="6">
+                        <Label styleClass="field-label" text="Password" />
+                        <PasswordField fx:id="passwordField" promptText="••••••••" styleClass="login-field" />
+                    </VBox>
+
+                    <!-- Error label -->
+                    <Label fx:id="errorLabel" styleClass="error-label" text="" wrapText="true" />
+
+                    <!-- Login button -->
+                    <Button maxWidth="Infinity" onAction="#onLoginButtonClicked" styleClass="login-btn" text="Sign In" />
+                </VBox>
+
+                <!-- Footer -->
+                <Label styleClass="login-footer" text="Indicium v1.0  ·  Authorized Personnel Only" />
+            </VBox>
+
+        </VBox>
+    </HBox>
+
+</StackPane>

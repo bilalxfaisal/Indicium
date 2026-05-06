@@ -1,5 +1,5 @@
 module com.indicium {
-    // These tell Java which libraries we are using
+    // Libraries
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
@@ -7,11 +7,15 @@ module com.indicium {
     requires mysql.connector.j;
     requires itextpdf;
 
-    // This allows JavaFX to "see" your UI classes to render them
+    // JavaFX needs reflective access to ALL controller/UI packages
     opens com.indicium.ui to javafx.fxml;
+    opens com.indicium.models to javafx.base;     // ← for ObservableList / PropertyValueFactory
+    opens com.indicium.services to javafx.fxml;   // ← if any service is referenced in FXML
 
-    // This allows other parts of the system to access your code
+    // Exports
     exports com.indicium;
     exports com.indicium.ui;
     exports com.indicium.services;
+    exports com.indicium.models;                  // ← add this
+    exports com.indicium.repository;              // ← add this
 }

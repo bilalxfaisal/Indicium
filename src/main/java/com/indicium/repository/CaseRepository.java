@@ -162,4 +162,21 @@ public class CaseRepository {
 
         return new Case(id, title, date, status);
     }
+    public List<Case> findAll() {
+        String sql = "SELECT * FROM Cases ORDER BY IncidentDate DESC";
+        List<Case> cases = new ArrayList<>();
+
+        try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                cases.add(extractCaseFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("[CaseRepo] ERROR fetching all cases: " + e.getMessage());
+        }
+        return cases;
+    }
+
 }
