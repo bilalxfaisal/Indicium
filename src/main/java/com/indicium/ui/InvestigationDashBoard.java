@@ -1,29 +1,52 @@
 package com.indicium.ui;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class InvestigationDashBoard extends Application {
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Exception {
 
-        // DashBoardController loads DashBoard.fxml internally in its constructor
-        // DO NOT use a second FXMLLoader here — that causes the double-load crash
-        DashBoardController dashboard = new DashBoardController();
+        // Always boot into Login first
+        Parent loginRoot = FXMLLoader.load(
+                getClass().getResource("/com/indicium/ui/Login.fxml")
+        );
 
-        // Wrap in StackPane so the search overlay sits on top of everything
-        StackPane root = new StackPane(dashboard, dashboard.getGlobalSearch());
-
-        Scene scene = new Scene(root, 1000, 650);
-
-        primaryStage.setTitle("INDICIUM");
+        Scene scene = new Scene(loginRoot);
+        primaryStage.setTitle("INDICIUM - Login");
         primaryStage.setScene(scene);
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(550);
+        primaryStage.setResizable(false);
         primaryStage.show();
+    }
+
+    /**
+     * Called by LoginController after successful authentication.
+     * Swaps the Login scene out and loads the full Dashboard.
+     */
+    public static void launchDashboard(Stage stage) {
+        try {
+            DashBoardController dashboard = new DashBoardController();
+
+            // Wrap in StackPane so the search overlay sits on top
+            javafx.scene.layout.StackPane root =
+                    new javafx.scene.layout.StackPane(dashboard, dashboard.getGlobalSearch());
+
+            Scene scene = new Scene(root, 1000, 650);
+            stage.setTitle("INDICIUM");
+            stage.setScene(scene);
+            stage.setResizable(true);
+            stage.setMinWidth(800);
+            stage.setMinHeight(550);
+            stage.setMaximized(true);
+            stage.show();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to launch dashboard: " + e.getMessage(), e);
+        }
     }
 
     public static void main(String[] args) {

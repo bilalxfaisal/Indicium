@@ -1,19 +1,28 @@
 package com.indicium;
-import com.indicium.models.Evidence;
-import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
+
 
 public class Main
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
-        String path = "D://FAST 2024//Semester 4//SDA//Semester Project Work//Project//Indicium//pom.xml";
-        File file = new File(path);
 
-        Evidence ev = new Evidence(file);
-        ev.linkWithCase(2);
-        ev.linkWithCase(5);
-        ev.setStatus(0);
+        // Change this to whatever password you want
+        String password = "ADMIN1234";
 
-        ev.displayEvidence();
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] encoded = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+
+        StringBuilder hex = new StringBuilder();
+        for (byte b : encoded) {
+            String h = Integer.toHexString(0xff & b);
+            if (h.length() == 1) hex.append('0');
+            hex.append(h);
+        }
+
+        System.out.println("Password : " + password);
+        System.out.println("SHA-256  : " + hex);
     }
 }

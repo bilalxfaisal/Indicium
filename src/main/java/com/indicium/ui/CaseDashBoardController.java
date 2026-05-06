@@ -1,16 +1,33 @@
 package com.indicium.ui;
 
+import com.indicium.controllers.CaseManager;
+import com.indicium.controllers.FilterCriteria;
+import com.indicium.controllers.FilterType;
+import com.indicium.models.Case;
+import com.indicium.models.CaseStatus;
+import com.indicium.models.UserAuth;
+import com.indicium.repository.CaseRepository;
+import com.indicium.repository.EvidenceRepo;
+import com.indicium.services.SessionManager;
+
+
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CaseDashBoardController extends StackPane {
 
@@ -40,6 +57,18 @@ public class CaseDashBoardController extends StackPane {
     @FXML private Label            errorDate;
     @FXML private Label            errorDuplicate;
 
+    // ── Backend ──
+    private CaseManager    caseManager;
+    private CaseRepository caseRepo;
+    private int            currentUserID;
+
+    // ── In-memory cache of loaded cases (for filtering without re-querying) ──
+    private List<Case> allCases;
+
+    // ══════════════════════════════════════════
+    //  Constructor
+    // ══════════════════════════════════════════
+
     public CaseDashBoardController() {
         URL fxmlUrl = getClass().getResource("/com/indicium/ui/CaseDashBoard.fxml");
         if (fxmlUrl == null)
@@ -55,13 +84,35 @@ public class CaseDashBoardController extends StackPane {
         }
     }
 
+    // ══════════════════════════════════════════
+    //  Initialize
+    // ══════════════════════════════════════════
+
     @FXML
     public void initialize() {
+        // 1. Pull logged-in user from session
+        currentUserID = SessionManager.getInstance()
+                .getCurrentUser()
+                .getUserID();
+
+        // 2. Wire up CaseManager
+        UserAuth userAuth = new UserAuth(
+                SessionManager.getInstance().getCurrentUser().getCredentials(),
+                null
+        );
+        caseManager = new CaseManager(userAuth, new EvidenceRepo());
+        caseRepo    = new CaseRepository();
+
+        // 3. Setup UI options
         setupFilterOptions();
+
+        // 4. Load cases from DB
         loadCases();
     }
 
-    // ── Setup ──────────────────────────────────────────────────────
+    // ══════════════════════════════════════════
+    //  Setup
+    // ══════════════════════════════════════════
 
     private void setupFilterOptions() {
         filterPriority.getItems().addAll("All", "High", "Medium", "Low");
@@ -71,19 +122,101 @@ public class CaseDashBoardController extends StackPane {
         inputPriority.getItems().addAll("High", "Medium", "Low");
     }
 
-    // ── Load Cases ─────────────────────────────────────────────────
+    // ══════════════════════════════════════════
+    //  Load Cases from DB
+    // ══════════════════════════════════════════
 
     private void loadCases() {
-        // TODO: Query DB for all cases assigned to the logged-in user
-        // TODO: Call buildCaseRow() for each result
-        // TODO: Update countActive, countArchived, countLocked labels
-        showEmptyState(true);
+        try {
+            // Pull all cases from DB
+            allCases = caseRepo.findAll();
+
+            // Render them
+            renderCases(allCases);
+            updateCountBadges(allCases);
+
+        } catch (Exception e) {
+            System.err.println("[CaseDashBoard] Failed to load cases: " + e.getMessage());
+            showEmptyState(true);
+        }
+    }
+
+    private void renderCases(List<Case> cases) {
+        // Clear existing rows (keep the header row at index 0 if you have one)
+        caseListContainer.getChildren().clear();
+
+        if (cases == null || cases.isEmpty()) {
+            showEmptyState(true);
+            return;
+        }
+
+        showEmptyState(false);
+
+        for (Case c : cases) {
+            // Map CaseStatus to display string
+            String statusDisplay = mapStatusToDisplay(c.getStatus());
+
+            // Priority — your Case model doesn't have priority yet,
+            // default to "Medium" until you add it to the DB schema
+            String priority = "Medium";
+
+            // Format date
+            String date = c.getIncidentDate() != null
+                    ? c.getIncidentDate().toLocalDate().toString()
+                    : "N/A";
+
+            buildCaseRow(
+                    String.valueOf(c.getCaseID()),
+                    c.getTitle(),
+                    priority,
+                    date,
+                    statusDisplay
+            );
+        }
+    }
+
+    private void updateCountBadges(List<Case> cases) {
+        long active   = cases.stream()
+                .filter(c -> c.getStatus() == CaseStatus.OPEN)
+                .count();
+        long archived = cases.stream()
+                .filter(c -> c.getStatus() == CaseStatus.ARCHIVED)
+                .count();
+        long locked   = cases.stream()
+                .filter(c -> c.getStatus() == CaseStatus.CLOSED)
+                .count();
+
+        countActive.setText(String.valueOf(active));
+        countArchived.setText(String.valueOf(archived));
+        countLocked.setText(String.valueOf(locked));
+    }
+
+    private String mapStatusToDisplay(CaseStatus status) {
+        return switch (status) {
+            case OPEN     -> "Active";
+            case ARCHIVED -> "Archived";
+            case CLOSED   -> "Locked";
+            default       -> "Active";
+        };
+    }
+
+    private CaseStatus mapDisplayToStatus(String display) {
+        return switch (display) {
+            case "Active"   -> CaseStatus.OPEN;
+            case "Archived" -> CaseStatus.ARCHIVED;
+            case "Locked"   -> CaseStatus.CLOSED;
+            default         -> CaseStatus.OPEN;
+        };
     }
 
     private void showEmptyState(boolean show) {
         emptyState.setVisible(show);
         emptyState.setManaged(show);
     }
+
+    // ══════════════════════════════════════════
+    //  Build Case Row
+    // ══════════════════════════════════════════
 
     private void buildCaseRow(String caseId, String title,
                               String priority, String date, String status) {
@@ -144,16 +277,31 @@ public class CaseDashBoardController extends StackPane {
         };
     }
 
-    // ── Overflow Menu ──────────────────────────────────────────────
+    // ══════════════════════════════════════════
+    //  Overflow Menu
+    // ══════════════════════════════════════════
+
+    private MenuItem makeMenuItem(String label, String iconFile) {
+        ImageView icon = new ImageView(
+                new Image(getClass().getResourceAsStream("/com/indicium/ui/Assets/" + iconFile))
+        );
+        icon.setFitWidth(14);
+        icon.setFitHeight(14);
+        icon.setPreserveRatio(true);
+
+        MenuItem item = new MenuItem(label, icon);
+        return item;
+    }
+
 
     private void showOverflowMenu(Button anchor, String caseId, String status) {
         ContextMenu menu = new ContextMenu();
 
-        MenuItem open    = new MenuItem("📂  Open Case");
-        MenuItem edit    = new MenuItem("✏️  Edit Details");
-        MenuItem lock    = new MenuItem("🔒  Lock Case");
-        MenuItem archive = new MenuItem("🗄️  Archive Case");
-        MenuItem delete  = new MenuItem("🗑️  Delete");
+        MenuItem open    = makeMenuItem("Open Case",     "icons8-open-100.png");
+        MenuItem edit    = makeMenuItem("Edit Details",  "icons8-edit-100.png");
+        MenuItem lock    = makeMenuItem("Lock Case",     "icons8-lock-100.png");
+        MenuItem archive = makeMenuItem("Archive Case",  "icons8-archive-100.png");
+        MenuItem delete  = makeMenuItem("Delete",        "icons8-delete-100.png");
 
         open.setOnAction(e    -> handleOpenCase(caseId));
         edit.setOnAction(e    -> handleEditCase(caseId));
@@ -161,14 +309,21 @@ public class CaseDashBoardController extends StackPane {
         archive.setOnAction(e -> handleArchiveCase(caseId));
         delete.setOnAction(e  -> handleDeleteCase(caseId));
 
-        delete.setDisable(true); // TODO: enable for admin role only via RBAC
+        String role = SessionManager.getInstance()
+                .getCurrentUser()
+                .getRole()
+                .toString();
+        delete.setDisable(!role.equalsIgnoreCase("ADMIN"));
 
         menu.getItems().addAll(open, edit, new SeparatorMenuItem(),
                 lock, archive, new SeparatorMenuItem(), delete);
         menu.show(anchor, javafx.geometry.Side.BOTTOM, 0, 0);
     }
 
-    // ── Filter Handlers ────────────────────────────────────────────
+
+    // ══════════════════════════════════════════
+    //  Filter Handlers
+    // ══════════════════════════════════════════
 
     @FXML private void handleSearch() { applyFilters(); }
     @FXML private void handleFilter() { applyFilters(); }
@@ -180,23 +335,55 @@ public class CaseDashBoardController extends StackPane {
         filterStatus.setValue("All");
         filterDateFrom.setValue(null);
         filterDateTo.setValue(null);
-        applyFilters();
+        renderCases(allCases);
+        updateCountBadges(allCases);
     }
 
     private void applyFilters() {
+        if (allCases == null) return;
+
         String    search   = searchField.getText().toLowerCase().trim();
         String    priority = filterPriority.getValue();
         String    status   = filterStatus.getValue();
         LocalDate from     = filterDateFrom.getValue();
         LocalDate to       = filterDateTo.getValue();
-        // TODO: Filter caseListContainer rows against all criteria
-        // TODO: Show emptyState if no rows pass the filter
+
+        List<Case> filtered = allCases.stream()
+                // Search by title or ID
+                .filter(c -> search.isEmpty()
+                        || c.getTitle().toLowerCase().contains(search)
+                        || String.valueOf(c.getCaseID()).contains(search))
+
+                // Status filter
+                .filter(c -> status.equals("All")
+                        || c.getStatus() == mapDisplayToStatus(status))
+
+                // Date range filter
+                .filter(c -> {
+                    if (c.getIncidentDate() == null) return true;
+                    LocalDate caseDate = c.getIncidentDate().toLocalDate();
+                    if (from != null && caseDate.isBefore(from)) return false;
+                    if (to   != null && caseDate.isAfter(to))   return false;
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        renderCases(filtered);
+        updateCountBadges(filtered);
     }
 
-    // ── Modal Handlers ─────────────────────────────────────────────
+    // ══════════════════════════════════════════
+    //  Modal Handlers
+    // ══════════════════════════════════════════
 
     @FXML
     private void handleNewCase() {
+        // Check permission before even opening the modal
+        if (!caseManager.startNewInvestigation(currentUserID)) {
+            showAlert("Permission Denied",
+                    "You don't have permission to create cases.");
+            return;
+        }
         clearModalFields();
         modalOverlay.setVisible(true);
         modalOverlay.setManaged(true);
@@ -212,20 +399,96 @@ public class CaseDashBoardController extends StackPane {
     private void handleSubmitCase() {
         if (!validateCaseForm()) return;
 
-        String    title       = inputTitle.getText().trim();
-        LocalDate date        = inputDate.getValue();
-        String    priority    = inputPriority.getValue();
-        String    description = inputDescription.getText().trim();
+        String    title    = inputTitle.getText().trim();
+        LocalDate date     = inputDate.getValue();
+        String    priority = inputPriority.getValue();
 
-        // TODO: Check for duplicate case title in DB
-        // TODO: Generate unique Case ID (e.g. "IND-XXXX")
-        // TODO: INSERT new case into DB
-        // TODO: Log creation in audit log
-        // TODO: Refresh caseListContainer + update count badges
-        // TODO: Show success toast
+        // 1. Check for duplicate title
+        boolean isDuplicate = allCases != null && allCases.stream()
+                .anyMatch(c -> c.getTitle().equalsIgnoreCase(title));
 
+        if (isDuplicate) {
+            errorDuplicate.setText("A case with this title already exists.");
+            errorDuplicate.setVisible(true);
+            errorDuplicate.setManaged(true);
+            return;
+        }
+
+        // 2. Create via CaseManager (handles DB save + audit log)
+        LocalDateTime dateTime = date.atStartOfDay();
+        int newCaseID = caseManager.initializeCase(title, dateTime, currentUserID);
+
+        System.out.println("[CaseDashBoard] New case created with ID: " + newCaseID);
+
+        // 3. Refresh the list
+        loadCases();
+
+        // 4. Close modal
         handleCloseModal();
     }
+
+    // ══════════════════════════════════════════
+    //  Case Row Actions
+    // ══════════════════════════════════════════
+
+    private void handleOpenCase(String caseId) {
+        // TODO: Navigate to case detail view, passing caseId
+        System.out.println("[CaseDashBoard] Opening case: " + caseId);
+    }
+
+    private void handleEditCase(String caseId) {
+        // TODO: Populate modal with existing case data for editing
+        System.out.println("[CaseDashBoard] Editing case: " + caseId);
+    }
+
+    private void handleLockCase(String caseId) {
+        int id = Integer.parseInt(caseId);
+        Case c = caseRepo.findById(id);
+        if (c == null) return;
+
+        c.setStatus(CaseStatus.CLOSED);
+        caseRepo.update(c, "status = 'CLOSED'");
+
+        System.out.println("[CaseDashBoard] Case locked: " + caseId);
+        loadCases(); // refresh
+    }
+
+    private void handleArchiveCase(String caseId) {
+        int id = Integer.parseInt(caseId);
+
+        // Uses CaseManager which also verifies integrity before archiving
+        int archived = caseManager.removeFromActiveSpace(
+                currentUserID, new int[]{id}
+        );
+
+        if (archived > 0) {
+            System.out.println("[CaseDashBoard] Case archived: " + caseId);
+            loadCases();
+        } else {
+            showAlert("Archive Failed",
+                    "Case could not be archived. Integrity check may have failed.");
+        }
+    }
+
+    private void handleDeleteCase(String caseId) {
+        // Confirm dialog before delete
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Delete Case");
+        confirm.setHeaderText("Are you sure?");
+        confirm.setContentText("This action cannot be undone.");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                // TODO: Add CaseRepository.delete(int caseID) method
+                System.out.println("[CaseDashBoard] Delete case: " + caseId);
+                loadCases();
+            }
+        });
+    }
+
+    // ══════════════════════════════════════════
+    //  Validation
+    // ══════════════════════════════════════════
 
     private boolean validateCaseForm() {
         boolean valid = true;
@@ -263,13 +526,15 @@ public class CaseDashBoardController extends StackPane {
         errorDuplicate.setVisible(false); errorDuplicate.setManaged(false);
     }
 
-    // ── Case Row Actions ───────────────────────────────────────────
+    // ══════════════════════════════════════════
+    //  Utility
+    // ══════════════════════════════════════════
 
-    private void handleOpenCase(String caseId)    { /* TODO: Load case detail view */ }
-    private void handleEditCase(String caseId)    { /* TODO: Populate and open edit form */ }
-    private void handleLockCase(String caseId)    { /* TODO: DB update status = Locked */ }
-    private void handleArchiveCase(String caseId) { /* TODO: DB update status = Archived */ }
-    private void handleDeleteCase(String caseId)  { /* TODO: RBAC check + confirm + DB delete */ }
-
-
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }
