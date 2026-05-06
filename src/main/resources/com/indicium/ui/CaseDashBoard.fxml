@@ -15,7 +15,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root stylesheets="@CaseDashBoard.css" type="StackPane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root stylesheets="@CaseDashBoard.css" type="StackPane"
+         xmlns="http://javafx.com/javafx/25"
+         xmlns:fx="http://javafx.com/fxml/1">
 
     <!-- ══════════ MAIN CONTENT ══════════ -->
     <VBox spacing="0" styleClass="cases-content" StackPane.alignment="TOP_LEFT">
@@ -26,14 +28,14 @@
             <VBox spacing="4">
                 <Label styleClass="section-title" text="Cases" />
                 <HBox spacing="16">
-                    <!-- DO LIKE A DB QUERY FOR RESULTS-->
-                    <Label fx:id="countActive" styleClass="count-badge,badge-active" text="0 Active" />
+                    <Label fx:id="countActive"   styleClass="count-badge,badge-active"   text="0 Active" />
                     <Label fx:id="countArchived" styleClass="count-badge,badge-archived" text="0 Archived" />
-                    <Label fx:id="countLocked" styleClass="count-badge,badge-locked" text="0 Locked" />
+                    <Label fx:id="countLocked"   styleClass="count-badge,badge-locked"   text="0 Locked" />
                 </HBox>
             </VBox>
             <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="btnNewCase" onAction="#handleNewCase" styleClass="btn-new-case" text="+ New Case" />
+            <Button fx:id="btnNewCase" onAction="#handleNewCase"
+                    styleClass="btn-new-case" text="+ New Case" />
         </HBox>
 
         <!-- ── Filter Row ── -->
@@ -43,23 +45,31 @@
                 <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
                     <image><Image url="@Assets/icons8-search-100.png" /></image>
                 </ImageView>
-                <TextField fx:id="searchField" onKeyReleased="#handleSearch" prefWidth="180" promptText="Search cases..." styleClass="search-field" />
+                <TextField fx:id="searchField" onKeyReleased="#handleSearch"
+                           prefWidth="180" promptText="Search cases..."
+                           styleClass="search-field" />
             </HBox>
-            <ComboBox fx:id="filterPriority" onAction="#handleFilter" prefWidth="120" promptText="Priority" styleClass="filter-combo" />
-            <ComboBox fx:id="filterStatus" onAction="#handleFilter" prefWidth="120" promptText="Status " styleClass="filter-combo" />
-            <DatePicker fx:id="filterDateFrom" onAction="#handleFilter" prefWidth="130" promptText="From" styleClass="filter-date" />
-            <DatePicker fx:id="filterDateTo" onAction="#handleFilter" prefWidth="130" promptText="To" styleClass="filter-date" />
-            <Button fx:id="btnClearFilters" onAction="#handleClearFilters" prefHeight="30" prefWidth="90" styleClass="btn-clear-filters" text="✕ Clear" />
+            <ComboBox fx:id="filterPriority" onAction="#handleFilter"
+                      prefWidth="120" promptText="Priority" styleClass="filter-combo" />
+            <ComboBox fx:id="filterStatus"   onAction="#handleFilter"
+                      prefWidth="120" promptText="Status"   styleClass="filter-combo" />
+            <DatePicker fx:id="filterDateFrom" onAction="#handleFilter"
+                        prefWidth="130" promptText="From" styleClass="filter-date" />
+            <DatePicker fx:id="filterDateTo"   onAction="#handleFilter"
+                        prefWidth="130" promptText="To"   styleClass="filter-date" />
+            <Button fx:id="btnClearFilters" onAction="#handleClearFilters"
+                    prefHeight="30" prefWidth="90"
+                    styleClass="btn-clear-filters" text="✕ Clear" />
         </HBox>
 
         <!-- ── Table Header ── -->
         <HBox spacing="0" styleClass="table-header">
             <padding><Insets bottom="10" left="24" right="24" top="10" /></padding>
-            <Label prefWidth="110" styleClass="col-header" text="CASE ID" />
-            <Label prefWidth="220" styleClass="col-header" text="TITLE" />
-            <Label prefWidth="90" styleClass="col-header" text="PRIORITY" />
-            <Label prefWidth="110" styleClass="col-header" text="DATE" />
-            <Label prefWidth="100" styleClass="col-header" text="STATUS" />
+            <Label prefWidth="110" styleClass="col-header" text="CASE ID"  />
+            <Label prefWidth="220" styleClass="col-header" text="TITLE"    />
+            <Label prefWidth="90"  styleClass="col-header" text="PRIORITY" />
+            <Label prefWidth="110" styleClass="col-header" text="DATE"     />
+            <Label prefWidth="100" styleClass="col-header" text="STATUS"   />
             <Label styleClass="col-header" text="ACTIONS" HBox.hgrow="ALWAYS" />
         </HBox>
 
@@ -68,11 +78,12 @@
             <VBox fx:id="caseListContainer" spacing="0" styleClass="case-list">
 
                 <!-- Empty State -->
-                <VBox fx:id="emptyState" alignment="CENTER" spacing="12" styleClass="empty-state" VBox.vgrow="ALWAYS">
+                <VBox fx:id="emptyState" alignment="CENTER" spacing="12"
+                      styleClass="empty-state" VBox.vgrow="ALWAYS">
                     <padding><Insets top="80" /></padding>
-                    <Label styleClass="empty-icon" text="📁" />
+                    <Label styleClass="empty-icon"  text="📁" />
                     <Label styleClass="empty-title" text="No cases found." />
-                    <Label styleClass="empty-sub" text="Try adjusting your filters or create a new case." />
+                    <Label styleClass="empty-sub"   text="Try adjusting your filters or create a new case." />
                     <Button onAction="#handleNewCase" styleClass="btn-new-case" text="+ New Case" />
                 </VBox>
 
@@ -81,51 +92,65 @@
 
     </VBox>
 
-    <!-- ══════════ NEW CASE MODAL (floats on top) ══════════ -->
-    <StackPane fx:id="modalOverlay" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
+    <!-- ══════════ CASE MODAL (New + Edit) ══════════ -->
+    <StackPane fx:id="modalOverlay" alignment="CENTER"
+               managed="false" styleClass="modal-overlay" visible="false">
 
         <VBox alignment="TOP_CENTER" maxWidth="480" spacing="16" styleClass="modal-box">
             <padding><Insets bottom="28" left="32" right="32" top="28" /></padding>
 
             <!-- Modal header -->
             <HBox alignment="CENTER_LEFT">
-                <Label styleClass="modal-title" text="New Case" HBox.hgrow="ALWAYS" />
-                <Button onAction="#handleCloseModal" styleClass="modal-close-btn" text="✕" />
+                <Label fx:id="modalTitle" styleClass="modal-title"
+                       text="New Case" HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleCloseModal"
+                        styleClass="modal-close-btn" text="✕" />
             </HBox>
 
             <!-- Case Title -->
             <VBox spacing="4">
                 <Label styleClass="form-label" text="Case Title *" />
-                <TextField fx:id="inputTitle" promptText="Enter case title" styleClass="form-field" />
-                <Label fx:id="errorTitle" managed="false" styleClass="field-error" text="" visible="false" />
+                <TextField fx:id="inputTitle" promptText="Enter case title"
+                           styleClass="form-field" />
+                <Label fx:id="errorTitle" managed="false" styleClass="field-error"
+                       text="" visible="false" />
             </VBox>
 
             <!-- Incident Date -->
             <VBox spacing="4">
                 <Label styleClass="form-label" text="Incident Date *" />
                 <DatePicker fx:id="inputDate" prefWidth="416" styleClass="form-field" />
-                <Label fx:id="errorDate" managed="false" styleClass="field-error" text="" visible="false" />
+                <Label fx:id="errorDate" managed="false" styleClass="field-error"
+                       text="" visible="false" />
             </VBox>
 
             <!-- Priority -->
             <VBox spacing="4">
                 <Label styleClass="form-label" text="Priority *" />
-                <ComboBox fx:id="inputPriority" prefWidth="416" promptText="Select priority" styleClass="form-field" />
+                <ComboBox fx:id="inputPriority" prefWidth="416"
+                          promptText="Select priority" styleClass="form-field" />
+                <Label fx:id="errorPriority" managed="false" styleClass="field-error"
+                       text="" visible="false" />
             </VBox>
 
             <!-- Description -->
             <VBox spacing="4">
-                <Label styleClass="form-label" text="Description *" />
-                <TextArea fx:id="inputDescription" prefHeight="90" promptText="Brief description of the case..." styleClass="form-field" wrapText="true" />
+                <Label styleClass="form-label" text="Description" />
+                <TextArea fx:id="inputDescription" prefHeight="90"
+                          promptText="Brief description of the case..."
+                          styleClass="form-field" wrapText="true" />
             </VBox>
 
             <!-- Duplicate warning -->
-            <Label fx:id="errorDuplicate" managed="false" styleClass="field-error" text="⚠ A case with this title already exists." visible="false" />
+            <Label fx:id="errorDuplicate" managed="false" styleClass="field-error"
+                   text="⚠ A case with this title already exists." visible="false" />
 
             <!-- Buttons -->
             <HBox alignment="CENTER_RIGHT" spacing="10">
-                <Button onAction="#handleCloseModal" styleClass="btn-cancel" text="Cancel" />
-                <Button fx:id="btnSubmitCase" onAction="#handleSubmitCase" styleClass="btn-new-case" text="Create Case" />
+                <Button onAction="#handleCloseModal"
+                        styleClass="btn-cancel" text="Cancel" />
+                <Button fx:id="btnSubmitCase" onAction="#handleSubmitCase"
+                        styleClass="btn-new-case" text="Create Case" />
             </HBox>
 
         </VBox>

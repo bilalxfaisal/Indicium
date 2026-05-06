@@ -17,13 +17,15 @@ public class UserDirectory {
     private static String PASS;
 
     static {
-        loadDatabaseConfig();
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("[UserDirectory] MySQL driver loaded OK.");
         } catch (ClassNotFoundException e) {
-            System.err.println("MySQL Driver not found.");
+            System.err.println("[UserDirectory] CRITICAL: Driver not found: " + e.getMessage());
         }
+        loadDatabaseConfig();
     }
+
 
     private static void loadDatabaseConfig() {
         Properties props = new Properties();

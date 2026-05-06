@@ -1,6 +1,7 @@
 package com.indicium.repository;
 
 import com.indicium.models.TimeLineEvent;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class TimeLineRepository {
+
     private String URL;
     private String USER;
     private String PASS;
@@ -19,7 +21,7 @@ public class TimeLineRepository {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            System.err.println("MySQL Driver not found.");
+            System.err.println("[TimeLineRepo] MySQL Driver not found.");
         }
     }
 
@@ -27,60 +29,149 @@ public class TimeLineRepository {
         Properties props = new Properties();
         try (FileInputStream in = new FileInputStream("database.properties")) {
             props.load(in);
-            this.URL = props.getProperty("db.url");
+            this.URL  = props.getProperty("db.url");
             this.USER = props.getProperty("db.user");
             this.PASS = props.getProperty("db.password");
         } catch (IOException e) {
-            System.err.println("CRITICAL: database.properties file not found! Please create it in the project root.");
+            System.err.println("[TimeLineRepo] CRITICAL: database.properties not found!");
         }
     }
 
-    public boolean saveEvent(int caseID, String description, LocalDateTime timestamp, int evidenceID) {
-        String sql = "INSERT INTO timeline_events (case_id, description, event_timestamp, linked_evidence_id) VALUES (?, ?, ?)";
+    private Connection connect() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASS);
+    }
 
-        // Now uses the variables loaded from the properties file
-        try (Connection con = DriverManager.getConnection(URL, USER, PASS);
-             PreparedStatement stmt = con.prepareStatement(sql)) {
+    // ── Save new event ──────────────────────────────────────────
 
-            stmt.setInt(1, caseID);
-            stmt.setString(2, description);
-            stmt.setTimestamp(3, Timestamp.valueOf(timestamp));
-            stmt.setInt(4, evidenceID);
+    public boolean saveEvent(TimeLineEvent event) {
+        String sql = """
+                INSERT INTO timeline_events
+                    (case_id, title, description, event_timestamp, linked_evidence_id, added_by)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """;
+        try (Connection conn = connect();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            int rowsInserted = stmt.executeUpdate();
-            return rowsInserted > 0;
+            ps.setInt(1, event.getCaseID());
+            ps.setString(2, event.getTitle());
+            ps.setString(3, event.getDescription());
+            ps.setTimestamp(4, Timestamp.valueOf(event.getTimestamp()));
+            ps.setInt(5, event.getLinkedEvidenceID());
+            ps.setString(6, event.getAddedBy());
+            ps.executeUpdate();
 
+            ResultSet keys = ps.getGeneratedKeys();
+            if (keys.next()) event.setEventID(keys.getInt(1));
+
+            return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("[TimeLineRepo] saveEvent failed: " + e.getMessage());
             return false;
         }
     }
 
-    public List<TimeLineEvent> getEvents(int caseID) {
+    // ── Update existing event ───────────────────────────────────
+
+    public boolean updateEvent(TimeLineEvent event) {
+        String sql = """
+                UPDATE timeline_events
+                SET title = ?, description = ?, event_timestamp = ?, linked_evidence_id = ?
+                WHERE event_id = ?
+                """;
+        try (Connection conn = connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, event.getTitle());
+            ps.setString(2, event.getDescription());
+            ps.setTimestamp(3, Timestamp.valueOf(event.getTimestamp()));
+            ps.setInt(4, event.getLinkedEvidenceID());
+            ps.setInt(5, event.getEventID());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("[TimeLineRepo] updateEvent failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // ── Delete event ────────────────────────────────────────────
+
+    public boolean deleteEvent(int eventID) {
+        String sql = "DELETE FROM timeline_events WHERE event_id = ?";
+        try (Connection conn = connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, eventID);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("[TimeLineRepo] deleteEvent failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // ── Get all events for a case ───────────────────────────────
+
+    public List<TimeLineEvent> findByCaseId(int caseID) {
+        String sql = """
+                SELECT event_id, case_id, title, description,
+                       event_timestamp, linked_evidence_id, added_by
+                FROM timeline_events
+                WHERE case_id = ?
+                ORDER BY event_timestamp ASC
+                """;
         List<TimeLineEvent> events = new ArrayList<>();
-        String sql = "SELECT * FROM timeline_events WHERE case_id = ? ORDER BY event_timestamp ASC";
+        try (Connection conn = connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        try (Connection con = DriverManager.getConnection(URL, USER, PASS);
-             PreparedStatement stmt = con.prepareStatement(sql)) {
+            ps.setInt(1, caseID);
+            ResultSet rs = ps.executeQuery();
 
-            stmt.setInt(1, caseID);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    LocalDateTime timestamp = rs.getTimestamp("event_timestamp").toLocalDateTime();
-                    String description = rs.getString("description");
-
-                    // Get the ID. If it's NULL in the database, JDBC returns 0.
-                    int linkedEvidenceID = rs.getInt("linked_evidence_id");
-
-                    TimeLineEvent event = new TimeLineEvent(timestamp, description, linkedEvidenceID);
-                    events.add(event);
-                }
+            while (rs.next()) {
+                TimeLineEvent e = new TimeLineEvent();
+                e.setEventID(rs.getInt("event_id"));
+                e.setCaseID(rs.getInt("case_id"));
+                e.setTitle(rs.getString("title"));
+                e.setDescription(rs.getString("description"));
+                e.setTimestamp(rs.getTimestamp("event_timestamp").toLocalDateTime());
+                e.setLinkedEvidenceID(rs.getInt("linked_evidence_id"));
+                e.setAddedBy(rs.getString("added_by"));
+                events.add(e);
             }
         } catch (SQLException e) {
-            System.err.println("Failed to fetch timeline: " + e.getMessage());
+            System.err.println("[TimeLineRepo] findByCaseId failed: " + e.getMessage());
         }
-
         return events;
+    }
+
+    // ── Find single event ───────────────────────────────────────
+
+    public TimeLineEvent findById(int eventID) {
+        String sql = """
+                SELECT event_id, case_id, title, description,
+                       event_timestamp, linked_evidence_id, added_by
+                FROM timeline_events
+                WHERE event_id = ?
+                """;
+        try (Connection conn = connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, eventID);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                TimeLineEvent e = new TimeLineEvent();
+                e.setEventID(rs.getInt("event_id"));
+                e.setCaseID(rs.getInt("case_id"));
+                e.setTitle(rs.getString("title"));
+                e.setDescription(rs.getString("description"));
+                e.setTimestamp(rs.getTimestamp("event_timestamp").toLocalDateTime());
+                e.setLinkedEvidenceID(rs.getInt("linked_evidence_id"));
+                e.setAddedBy(rs.getString("added_by"));
+                return e;
+            }
+        } catch (SQLException e) {
+            System.err.println("[TimeLineRepo] findById failed: " + e.getMessage());
+        }
+        return null;
     }
 }

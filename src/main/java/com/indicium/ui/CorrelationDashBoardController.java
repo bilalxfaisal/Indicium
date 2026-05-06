@@ -1,13 +1,25 @@
 package com.indicium.ui;
 
+import com.indicium.controllers.CorrelationManager;
+import com.indicium.models.Case;
+import com.indicium.models.CorrelationLink;
+import com.indicium.models.Evidence;
+import com.indicium.repository.CaseRepository;
+import com.indicium.services.SessionManager;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CorrelationDashBoardController extends StackPane {
 
@@ -34,9 +46,9 @@ public class CorrelationDashBoardController extends StackPane {
     @FXML private Label stepThree;
 
     // ── Source panel ──
-    @FXML private ComboBox<String> sourceCaseCombo;
-    @FXML private VBox             sourceEvidenceList;
-    @FXML private VBox             sourceEmptyHint;
+    @FXML private ComboBox<Case> sourceCaseCombo;
+    @FXML private VBox           sourceEvidenceList;
+    @FXML private VBox           sourceEmptyHint;
 
     // ── Target panel ──
     @FXML private TextField targetCaseSearch;
@@ -56,37 +68,36 @@ public class CorrelationDashBoardController extends StackPane {
     // ── Delete modal ──
     @FXML private StackPane modalOverlay;
     @FXML private Label     modalLinkSummary;
-    @FXML private Button    btnConfirmDelete;
 
     // ── Wizard state ──
     private enum WizardStep {
-        VIEWING_LINKS,
-        SELECT_SOURCE,
-        SELECT_TARGET_CASE,
-        SELECT_TARGET_EV,
-        CONFIRM_LINK
+        VIEWING_LINKS, SELECT_SOURCE,
+        SELECT_TARGET_CASE, SELECT_TARGET_EV, CONFIRM_LINK
     }
-
     private WizardStep currentStep = WizardStep.VIEWING_LINKS;
 
     // ── Selections ──
-    private String selectedSourceCaseId   = null;
-    private String selectedSourceEvidId   = null;
-    private String selectedSourceEvidName = null;
+    private int    selectedSourceCaseID   = -1;
+    private int    selectedSourceEvidID   = -1;
+    private String selectedSourceEvidName = "";
+    private int    selectedTargetCaseID   = -1;
+    private String selectedTargetCaseName = "";
+    private int    selectedTargetEvidID   = -1;
+    private String selectedTargetEvidName = "";
+    private int    pendingDeleteLinkID    = -1;
+    private int    pendingDeleteSrcCaseID = -1;
 
-    private String selectedTargetCaseId   = null;
-    private String selectedTargetCaseName = null;
-    private String selectedTargetEvidId   = null;
-    private String selectedTargetEvidName = null;
+    private CorrelationManager corrManager;
+    private CaseRepository     caseRepo;
 
-    // ── Pending delete ──
-    private String pendingDeleteLinkId = null;
+    private static final DateTimeFormatter DT_FMT =
+            DateTimeFormatter.ofPattern("dd MMM yyyy  HH:mm");
 
-    // ── Constructor ──
+    // ── Constructor ─────────────────────────────────────────────
+
     public CorrelationDashBoardController() {
         URL fxmlUrl = getClass().getResource(
-                "/com/indicium/ui/CorrelationDashboard.fxml"
-        );
+                "/com/indicium/ui/CorrelationDashboard.fxml");
         if (fxmlUrl == null)
             throw new RuntimeException("CorrelationDashboard.fxml not found.");
 
@@ -97,120 +108,195 @@ public class CorrelationDashBoardController extends StackPane {
             loader.load();
         } catch (IOException e) {
             throw new RuntimeException(
-                    "Failed to load CorrelationDashboard.fxml: " + e.getMessage(), e
-            );
+                    "Failed to load CorrelationDashboard.fxml: " + e.getMessage(), e);
         }
     }
 
+    // ── Initialize ───────────────────────────────────────────────
+
     @FXML
     public void initialize() {
+        corrManager = new CorrelationManager();
+        caseRepo    = new CaseRepository();
         setupFilters();
         loadLinks();
         transitionTo(WizardStep.VIEWING_LINKS);
     }
 
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
     //  SETUP
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
 
     private void setupFilters() {
-        // TODO: populate filterCaseCombo from DB — SELECT DISTINCT case_id FROM cases
+        // Case filter — populated from DB
+        filterCaseCombo.getItems().add("All");
+        filterCaseCombo.getItems().addAll(corrManager.getDistinctCaseTitles());
+        filterCaseCombo.setValue("All");
+
         filterTypeCombo.getItems().addAll(
-                "All", "Image", "Video", "Document", "Audio", "Other"
-        );
+                "All", "Image", "Video", "Document", "Audio", "Bitstream", "Other");
         filterTypeCombo.setValue("All");
+
+        // Source case combo — full case list
+        setupSourceCaseCombo();
     }
 
-    // ══════════════════════════════════════════════════════════
-    //  LOAD EXISTING LINKS
-    // ══════════════════════════════════════════════════════════
+    private void setupSourceCaseCombo() {
+        sourceCaseCombo.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Case c, boolean empty) {
+                super.updateItem(c, empty);
+                if (empty || c == null) setText(null);
+                else setText("#" + String.format("%04d", c.getCaseID())
+                        + "  —  " + c.getTitle());
+            }
+        });
+        sourceCaseCombo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Case c, boolean empty) {
+                super.updateItem(c, empty);
+                if (empty || c == null) {
+                    setText("Choose a case...");
+                    setStyle("-fx-text-fill: #90A4AE;");
+                } else {
+                    setText("#" + String.format("%04d", c.getCaseID())
+                            + "  —  " + c.getTitle());
+                    setStyle("-fx-text-fill: #0D1B1E; -fx-font-weight: bold;");
+                }
+            }
+        });
+        try {
+            sourceCaseCombo.getItems().setAll(caseRepo.findAll());
+        } catch (Exception e) {
+            System.err.println("[CorrelationDashBoard] Failed to load cases: "
+                    + e.getMessage());
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  LOAD & RENDER EXISTING LINKS
+    // ═══════════════════════════════════════════════════════════
 
     private void loadLinks() {
+        String search     = searchField != null ? searchField.getText().trim() : "";
+        String caseFilter = filterCaseCombo != null ? filterCaseCombo.getValue() : "All";
+        String typeFilter = filterTypeCombo != null ? filterTypeCombo.getValue() : "All";
+
+        List<CorrelationLink> links = corrManager.getLinks(search, caseFilter, typeFilter);
+
         viewLinksList.getChildren().clear();
         viewLinksList.getChildren().add(emptyState);
 
-        // TODO: SELECT cl.link_id,
-        //              src_ev.name, src_ev.type, src_c.case_id, src_c.title,
-        //              tgt_ev.name, tgt_ev.type, tgt_c.case_id, tgt_c.title,
-        //              u.username, cl.created_at
-        //       FROM correlation_links cl
-        //       JOIN evidence src_ev ON cl.source_ev_id = src_ev.id
-        //       JOIN cases    src_c  ON src_ev.case_id  = src_c.id
-        //       JOIN evidence tgt_ev ON cl.target_ev_id = tgt_ev.id
-        //       JOIN cases    tgt_c  ON tgt_ev.case_id  = tgt_c.id
-        //       JOIN users    u      ON cl.created_by   = u.id
-        //       ORDER BY cl.created_at DESC;
-        // TODO: For each row call buildLinkRow(...)
-        // TODO: Update countLinks label
+        if (links.isEmpty()) {
+            showEmptyState(true);
+            countLinks.setText("0 Links");
+            return;
+        }
 
-        showEmptyState(true); // remove once DB wired
+        showEmptyState(false);
+        countLinks.setText(links.size() + " Link" + (links.size() == 1 ? "" : "s"));
+
+        for (CorrelationLink lnk : links) {
+            buildLinkRow(
+                    lnk.getLinkID(),
+                    lnk.getSrcEvidName(), lnk.getSrcEvidType(),
+                    "#" + String.format("%04d", lnk.getSrcCaseID())
+                            + " " + lnk.getSrcCaseTitle(),
+                    lnk.getTgtEvidName(), lnk.getTgtEvidType(),
+                    "#" + String.format("%04d", lnk.getTgtCaseID())
+                            + " " + lnk.getTgtCaseTitle(),
+                    lnk.getLinkedBy(),
+                    lnk.getCreatedAt() != null
+                            ? lnk.getCreatedAt().format(DT_FMT) : "—",
+                    lnk.getSrcCaseID()
+            );
+        }
+
+        // Refresh filter combo with latest case titles
+        String current = filterCaseCombo.getValue();
+        filterCaseCombo.getItems().clear();
+        filterCaseCombo.getItems().add("All");
+        filterCaseCombo.getItems().addAll(corrManager.getDistinctCaseTitles());
+        filterCaseCombo.setValue(current != null ? current : "All");
     }
 
-    /**
-     * Builds one link row in the existing-links list.
-     */
-    private void buildLinkRow(String linkId,
-                              String srcEvName, String srcEvType, String srcCaseId,
-                              String tgtEvName, String tgtEvType, String tgtCaseId,
-                              String linkedBy, String date) {
+    private void buildLinkRow(int linkId,
+                              String srcEvName, String srcEvType, String srcCaseLabel,
+                              String tgtEvName, String tgtEvType, String tgtCaseLabel,
+                              String linkedBy, String date, int srcCaseID) {
         HBox row = new HBox();
         row.getStyleClass().add("link-row");
         row.setAlignment(Pos.CENTER_LEFT);
         row.setSpacing(0);
 
         // Source evidence cell
-        VBox srcCell = buildEvCell(srcEvName, srcEvType, srcCaseId, 200);
+        VBox srcCell = buildEvCell(srcEvName, srcEvType, 200);
 
         // Source case chip
         HBox srcCaseCell = new HBox();
         srcCaseCell.setPrefWidth(160);
         srcCaseCell.setAlignment(Pos.CENTER_LEFT);
-        Label srcChip = new Label(srcCaseId);
+        Label srcChip = new Label(srcCaseLabel);
         srcChip.getStyleClass().add("link-case-chip");
         srcCaseCell.getChildren().add(srcChip);
 
-        // Connector
+        // Connector icon
         HBox connCell = new HBox();
         connCell.getStyleClass().add("link-connector-cell");
         connCell.setAlignment(Pos.CENTER);
-        Label connIcon = new Label("⇄");
-        connIcon.getStyleClass().add("link-connector-icon");
-        connCell.getChildren().add(connIcon);
+        try {
+            var stream = getClass().getResourceAsStream(
+                    "/com/indicium/ui/Assets/icons8-link-100.png");
+            if (stream != null) {
+                ImageView iv = new ImageView(new Image(stream));
+                iv.setFitWidth(18); iv.setFitHeight(18); iv.setPreserveRatio(true);
+                connCell.getChildren().add(iv);
+            } else {
+                Label fallback = new Label("⇄");
+                fallback.getStyleClass().add("link-connector-icon");
+                connCell.getChildren().add(fallback);
+            }
+        } catch (Exception ignored) {
+            Label fallback = new Label("⇄");
+            fallback.getStyleClass().add("link-connector-icon");
+            connCell.getChildren().add(fallback);
+        }
 
         // Target evidence cell
-        VBox tgtCell = buildEvCell(tgtEvName, tgtEvType, tgtCaseId, 200);
+        VBox tgtCell = buildEvCell(tgtEvName, tgtEvType, 200);
 
         // Target case chip
         HBox tgtCaseCell = new HBox();
         tgtCaseCell.setPrefWidth(160);
         tgtCaseCell.setAlignment(Pos.CENTER_LEFT);
-        Label tgtChip = new Label(tgtCaseId);
+        Label tgtChip = new Label(tgtCaseLabel);
         tgtChip.getStyleClass().add("link-case-chip");
         tgtCaseCell.getChildren().add(tgtChip);
 
-        // Meta + delete
+        // Meta
         VBox metaCell = new VBox(2);
         HBox.setHgrow(metaCell, Priority.ALWAYS);
         metaCell.setAlignment(Pos.CENTER_LEFT);
-        Label lblBy   = new Label(linkedBy);
-        lblBy.getStyleClass().add("link-meta");
-        Label lblDate = new Label(date);
-        lblDate.getStyleClass().add("link-meta-time");
+        Label lblBy   = new Label(linkedBy);  lblBy.getStyleClass().add("link-meta");
+        Label lblDate = new Label(date);      lblDate.getStyleClass().add("link-meta-time");
         metaCell.getChildren().addAll(lblBy, lblDate);
 
-        // Delete button — TODO: hide if user role != ADMIN
+        // Delete button — admin only
+        String role = SessionManager.getInstance().getCurrentUser()
+                .getRole().toString();
         Button btnDel = new Button("Remove");
         btnDel.getStyleClass().add("btn-delete");
-        btnDel.setOnAction(e -> promptDeleteLink(linkId, srcEvName, tgtEvName));
+        btnDel.setDisable(!role.equalsIgnoreCase("ADMIN"));
+        btnDel.setOnAction(e -> promptDeleteLink(linkId, srcEvName,
+                tgtEvName, srcCaseID));
 
         row.getChildren().addAll(
                 srcCell, srcCaseCell, connCell,
-                tgtCell, tgtCaseCell, metaCell, btnDel
-        );
+                tgtCell, tgtCaseCell, metaCell, btnDel);
         viewLinksList.getChildren().add(row);
     }
 
-    private VBox buildEvCell(String name, String type, String caseId, double width) {
+    private VBox buildEvCell(String name, String type, double width) {
         VBox cell = new VBox(3);
         cell.setPrefWidth(width);
         cell.setAlignment(Pos.CENTER_LEFT);
@@ -218,13 +304,10 @@ public class CorrelationDashBoardController extends StackPane {
         Label lblName = new Label(name);
         lblName.getStyleClass().add("link-ev-name");
 
-        HBox meta = new HBox(6);
-        meta.setAlignment(Pos.CENTER_LEFT);
-        Label typeChip = new Label(type.toUpperCase());
+        Label typeChip = new Label(type != null ? type.toUpperCase() : "OTHER");
         typeChip.getStyleClass().addAll("ev-type-chip", getTypeChipStyle(type));
-        meta.getChildren().add(typeChip);
 
-        cell.getChildren().addAll(lblName, meta);
+        cell.getChildren().addAll(lblName, typeChip);
         return cell;
     }
 
@@ -233,45 +316,31 @@ public class CorrelationDashBoardController extends StackPane {
         emptyState.setManaged(show);
     }
 
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
     //  WIZARD STATE MACHINE
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
 
     private void transitionTo(WizardStep step) {
         currentStep = step;
-
         boolean isViewing = (step == WizardStep.VIEWING_LINKS);
 
-        // Show/hide top chrome
-        filterRow.setVisible(isViewing);
-        filterRow.setManaged(isViewing);
-        tableHeader.setVisible(isViewing);
-        tableHeader.setManaged(isViewing);
+        filterRow.setVisible(isViewing);   filterRow.setManaged(isViewing);
+        tableHeader.setVisible(isViewing); tableHeader.setManaged(isViewing);
+        viewLinksList.setVisible(isViewing); viewLinksList.setManaged(isViewing);
+        viewWizard.setVisible(!isViewing);   viewWizard.setManaged(!isViewing);
 
-        // Show/hide main panels
-        viewLinksList.setVisible(isViewing);
-        viewLinksList.setManaged(isViewing);
-        viewWizard.setVisible(!isViewing);
-        viewWizard.setManaged(!isViewing);
-
-        // Preview bar only when confirm step
         boolean showPreview = (step == WizardStep.CONFIRM_LINK);
         linkPreviewBar.setVisible(showPreview);
         linkPreviewBar.setManaged(showPreview);
 
-        // Update breadcrumb chips
         updateBreadcrumb(step);
     }
 
     private void updateBreadcrumb(WizardStep step) {
-        resetChip(stepOne);
-        resetChip(stepTwo);
-        resetChip(stepThree);
-
+        resetChip(stepOne); resetChip(stepTwo); resetChip(stepThree);
         switch (step) {
-            case SELECT_SOURCE -> {
-                stepOne.getStyleClass().add("step-active");
-            }
+            case SELECT_SOURCE ->
+                    stepOne.getStyleClass().add("step-active");
             case SELECT_TARGET_CASE -> {
                 stepOne.getStyleClass().add("step-done");
                 stepTwo.getStyleClass().add("step-active");
@@ -281,7 +350,7 @@ public class CorrelationDashBoardController extends StackPane {
                 stepTwo.getStyleClass().add("step-done");
                 stepThree.getStyleClass().add("step-active");
             }
-            default -> { /* VIEWING_LINKS — no chips active */ }
+            default -> {}
         }
     }
 
@@ -290,14 +359,13 @@ public class CorrelationDashBoardController extends StackPane {
         chip.getStyleClass().add("step-inactive");
     }
 
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
     //  WIZARD HANDLERS
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
 
     @FXML
     private void handleNewLink() {
         resetWizardSelections();
-        populateSourceCaseCombo();
         transitionTo(WizardStep.SELECT_SOURCE);
     }
 
@@ -309,103 +377,244 @@ public class CorrelationDashBoardController extends StackPane {
 
     @FXML
     private void handleSourceCaseSelected() {
-        String caseId = sourceCaseCombo.getValue();
-        if (caseId == null) return;
+        Case selected = sourceCaseCombo.getValue();
+        if (selected == null) return;
 
-        selectedSourceCaseId = caseId;
-        selectedSourceEvidId = null;
-        loadSourceEvidenceList(caseId);
+        selectedSourceCaseID = selected.getCaseID();
+        selectedSourceEvidID = -1;
+
+        loadEvidencePickList(
+                corrManager.getEvidenceForCase(selectedSourceCaseID),
+                sourceEvidenceList,
+                sourceEmptyHint,
+                true   // isSource
+        );
         transitionTo(WizardStep.SELECT_SOURCE);
     }
 
     @FXML
     private void handleTargetCaseSearch() {
-        String query = targetCaseSearch.getText().trim();
+        String query = targetCaseSearch.getText().trim().toLowerCase();
         if (query.isEmpty()) return;
 
-        // TODO: SELECT case_id, title FROM cases
-        //       WHERE case_id LIKE ? OR title LIKE ?
-        //       AND case_id != selectedSourceCaseId   ← exclude source case
-        //       LIMIT 10
-        // TODO: For each result call buildTargetCaseResult(caseId, title)
-        targetCaseResults.getChildren().clear();
-        targetCaseResults.setVisible(true);
-        targetCaseResults.setManaged(true);
+        try {
+            List<Case> results = caseRepo.findAll().stream()
+                    .filter(c -> c.getCaseID() != selectedSourceCaseID)
+                    .filter(c -> c.getTitle().toLowerCase().contains(query)
+                            || String.valueOf(c.getCaseID()).contains(query))
+                    .collect(Collectors.toList());
+
+            targetCaseResults.getChildren().clear();
+
+            if (results.isEmpty()) {
+                Label none = new Label("No cases found.");
+                none.setStyle("-fx-text-fill: #90A4AE; -fx-font-family: 'Segoe UI';"
+                        + "-fx-font-size: 12px; -fx-padding: 10 16 10 16;");
+                targetCaseResults.getChildren().add(none);
+            } else {
+                for (Case c : results) {
+                    buildTargetCaseResultRow(c);
+                }
+            }
+
+            targetCaseResults.setVisible(true);
+            targetCaseResults.setManaged(true);
+
+        } catch (Exception e) {
+            System.err.println("[CorrelationDashBoard] Target case search failed: "
+                    + e.getMessage());
+        }
     }
 
-    private void selectTargetCase(String caseId, String title) {
-        selectedTargetCaseId   = caseId;
+    private void buildTargetCaseResultRow(Case c) {
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setStyle("-fx-background-color: #FAFAFA; -fx-padding: 8 16 8 16;"
+                + "-fx-border-color: transparent transparent #F0F0F0 transparent;"
+                + "-fx-border-width: 0 0 1 0; -fx-cursor: hand;");
+
+        Label lblId = new Label("#" + String.format("%04d", c.getCaseID()));
+        lblId.setStyle("-fx-text-fill: #90A4AE; -fx-font-family: 'Segoe UI';"
+                + "-fx-font-size: 12px; -fx-font-weight: bold;");
+
+        Label lblTitle = new Label(c.getTitle());
+        lblTitle.setStyle("-fx-text-fill: #0D1B1E; -fx-font-family: 'Segoe UI';"
+                + "-fx-font-size: 13px;");
+        HBox.setHgrow(lblTitle, Priority.ALWAYS);
+
+        // Authorize check before allowing selection
+        int userID = SessionManager.getInstance().getCurrentUser().getUserID();
+        boolean authorized = corrManager.initiateLink(userID, c.getCaseID());
+
+        if (authorized) {
+            Button btnSelect = new Button("Select");
+            btnSelect.setStyle("-fx-background-color: #00BCD4; -fx-text-fill: #FFFFFF;"
+                    + "-fx-font-family: 'Segoe UI'; -fx-font-size: 11px;"
+                    + "-fx-font-weight: bold; -fx-background-radius: 6;"
+                    + "-fx-border-color: transparent; -fx-padding: 4 12 4 12;"
+                    + "-fx-cursor: hand;");
+            btnSelect.setOnAction(e -> selectTargetCase(c.getCaseID(), c.getTitle()));
+            row.getChildren().addAll(lblId, lblTitle, btnSelect);
+        } else {
+            Label locked = new Label("No Access");
+            locked.setStyle("-fx-text-fill: #EF5350; -fx-font-family: 'Segoe UI';"
+                    + "-fx-font-size: 11px; -fx-font-weight: bold;");
+            row.getChildren().addAll(lblId, lblTitle, locked);
+        }
+
+        targetCaseResults.getChildren().add(row);
+    }
+
+    private void selectTargetCase(int caseID, String title) {
+        selectedTargetCaseID   = caseID;
         selectedTargetCaseName = title;
-        selectedTargetEvidId   = null;
+        selectedTargetEvidID   = -1;
 
-        // TODO: Trigger UC-4 Authorize Case Access check here
-        //   authorizeCaseAccess(currentUserId, caseId);
+        targetCaseResults.setVisible(false);
+        targetCaseResults.setManaged(false);
+        targetCaseSearch.clear();
 
-        loadTargetEvidenceList(caseId);
+        loadEvidencePickList(
+                corrManager.getEvidenceForCase(caseID),
+                targetEvidenceList,
+                targetEmptyHint,
+                false  // isTarget
+        );
         transitionTo(WizardStep.SELECT_TARGET_EV);
     }
 
-    private void selectSourceEvidence(String evidId, String evidName) {
-        selectedSourceEvidId   = evidId;
-        selectedSourceEvidName = evidName;
-        refreshEvidenceSelectionUI(sourceEvidenceList, evidId);
-        checkPreviewReady();
-    }
+    // ═══════════════════════════════════════════════════════════
+    //  EVIDENCE PICK LIST
+    // ═══════════════════════════════════════════════════════════
 
-    private void selectTargetEvidence(String evidId, String evidName) {
-        selectedTargetEvidId   = evidId;
-        selectedTargetEvidName = evidName;
-        refreshEvidenceSelectionUI(targetEvidenceList, evidId);
-        checkPreviewReady();
-    }
+    private void loadEvidencePickList(List<Evidence> evidenceList,
+                                      VBox container, VBox emptyHint,
+                                      boolean isSource) {
+        container.getChildren().clear();
+        container.getChildren().add(emptyHint);
 
-    /**
-     * Called whenever a selection changes — shows preview bar
-     * and enables Create Link if both sides are chosen.
-     */
-    private void checkPreviewReady() {
-        boolean ready = selectedSourceEvidId != null && selectedTargetEvidId != null;
-
-        if (ready) {
-            previewSourceName.setText(selectedSourceEvidName);
-            previewSourceCase.setText(selectedSourceCaseId);
-            previewTargetName.setText(selectedTargetEvidName);
-            previewTargetCase.setText(selectedTargetCaseId);
-
-            boolean conflict = checkLinkConflict(
-                    selectedSourceEvidId, selectedTargetEvidId
-            );
-            lblConflict.setVisible(conflict);
-            lblConflict.setManaged(conflict);
-            btnCreateLink.setDisable(conflict);
-
-            transitionTo(WizardStep.CONFIRM_LINK);
+        if (evidenceList == null || evidenceList.isEmpty()) {
+            emptyHint.setVisible(true);
+            emptyHint.setManaged(true);
+            return;
         }
+
+        emptyHint.setVisible(false);
+        emptyHint.setManaged(false);
+
+        for (Evidence ev : evidenceList) {
+            HBox item = new HBox(10);
+            item.setAlignment(Pos.CENTER_LEFT);
+            item.getStyleClass().add("evidence-pick-item");
+            item.setUserData(String.valueOf(ev.getEvidenceID()));
+
+            VBox info = new VBox(3);
+            HBox.setHgrow(info, Priority.ALWAYS);
+
+            Label lblName = new Label(ev.getName());
+            lblName.getStyleClass().add("ev-item-name");
+
+            Label lblMeta = new Label("EV-" + ev.getEvidenceID()
+                    + "  ·  " + (ev.getType() != null ? ev.getType() : "Other"));
+            lblMeta.getStyleClass().add("ev-item-meta");
+
+            info.getChildren().addAll(lblName, lblMeta);
+
+            Label typeChip = new Label(
+                    ev.getType() != null ? ev.getType().toUpperCase() : "OTHER");
+            typeChip.getStyleClass().addAll("ev-type-chip",
+                    getTypeChipStyle(ev.getType()));
+
+            item.getChildren().addAll(info, typeChip);
+
+            // Click to select
+            item.setOnMouseClicked(e -> {
+                if (isSource) {
+                    selectSourceEvidence(ev.getEvidenceID(), ev.getName(),
+                            container);
+                } else {
+                    selectTargetEvidence(ev.getEvidenceID(), ev.getName(),
+                            container);
+                }
+            });
+
+            container.getChildren().add(item);
+        }
+    }
+
+    private void selectSourceEvidence(int evidID, String evidName, VBox container) {
+        selectedSourceEvidID   = evidID;
+        selectedSourceEvidName = evidName;
+        highlightSelectedItem(container, evidID);
+        checkPreviewReady();
+    }
+
+    private void selectTargetEvidence(int evidID, String evidName, VBox container) {
+        selectedTargetEvidID   = evidID;
+        selectedTargetEvidName = evidName;
+        highlightSelectedItem(container, evidID);
+        checkPreviewReady();
+    }
+
+    private void highlightSelectedItem(VBox container, int evidID) {
+        container.getChildren().forEach(node -> {
+            if (node instanceof HBox item) {
+                item.getStyleClass().removeAll("evidence-pick-item-selected");
+                if (String.valueOf(evidID).equals(item.getUserData())) {
+                    item.getStyleClass().add("evidence-pick-item-selected");
+                }
+            }
+        });
+    }
+
+    private void checkPreviewReady() {
+        if (selectedSourceEvidID == -1 || selectedTargetEvidID == -1) return;
+
+        previewSourceName.setText(selectedSourceEvidName);
+        previewSourceCase.setText("Case #" + String.format("%04d", selectedSourceCaseID));
+        previewTargetName.setText(selectedTargetEvidName);
+        previewTargetCase.setText("Case #" + String.format("%04d", selectedTargetCaseID));
+
+        boolean conflict = corrManager.linkAlreadyExists(
+                selectedSourceEvidID, selectedTargetEvidID);
+        lblConflict.setVisible(conflict);
+        lblConflict.setManaged(conflict);
+        btnCreateLink.setDisable(conflict);
+
+        transitionTo(WizardStep.CONFIRM_LINK);
     }
 
     @FXML
     private void handleCreateLink() {
-        if (selectedSourceEvidId == null || selectedTargetEvidId == null) return;
+        if (selectedSourceEvidID == -1 || selectedTargetEvidID == -1) return;
 
-        // TODO: INSERT INTO correlation_links
-        //         (source_ev_id, target_ev_id, created_by, created_at)
-        //       VALUES (?, ?, ?, NOW())
-        // TODO: Log to audit_log:
-        //         action=LINK_CREATE, type=Evidence,
-        //         source=selectedSourceEvidId, target=selectedTargetEvidId
-        // TODO: Refresh countLinks badge
+        int userID = SessionManager.getInstance().getCurrentUser().getUserID();
 
-        resetWizardSelections();
-        transitionTo(WizardStep.VIEWING_LINKS);
-        loadLinks();
+        boolean success = corrManager.createCrossCaseLink(
+                userID,
+                selectedSourceEvidID, selectedSourceCaseID,
+                selectedTargetEvidID, selectedTargetCaseID
+        );
+
+        if (success) {
+            resetWizardSelections();
+            transitionTo(WizardStep.VIEWING_LINKS);
+            loadLinks();
+        } else {
+            lblConflict.setText("Failed to create link. It may already exist or access was denied.");
+            lblConflict.setVisible(true);
+            lblConflict.setManaged(true);
+        }
     }
 
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
     //  DELETE MODAL
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
 
-    private void promptDeleteLink(String linkId, String srcName, String tgtName) {
-        pendingDeleteLinkId = linkId;
+    private void promptDeleteLink(int linkID, String srcName,
+                                  String tgtName, int srcCaseID) {
+        pendingDeleteLinkID    = linkID;
+        pendingDeleteSrcCaseID = srcCaseID;
         modalLinkSummary.setText(srcName + "  ⇄  " + tgtName);
         modalOverlay.setVisible(true);
         modalOverlay.setManaged(true);
@@ -413,218 +622,83 @@ public class CorrelationDashBoardController extends StackPane {
 
     @FXML
     private void handleConfirmDelete() {
-        if (pendingDeleteLinkId == null) return;
+        if (pendingDeleteLinkID == -1) return;
 
-        // TODO: DELETE FROM correlation_links WHERE link_id = ?
-        // TODO: Log to audit_log: action=LINK_REMOVE
-        // TODO: Refresh list
+        int userID = SessionManager.getInstance().getCurrentUser().getUserID();
+        boolean deleted = corrManager.removeLink(
+                userID, pendingDeleteLinkID, pendingDeleteSrcCaseID);
 
-        pendingDeleteLinkId = null;
-        handleCloseModal();
-        loadLinks();
+        if (deleted) {
+            handleCloseModal();
+            loadLinks();
+        } else {
+            showAlert("Delete Failed", "Could not remove the link.");
+        }
     }
 
     @FXML
     private void handleCloseModal() {
         modalOverlay.setVisible(false);
         modalOverlay.setManaged(false);
-        pendingDeleteLinkId = null;
+        pendingDeleteLinkID    = -1;
+        pendingDeleteSrcCaseID = -1;
     }
 
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
     //  FILTER HANDLERS
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
 
-    @FXML private void handleSearch() { applyFilters(); }
-    @FXML private void handleFilter() { applyFilters(); }
+    @FXML private void handleSearch() { loadLinks(); }
+    @FXML private void handleFilter() { loadLinks(); }
 
     @FXML
     private void handleClearFilters() {
         searchField.clear();
-        filterCaseCombo.setValue(null);
+        filterCaseCombo.setValue("All");
         filterTypeCombo.setValue("All");
-        applyFilters();
-    }
-
-    private void applyFilters() {
-        // TODO: Re-query DB with active filter values
         loadLinks();
     }
 
-    // ══════════════════════════════════════════════════════════
-    //  HELPERS — Evidence list builders
-    // ══════════════════════════════════════════════════════════
-
-    private void populateSourceCaseCombo() {
-        sourceCaseCombo.getItems().clear();
-        // TODO: SELECT case_id FROM cases WHERE status = 'ACTIVE'
-        //       ORDER BY created_at DESC
-    }
-
-    private void loadSourceEvidenceList(String caseId) {
-        sourceEvidenceList.getChildren().clear();
-        sourceEmptyHint.setVisible(false);
-        sourceEmptyHint.setManaged(false);
-
-        // TODO: SELECT ev_id, name, file_type, date_seized
-        //       FROM evidence WHERE case_id = ? ORDER BY date_seized DESC
-        // TODO: For each row call buildEvidencePickItem(
-        //           sourceEvidenceList, evId, name, type, date, true)
-    }
-
-    private void loadTargetEvidenceList(String caseId) {
-        targetEvidenceList.getChildren().clear();
-        targetEmptyHint.setVisible(false);
-        targetEmptyHint.setManaged(false);
-
-        // TODO: Same query as loadSourceEvidenceList but for target case
-        // TODO: For each row call buildEvidencePickItem(
-        //           targetEvidenceList, evId, name, type, date, false)
-    }
-
-    /**
-     * Builds a clickable evidence item row for the pick lists.
-     *
-     * @param container  sourceEvidenceList or targetEvidenceList
-     * @param evId       evidence primary key
-     * @param name       file name
-     * @param type       "Image" | "Video" | "Document" | "Audio" | "Other"
-     * @param date       date seized string
-     * @param isSource   true = source panel, false = target panel
-     */
-    private void buildEvidencePickItem(VBox container, String evId,
-                                       String name, String type,
-                                       String date, boolean isSource) {
-        HBox item = new HBox(10);
-        item.getStyleClass().add("evidence-pick-item");
-        item.setAlignment(Pos.CENTER_LEFT);
-        item.setUserData(evId);
-
-        // File type chip
-        Label typeChip = new Label(type.toUpperCase());
-        typeChip.getStyleClass().addAll("ev-type-chip", getTypeChipStyle(type));
-
-        // Name + date
-        VBox info = new VBox(2);
-        HBox.setHgrow(info, Priority.ALWAYS);
-        Label lblName = new Label(name);
-        lblName.getStyleClass().add("ev-item-name");
-        Label lblDate = new Label(date);
-        lblDate.getStyleClass().add("ev-item-meta");
-        info.getChildren().addAll(lblName, lblDate);
-
-        // Checkmark (hidden until selected)
-        Label check = new Label("✓");
-        check.getStyleClass().add("ev-selected-check");
-        check.setVisible(false);
-        check.setManaged(false);
-
-        item.getChildren().addAll(typeChip, info, check);
-
-        item.setOnMouseClicked(e -> {
-            if (isSource) {
-                selectSourceEvidence(evId, name);
-            } else {
-                selectTargetEvidence(evId, name);
-            }
-        });
-
-        container.getChildren().add(item);
-    }
-
-    /**
-     * Builds a target case search result row.
-     */
-    private void buildTargetCaseResult(String caseId, String title) {
-        VBox item = new VBox(2);
-        item.getStyleClass().add("case-result-item");
-        item.setUserData(caseId);
-
-        Label lblId    = new Label(caseId);
-        lblId.getStyleClass().add("case-result-id");
-        Label lblTitle = new Label(title);
-        lblTitle.getStyleClass().add("case-result-title");
-        item.getChildren().addAll(lblId, lblTitle);
-
-        item.setOnMouseClicked(e -> {
-            selectTargetCase(caseId, title);
-            targetCaseResults.setVisible(false);
-            targetCaseResults.setManaged(false);
-        });
-
-        targetCaseResults.getChildren().add(item);
-    }
-
-    /**
-     * Refreshes selected/unselected visual state on all items in a list.
-     */
-    private void refreshEvidenceSelectionUI(VBox list, String selectedId) {
-        list.getChildren().forEach(node -> {
-            if (node instanceof HBox item) {
-                boolean isSelected = selectedId.equals(item.getUserData());
-                item.getStyleClass().removeAll(
-                        "evidence-pick-item-selected", "evidence-pick-item"
-                );
-                item.getStyleClass().add(
-                        isSelected ? "evidence-pick-item-selected" : "evidence-pick-item"
-                );
-                // Toggle checkmark visibility
-                item.getChildren().stream()
-                        .filter(c -> c instanceof Label &&
-                                ((Label) c).getStyleClass().contains("ev-selected-check"))
-                        .forEach(c -> {
-                            c.setVisible(isSelected);
-                            c.setManaged(isSelected);
-                        });
-            }
-        });
-    }
-
-    // ══════════════════════════════════════════════════════════
-    //  HELPERS — Misc
-    // ══════════════════════════════════════════════════════════
-
-    private boolean checkLinkConflict(String srcEvId, String tgtEvId) {
-        // TODO: SELECT COUNT(*) FROM correlation_links
-        //       WHERE (source_ev_id = ? AND target_ev_id = ?)
-        //          OR (source_ev_id = ? AND target_ev_id = ?)
-        return false; // placeholder
-    }
+    // ═══════════════════════════════════════════════════════════
+    //  HELPERS
+    // ═══════════════════════════════════════════════════════════
 
     private void resetWizardSelections() {
-        selectedSourceCaseId   = null;
-        selectedSourceEvidId   = null;
-        selectedSourceEvidName = null;
-        selectedTargetCaseId   = null;
-        selectedTargetCaseName = null;
-        selectedTargetEvidId   = null;
-        selectedTargetEvidName = null;
-
+        selectedSourceCaseID   = -1;
+        selectedSourceEvidID   = -1;
+        selectedSourceEvidName = "";
+        selectedTargetCaseID   = -1;
+        selectedTargetCaseName = "";
+        selectedTargetEvidID   = -1;
+        selectedTargetEvidName = "";
         sourceCaseCombo.setValue(null);
-        targetCaseSearch.clear();
         sourceEvidenceList.getChildren().clear();
+        sourceEvidenceList.getChildren().add(sourceEmptyHint);
         targetEvidenceList.getChildren().clear();
+        targetEvidenceList.getChildren().add(targetEmptyHint);
         targetCaseResults.getChildren().clear();
-
-        sourceEmptyHint.setVisible(true);
-        sourceEmptyHint.setManaged(true);
-        targetEmptyHint.setVisible(true);
-        targetEmptyHint.setManaged(true);
         targetCaseResults.setVisible(false);
         targetCaseResults.setManaged(false);
-
-        lblConflict.setVisible(false);
-        lblConflict.setManaged(false);
-        btnCreateLink.setDisable(true);
+        targetCaseSearch.clear();
     }
 
     private String getTypeChipStyle(String type) {
+        if (type == null) return "ev-type-other";
         return switch (type.toLowerCase()) {
-            case "image"    -> "ev-type-image";
-            case "video"    -> "ev-type-video";
-            case "document" -> "ev-type-document";
-            case "audio"    -> "ev-type-audio";
-            default         -> "ev-type-other";
+            case "image"     -> "ev-type-image";
+            case "video"     -> "ev-type-video";
+            case "document"  -> "ev-type-document";
+            case "audio"     -> "ev-type-audio";
+            case "bitstream" -> "ev-type-bitstream";
+            default          -> "ev-type-other";
         };
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

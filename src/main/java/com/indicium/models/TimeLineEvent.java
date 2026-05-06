@@ -1,37 +1,44 @@
 package com.indicium.models;
 
-import com.indicium.repository.EvidenceRepo;
 import java.time.LocalDateTime;
 
 public class TimeLineEvent {
+
+    private int           eventID;
+    private int           caseID;
+    private String        title;
+    private String        description;
     private LocalDateTime timestamp;
-    private String description; // Small 'd' is standard Java naming
-    private int linkedEvidenceID;
+    private int           linkedEvidenceID;
+    private String        addedBy;
 
-    public TimeLineEvent(LocalDateTime timestamp, String description, int linkedEvidenceID) {
-        this.timestamp = timestamp;
-        this.description = description;
+    public TimeLineEvent() {}
+
+    public TimeLineEvent(int caseID, String title, String description,
+                         LocalDateTime timestamp, int linkedEvidenceID, String addedBy) {
+        this.caseID           = caseID;
+        this.title            = title;
+        this.description      = description;
+        this.timestamp        = timestamp;
         this.linkedEvidenceID = linkedEvidenceID;
+        this.addedBy          = addedBy;
     }
 
-    // Fixed Public Constructor
-    public TimeLineEvent(int linkedEvidenceID, String description, int caseID) {
-        if (!verify_case_belonging(linkedEvidenceID, caseID)) {
-            throw new IllegalArgumentException("Evidence ID " + linkedEvidenceID + " does not belong to Case ID " + caseID);
-        }
+    // ── Getters ──
+    public int           getEventID()         { return eventID; }
+    public int           getCaseID()          { return caseID; }
+    public String        getTitle()           { return title; }
+    public String        getDescription()     { return description; }
+    public LocalDateTime getTimestamp()       { return timestamp; }
+    public int           getLinkedEvidenceID(){ return linkedEvidenceID; }
+    public String        getAddedBy()         { return addedBy; }
 
-        this.timestamp = LocalDateTime.now();
-        this.description = description;
-        this.linkedEvidenceID = linkedEvidenceID;
-    }
-
-    // Logic to check if the evidence actually belongs to the case
-    private boolean verify_case_belonging(int evidenceID, int caseID) {
-        Evidence evidence = EvidenceRepo.getEvidence(evidenceID);
-        if (evidence == null) {
-            System.out.println("[TimeLineEvent] ERROR: Evidence ID " + evidenceID + " not found.");
-            return false;
-        }
-        return evidence.verifyBelongsToCase(caseID);
-    }
+    // ── Setters ──
+    public void setEventID(int eventID)                   { this.eventID = eventID; }
+    public void setCaseID(int caseID)                     { this.caseID = caseID; }
+    public void setTitle(String title)                    { this.title = title; }
+    public void setDescription(String description)        { this.description = description; }
+    public void setTimestamp(LocalDateTime timestamp)     { this.timestamp = timestamp; }
+    public void setLinkedEvidenceID(int linkedEvidenceID) { this.linkedEvidenceID = linkedEvidenceID; }
+    public void setAddedBy(String addedBy)                { this.addedBy = addedBy; }
 }

@@ -154,6 +154,7 @@ public class Evidence
     public String getHash() { return this.hash; }
 
     public String getName() { return this.name; }
+     public EvidenceStatus getStatus() { return this.status; }
 
     // --- Setters ---
 
@@ -196,4 +197,11 @@ public class Evidence
                         "======================================"
         );
     }
+
+    public void setName(String name)           { this.name = name; }
+    public void setFilePath(String path)       { this.filePath = path; }
+    public void setDigitalFingerprint(String h){ this.digitalFingerprint = h; }
+    public void setStatus(EvidenceStatus s)    { this.status = s; }
+    public java.time.LocalDateTime getDateSeized() { return null; } // wire to DB column when added
+
 }
