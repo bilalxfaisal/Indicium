@@ -5,7 +5,6 @@ import com.indicium.models.Case;
 import com.indicium.models.CorrelationLink;
 import com.indicium.models.Evidence;
 import com.indicium.repository.CaseRepository;
-import com.indicium.services.SessionManager;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -87,6 +86,11 @@ public class CorrelationDashBoardController extends StackPane {
     private int    pendingDeleteLinkID    = -1;
     private int    pendingDeleteSrcCaseID = -1;
 
+    // ── No session manager — hardcoded investigator ID 1 ──
+    // Replace this with however your app tracks the logged-in user
+    private static final int    CURRENT_USER_ID   = 1;
+    private static final String CURRENT_USER_ROLE = "ADMIN";
+
     private CorrelationManager corrManager;
     private CaseRepository     caseRepo;
 
@@ -128,7 +132,6 @@ public class CorrelationDashBoardController extends StackPane {
     // ═══════════════════════════════════════════════════════════
 
     private void setupFilters() {
-        // Case filter — populated from DB
         filterCaseCombo.getItems().add("All");
         filterCaseCombo.getItems().addAll(corrManager.getDistinctCaseTitles());
         filterCaseCombo.setValue("All");
@@ -137,7 +140,6 @@ public class CorrelationDashBoardController extends StackPane {
                 "All", "Image", "Video", "Document", "Audio", "Bitstream", "Other");
         filterTypeCombo.setValue("All");
 
-        // Source case combo — full case list
         setupSourceCaseCombo();
     }
 
@@ -146,9 +148,8 @@ public class CorrelationDashBoardController extends StackPane {
             @Override
             protected void updateItem(Case c, boolean empty) {
                 super.updateItem(c, empty);
-                if (empty || c == null) setText(null);
-                else setText("#" + String.format("%04d", c.getCaseID())
-                        + "  —  " + c.getTitle());
+                setText((empty || c == null) ? null
+                        : "#" + c.getCaseID() + "  —  " + c.getTitle());
             }
         });
         sourceCaseCombo.setButtonCell(new ListCell<>() {
@@ -159,8 +160,7 @@ public class CorrelationDashBoardController extends StackPane {
                     setText("Choose a case...");
                     setStyle("-fx-text-fill: #90A4AE;");
                 } else {
-                    setText("#" + String.format("%04d", c.getCaseID())
-                            + "  —  " + c.getTitle());
+                    setText("#" + c.getCaseID() + "  —  " + c.getTitle());
                     setStyle("-fx-text-fill: #0D1B1E; -fx-font-weight: bold;");
                 }
             }
@@ -178,9 +178,9 @@ public class CorrelationDashBoardController extends StackPane {
     // ═══════════════════════════════════════════════════════════
 
     private void loadLinks() {
-        String search     = searchField != null ? searchField.getText().trim() : "";
-        String caseFilter = filterCaseCombo != null ? filterCaseCombo.getValue() : "All";
-        String typeFilter = filterTypeCombo != null ? filterTypeCombo.getValue() : "All";
+        String search     = searchField     != null ? searchField.getText().trim() : "";
+        String caseFilter = filterCaseCombo != null ? filterCaseCombo.getValue()   : "All";
+        String typeFilter = filterTypeCombo != null ? filterTypeCombo.getValue()   : "All";
 
         List<CorrelationLink> links = corrManager.getLinks(search, caseFilter, typeFilter);
 
@@ -200,19 +200,16 @@ public class CorrelationDashBoardController extends StackPane {
             buildLinkRow(
                     lnk.getLinkID(),
                     lnk.getSrcEvidName(), lnk.getSrcEvidType(),
-                    "#" + String.format("%04d", lnk.getSrcCaseID())
-                            + " " + lnk.getSrcCaseTitle(),
+                    "#" + lnk.getSrcCaseID() + "  " + lnk.getSrcCaseTitle(),
                     lnk.getTgtEvidName(), lnk.getTgtEvidType(),
-                    "#" + String.format("%04d", lnk.getTgtCaseID())
-                            + " " + lnk.getTgtCaseTitle(),
+                    "#" + lnk.getTgtCaseID() + "  " + lnk.getTgtCaseTitle(),
                     lnk.getLinkedBy(),
-                    lnk.getCreatedAt() != null
-                            ? lnk.getCreatedAt().format(DT_FMT) : "—",
+                    lnk.getCreatedAt() != null ? lnk.getCreatedAt().format(DT_FMT) : "—",
                     lnk.getSrcCaseID()
             );
         }
 
-        // Refresh filter combo with latest case titles
+        // Refresh case filter combo
         String current = filterCaseCombo.getValue();
         filterCaseCombo.getItems().clear();
         filterCaseCombo.getItems().add("All");
@@ -229,10 +226,8 @@ public class CorrelationDashBoardController extends StackPane {
         row.setAlignment(Pos.CENTER_LEFT);
         row.setSpacing(0);
 
-        // Source evidence cell
         VBox srcCell = buildEvCell(srcEvName, srcEvType, 200);
 
-        // Source case chip
         HBox srcCaseCell = new HBox();
         srcCaseCell.setPrefWidth(160);
         srcCaseCell.setAlignment(Pos.CENTER_LEFT);
@@ -240,32 +235,16 @@ public class CorrelationDashBoardController extends StackPane {
         srcChip.getStyleClass().add("link-case-chip");
         srcCaseCell.getChildren().add(srcChip);
 
-        // Connector icon
+        // Connector
         HBox connCell = new HBox();
         connCell.getStyleClass().add("link-connector-cell");
         connCell.setAlignment(Pos.CENTER);
-        try {
-            var stream = getClass().getResourceAsStream(
-                    "/com/indicium/ui/Assets/icons8-link-100.png");
-            if (stream != null) {
-                ImageView iv = new ImageView(new Image(stream));
-                iv.setFitWidth(18); iv.setFitHeight(18); iv.setPreserveRatio(true);
-                connCell.getChildren().add(iv);
-            } else {
-                Label fallback = new Label("⇄");
-                fallback.getStyleClass().add("link-connector-icon");
-                connCell.getChildren().add(fallback);
-            }
-        } catch (Exception ignored) {
-            Label fallback = new Label("⇄");
-            fallback.getStyleClass().add("link-connector-icon");
-            connCell.getChildren().add(fallback);
-        }
+        Label conn = new Label("⇄");
+        conn.getStyleClass().add("link-connector-icon");
+        connCell.getChildren().add(conn);
 
-        // Target evidence cell
         VBox tgtCell = buildEvCell(tgtEvName, tgtEvType, 200);
 
-        // Target case chip
         HBox tgtCaseCell = new HBox();
         tgtCaseCell.setPrefWidth(160);
         tgtCaseCell.setAlignment(Pos.CENTER_LEFT);
@@ -273,25 +252,19 @@ public class CorrelationDashBoardController extends StackPane {
         tgtChip.getStyleClass().add("link-case-chip");
         tgtCaseCell.getChildren().add(tgtChip);
 
-        // Meta
         VBox metaCell = new VBox(2);
         HBox.setHgrow(metaCell, Priority.ALWAYS);
         metaCell.setAlignment(Pos.CENTER_LEFT);
-        Label lblBy   = new Label(linkedBy);  lblBy.getStyleClass().add("link-meta");
-        Label lblDate = new Label(date);      lblDate.getStyleClass().add("link-meta-time");
+        Label lblBy   = new Label(linkedBy); lblBy.getStyleClass().add("link-meta");
+        Label lblDate = new Label(date);     lblDate.getStyleClass().add("link-meta-time");
         metaCell.getChildren().addAll(lblBy, lblDate);
 
-        // Delete button — admin only
-        String role = SessionManager.getInstance().getCurrentUser()
-                .getRole().toString();
+        // Delete — visible to all, you can restrict by role later
         Button btnDel = new Button("Remove");
         btnDel.getStyleClass().add("btn-delete");
-        btnDel.setDisable(!role.equalsIgnoreCase("ADMIN"));
-        btnDel.setOnAction(e -> promptDeleteLink(linkId, srcEvName,
-                tgtEvName, srcCaseID));
+        btnDel.setOnAction(e -> promptDeleteLink(linkId, srcEvName, tgtEvName, srcCaseID));
 
-        row.getChildren().addAll(
-                srcCell, srcCaseCell, connCell,
+        row.getChildren().addAll(srcCell, srcCaseCell, connCell,
                 tgtCell, tgtCaseCell, metaCell, btnDel);
         viewLinksList.getChildren().add(row);
     }
@@ -300,13 +273,10 @@ public class CorrelationDashBoardController extends StackPane {
         VBox cell = new VBox(3);
         cell.setPrefWidth(width);
         cell.setAlignment(Pos.CENTER_LEFT);
-
-        Label lblName = new Label(name);
+        Label lblName = new Label(name != null ? name : "—");
         lblName.getStyleClass().add("link-ev-name");
-
         Label typeChip = new Label(type != null ? type.toUpperCase() : "OTHER");
         typeChip.getStyleClass().addAll("ev-type-chip", getTypeChipStyle(type));
-
         cell.getChildren().addAll(lblName, typeChip);
         return cell;
     }
@@ -324,8 +294,8 @@ public class CorrelationDashBoardController extends StackPane {
         currentStep = step;
         boolean isViewing = (step == WizardStep.VIEWING_LINKS);
 
-        filterRow.setVisible(isViewing);   filterRow.setManaged(isViewing);
-        tableHeader.setVisible(isViewing); tableHeader.setManaged(isViewing);
+        filterRow.setVisible(isViewing);     filterRow.setManaged(isViewing);
+        tableHeader.setVisible(isViewing);   tableHeader.setManaged(isViewing);
         viewLinksList.setVisible(isViewing); viewLinksList.setManaged(isViewing);
         viewWizard.setVisible(!isViewing);   viewWizard.setManaged(!isViewing);
 
@@ -383,12 +353,8 @@ public class CorrelationDashBoardController extends StackPane {
         selectedSourceCaseID = selected.getCaseID();
         selectedSourceEvidID = -1;
 
-        loadEvidencePickList(
-                corrManager.getEvidenceForCase(selectedSourceCaseID),
-                sourceEvidenceList,
-                sourceEmptyHint,
-                true   // isSource
-        );
+        List<Evidence> evList = corrManager.getEvidenceForCase(selectedSourceCaseID);
+        loadEvidencePickList(evList, sourceEvidenceList, sourceEmptyHint, true);
         transitionTo(WizardStep.SELECT_SOURCE);
     }
 
@@ -412,9 +378,8 @@ public class CorrelationDashBoardController extends StackPane {
                         + "-fx-font-size: 12px; -fx-padding: 10 16 10 16;");
                 targetCaseResults.getChildren().add(none);
             } else {
-                for (Case c : results) {
+                for (Case c : results)
                     buildTargetCaseResultRow(c);
-                }
             }
 
             targetCaseResults.setVisible(true);
@@ -433,7 +398,7 @@ public class CorrelationDashBoardController extends StackPane {
                 + "-fx-border-color: transparent transparent #F0F0F0 transparent;"
                 + "-fx-border-width: 0 0 1 0; -fx-cursor: hand;");
 
-        Label lblId = new Label("#" + String.format("%04d", c.getCaseID()));
+        Label lblId = new Label("#" + c.getCaseID());
         lblId.setStyle("-fx-text-fill: #90A4AE; -fx-font-family: 'Segoe UI';"
                 + "-fx-font-size: 12px; -fx-font-weight: bold;");
 
@@ -442,26 +407,15 @@ public class CorrelationDashBoardController extends StackPane {
                 + "-fx-font-size: 13px;");
         HBox.setHgrow(lblTitle, Priority.ALWAYS);
 
-        // Authorize check before allowing selection
-        int userID = SessionManager.getInstance().getCurrentUser().getUserID();
-        boolean authorized = corrManager.initiateLink(userID, c.getCaseID());
+        Button btnSelect = new Button("Select");
+        btnSelect.setStyle("-fx-background-color: #00BCD4; -fx-text-fill: #FFFFFF;"
+                + "-fx-font-family: 'Segoe UI'; -fx-font-size: 11px;"
+                + "-fx-font-weight: bold; -fx-background-radius: 6;"
+                + "-fx-border-color: transparent; -fx-padding: 4 12 4 12;"
+                + "-fx-cursor: hand;");
+        btnSelect.setOnAction(e -> selectTargetCase(c.getCaseID(), c.getTitle()));
 
-        if (authorized) {
-            Button btnSelect = new Button("Select");
-            btnSelect.setStyle("-fx-background-color: #00BCD4; -fx-text-fill: #FFFFFF;"
-                    + "-fx-font-family: 'Segoe UI'; -fx-font-size: 11px;"
-                    + "-fx-font-weight: bold; -fx-background-radius: 6;"
-                    + "-fx-border-color: transparent; -fx-padding: 4 12 4 12;"
-                    + "-fx-cursor: hand;");
-            btnSelect.setOnAction(e -> selectTargetCase(c.getCaseID(), c.getTitle()));
-            row.getChildren().addAll(lblId, lblTitle, btnSelect);
-        } else {
-            Label locked = new Label("No Access");
-            locked.setStyle("-fx-text-fill: #EF5350; -fx-font-family: 'Segoe UI';"
-                    + "-fx-font-size: 11px; -fx-font-weight: bold;");
-            row.getChildren().addAll(lblId, lblTitle, locked);
-        }
-
+        row.getChildren().addAll(lblId, lblTitle, btnSelect);
         targetCaseResults.getChildren().add(row);
     }
 
@@ -474,12 +428,8 @@ public class CorrelationDashBoardController extends StackPane {
         targetCaseResults.setManaged(false);
         targetCaseSearch.clear();
 
-        loadEvidencePickList(
-                corrManager.getEvidenceForCase(caseID),
-                targetEvidenceList,
-                targetEmptyHint,
-                false  // isTarget
-        );
+        List<Evidence> evList = corrManager.getEvidenceForCase(caseID);
+        loadEvidencePickList(evList, targetEvidenceList, targetEmptyHint, false);
         transitionTo(WizardStep.SELECT_TARGET_EV);
     }
 
@@ -511,31 +461,31 @@ public class CorrelationDashBoardController extends StackPane {
             VBox info = new VBox(3);
             HBox.setHgrow(info, Priority.ALWAYS);
 
-            Label lblName = new Label(ev.getName());
+            // Evidence uses File — get display name from file name
+            String displayName = ev.getFile() != null
+                    ? ev.getFile().getName() : "EV-" + ev.getEvidenceID();
+
+            // Derive type from file extension
+            String type = getTypeFromFileName(displayName);
+
+            Label lblName = new Label(displayName);
             lblName.getStyleClass().add("ev-item-name");
 
-            Label lblMeta = new Label("EV-" + ev.getEvidenceID()
-                    + "  ·  " + (ev.getType() != null ? ev.getType() : "Other"));
+            Label lblMeta = new Label("EV-" + ev.getEvidenceID() + "  ·  " + type);
             lblMeta.getStyleClass().add("ev-item-meta");
 
             info.getChildren().addAll(lblName, lblMeta);
 
-            Label typeChip = new Label(
-                    ev.getType() != null ? ev.getType().toUpperCase() : "OTHER");
-            typeChip.getStyleClass().addAll("ev-type-chip",
-                    getTypeChipStyle(ev.getType()));
+            Label typeChip = new Label(type.toUpperCase());
+            typeChip.getStyleClass().addAll("ev-type-chip", getTypeChipStyle(type));
 
             item.getChildren().addAll(info, typeChip);
 
-            // Click to select
             item.setOnMouseClicked(e -> {
-                if (isSource) {
-                    selectSourceEvidence(ev.getEvidenceID(), ev.getName(),
-                            container);
-                } else {
-                    selectTargetEvidence(ev.getEvidenceID(), ev.getName(),
-                            container);
-                }
+                if (isSource)
+                    selectSourceEvidence(ev.getEvidenceID(), displayName, container);
+                else
+                    selectTargetEvidence(ev.getEvidenceID(), displayName, container);
             });
 
             container.getChildren().add(item);
@@ -560,9 +510,8 @@ public class CorrelationDashBoardController extends StackPane {
         container.getChildren().forEach(node -> {
             if (node instanceof HBox item) {
                 item.getStyleClass().removeAll("evidence-pick-item-selected");
-                if (String.valueOf(evidID).equals(item.getUserData())) {
+                if (String.valueOf(evidID).equals(item.getUserData()))
                     item.getStyleClass().add("evidence-pick-item-selected");
-                }
             }
         });
     }
@@ -571,15 +520,16 @@ public class CorrelationDashBoardController extends StackPane {
         if (selectedSourceEvidID == -1 || selectedTargetEvidID == -1) return;
 
         previewSourceName.setText(selectedSourceEvidName);
-        previewSourceCase.setText("Case #" + String.format("%04d", selectedSourceCaseID));
+        previewSourceCase.setText("Case #" + selectedSourceCaseID);
         previewTargetName.setText(selectedTargetEvidName);
-        previewTargetCase.setText("Case #" + String.format("%04d", selectedTargetCaseID));
+        previewTargetCase.setText("Case #" + selectedTargetCaseID);
 
         boolean conflict = corrManager.linkAlreadyExists(
                 selectedSourceEvidID, selectedTargetEvidID);
+
         lblConflict.setVisible(conflict);
         lblConflict.setManaged(conflict);
-        btnCreateLink.setDisable(conflict);
+        btnCreateLink.setDisable(conflict); // false = enabled when no conflict
 
         transitionTo(WizardStep.CONFIRM_LINK);
     }
@@ -588,10 +538,8 @@ public class CorrelationDashBoardController extends StackPane {
     private void handleCreateLink() {
         if (selectedSourceEvidID == -1 || selectedTargetEvidID == -1) return;
 
-        int userID = SessionManager.getInstance().getCurrentUser().getUserID();
-
         boolean success = corrManager.createCrossCaseLink(
-                userID,
+                CURRENT_USER_ID,
                 selectedSourceEvidID, selectedSourceCaseID,
                 selectedTargetEvidID, selectedTargetCaseID
         );
@@ -601,7 +549,7 @@ public class CorrelationDashBoardController extends StackPane {
             transitionTo(WizardStep.VIEWING_LINKS);
             loadLinks();
         } else {
-            lblConflict.setText("Failed to create link. It may already exist or access was denied.");
+            lblConflict.setText("⚠  Link already exists or access was denied.");
             lblConflict.setVisible(true);
             lblConflict.setManaged(true);
         }
@@ -624,9 +572,8 @@ public class CorrelationDashBoardController extends StackPane {
     private void handleConfirmDelete() {
         if (pendingDeleteLinkID == -1) return;
 
-        int userID = SessionManager.getInstance().getCurrentUser().getUserID();
         boolean deleted = corrManager.removeLink(
-                userID, pendingDeleteLinkID, pendingDeleteSrcCaseID);
+                CURRENT_USER_ID, pendingDeleteLinkID, pendingDeleteSrcCaseID);
 
         if (deleted) {
             handleCloseModal();
@@ -680,6 +627,25 @@ public class CorrelationDashBoardController extends StackPane {
         targetCaseResults.setVisible(false);
         targetCaseResults.setManaged(false);
         targetCaseSearch.clear();
+    }
+
+    // ── Derive type from file extension ─────────────────────────
+    private String getTypeFromFileName(String fileName) {
+        if (fileName == null) return "Other";
+        String lower = fileName.toLowerCase();
+        if (lower.endsWith(".png") || lower.endsWith(".jpg")
+                || lower.endsWith(".jpeg") || lower.endsWith(".bmp")
+                || lower.endsWith(".gif"))  return "Image";
+        if (lower.endsWith(".mp4") || lower.endsWith(".avi")
+                || lower.endsWith(".mov") || lower.endsWith(".mkv")) return "Video";
+        if (lower.endsWith(".pdf") || lower.endsWith(".doc")
+                || lower.endsWith(".docx") || lower.endsWith(".txt")
+                || lower.endsWith(".xlsx")) return "Document";
+        if (lower.endsWith(".mp3") || lower.endsWith(".wav")
+                || lower.endsWith(".aac"))  return "Audio";
+        if (lower.endsWith(".bin") || lower.endsWith(".img")
+                || lower.endsWith(".iso"))  return "Bitstream";
+        return "Other";
     }
 
     private String getTypeChipStyle(String type) {
