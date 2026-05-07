@@ -1,15 +1,22 @@
 package com.indicium.ui;
 
+import com.indicium.controllers.ReportManager;
+import com.indicium.models.Report;
+import com.indicium.repository.CaseRepository;
+import com.indicium.services.SessionManager;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -69,17 +76,26 @@ public class ReportGenController extends StackPane {
     @FXML private StackPane progressFill;
 
     // ── State ──
-    private String  selectedReportType = "CASE_SUMMARY";
-    private String  selectedCaseId     = null;
-    private String  selectedCaseName   = null;
+    private String  selectedReportType  = "CASE_SUMMARY";
+    private String  selectedCaseId      = null;
+    private String  selectedCaseName    = null;
 
-    // Toggle states
     private boolean includeInvestigators = true;
     private boolean includePhotoEvidence = true;
     private boolean includeTimeline      = true;
     private boolean includeAuditTrail    = false;
 
-    // ── Constructor ──
+    // ── Services ──
+    private final ReportManager  reportManager = new ReportManager();
+    private final CaseRepository caseRepo      = new CaseRepository();
+
+    // ── Last generated report ──
+    private Report lastGeneratedReport = null;
+
+    // ══════════════════════════════════════════════════════════
+    //  Constructor
+    // ══════════════════════════════════════════════════════════
+
     public ReportGenController() {
         URL fxmlUrl = getClass().getResource(
                 "/com/indicium/ui/ReportGenerationDashBoard.fxml"
@@ -99,10 +115,22 @@ public class ReportGenController extends StackPane {
         }
     }
 
+    // ══════════════════════════════════════════════════════════
+    //  Initialize
+    // ══════════════════════════════════════════════════════════
+
     @FXML
     public void initialize() {
         setupCombos();
         setupFieldListeners();
+        // ✅ Show the preview bar immediately — it's always visible
+        previewBar.setVisible(true);
+        previewBar.setManaged(true);
+        // ✅ Sync initial toggle styles with initial boolean states
+        updateToggleStyle(toggleInvestigators, checkInvestigators, includeInvestigators);
+        updateToggleStyle(togglePhotoEvidence,  checkPhotoEvidence,  includePhotoEvidence);
+        updateToggleStyle(toggleTimeline,       checkTimeline,       includeTimeline);
+        updateToggleStyle(toggleAuditTrail,     checkAuditTrail,     includeAuditTrail);
         refreshPreviewBar();
     }
 
@@ -124,6 +152,31 @@ public class ReportGenController extends StackPane {
     }
 
     // ══════════════════════════════════════════════════════════
+    //  Toggle style helper — uses CSS class names from the CSS file
+    //  CSS has: .toggle-on / .toggle-off  (NOT toggle-card-on/off)
+    // ══════════════════════════════════════════════════════════
+
+    private void updateToggleStyle(VBox card, Label check, boolean active) {
+        if (active) {
+            card.getStyleClass().remove("toggle-off");
+            if (!card.getStyleClass().contains("toggle-on"))
+                card.getStyleClass().add("toggle-on");
+            check.getStyleClass().remove("toggle-check-off");
+            if (!check.getStyleClass().contains("toggle-check"))
+                check.getStyleClass().add("toggle-check");
+            check.setText("✓");
+        } else {
+            card.getStyleClass().remove("toggle-on");
+            if (!card.getStyleClass().contains("toggle-off"))
+                card.getStyleClass().add("toggle-off");
+            check.getStyleClass().remove("toggle-check");
+            if (!check.getStyleClass().contains("toggle-check-off"))
+                check.getStyleClass().add("toggle-check-off");
+            check.setText("✕");
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
     //  SECTION 1 — Report Type
     // ══════════════════════════════════════════════════════════
 
@@ -132,15 +185,15 @@ public class ReportGenController extends StackPane {
         VBox clicked = (VBox) e.getSource();
         selectedReportType = (String) clicked.getUserData();
 
-        // Toggle active card style
         cardCaseSummary.getStyleClass().remove("report-type-active");
         cardAuditLog.getStyleClass().remove("report-type-active");
         clicked.getStyleClass().add("report-type-active");
 
-        // Hide case selector for audit log — it's system-wide
         boolean needsCase = selectedReportType.equals("CASE_SUMMARY");
         sectionCaseSelect.setVisible(needsCase);
         sectionCaseSelect.setManaged(needsCase);
+
+        if (!needsCase) clearCaseSelection();
 
         refreshPreviewBar();
     }
@@ -162,11 +215,21 @@ public class ReportGenController extends StackPane {
             return;
         }
 
-        // TODO: SELECT case_id, title, status FROM cases
-        //       WHERE (LOWER(case_id) LIKE ? OR LOWER(title) LIKE ?)
-        //       AND (status = ? OR ? = 'All')
-        //       ORDER BY created_at DESC LIMIT 8
-        // TODO: For each result call buildCaseResultItem(caseId, title, status)
+        List<com.indicium.models.Case> results = caseRepo.searchCases(query, status);
+
+        if (results.isEmpty()) {
+            Label noResult = new Label("No cases found.");
+            noResult.getStyleClass().add("case-result-empty");
+            caseResultsList.getChildren().add(noResult);
+        } else {
+            for (com.indicium.models.Case c : results) {
+                buildCaseResultItem(
+                        String.valueOf(c.getCaseID()),
+                        c.getTitle(),
+                        c.getStatus().name()
+                );
+            }
+        }
 
         caseResultsList.setVisible(true);
         caseResultsList.setManaged(true);
@@ -175,14 +238,17 @@ public class ReportGenController extends StackPane {
     private void buildCaseResultItem(String caseId, String title, String status) {
         VBox item = new VBox(2);
         item.getStyleClass().add("case-result-item");
-        item.setUserData(caseId);
 
-        Label lblId    = new Label(caseId);
+        Label lblId     = new Label("Case #" + caseId);
         lblId.getStyleClass().add("case-result-id");
-        Label lblTitle = new Label(title);
-        lblTitle.getStyleClass().add("case-result-title");
-        item.getChildren().addAll(lblId, lblTitle);
 
+        Label lblTitle  = new Label(title);
+        lblTitle.getStyleClass().add("case-result-title");
+
+        Label lblStatus = new Label(status);
+        lblStatus.getStyleClass().add("case-result-id"); // reuse muted style
+
+        item.getChildren().addAll(lblId, lblTitle, lblStatus);
         item.setOnMouseClicked(e -> selectCase(caseId, title));
         caseResultsList.getChildren().add(item);
     }
@@ -191,58 +257,59 @@ public class ReportGenController extends StackPane {
         selectedCaseId   = caseId;
         selectedCaseName = title;
 
-        chipCaseId.setText(caseId);
+        chipCaseId.setText("Case #" + caseId);
         chipCaseTitle.setText(title);
 
         selectedCaseChip.setVisible(true);
         selectedCaseChip.setManaged(true);
+
         caseResultsList.setVisible(false);
         caseResultsList.setManaged(false);
         caseSearchField.clear();
 
+        setValidationError("");
         refreshPreviewBar();
     }
 
     @FXML
     private void handleClearCase() {
-        selectedCaseId   = null;
-        selectedCaseName = null;
-        selectedCaseChip.setVisible(false);
-        selectedCaseChip.setManaged(false);
+        clearCaseSelection();
         refreshPreviewBar();
     }
 
+    private void clearCaseSelection() {
+        selectedCaseId   = null;
+        selectedCaseName = null;
+        chipCaseId.setText("—");
+        chipCaseTitle.setText("—");
+        selectedCaseChip.setVisible(false);
+        selectedCaseChip.setManaged(false);
+    }
+
     // ══════════════════════════════════════════════════════════
-    //  SECTION 4 — Include Toggles
+    //  SECTION 4 — Toggle Sections
+    //  Called from FXML onMouseClicked="#handleToggleSection"
     // ══════════════════════════════════════════════════════════
 
     @FXML
     private void handleToggleSection(javafx.scene.input.MouseEvent e) {
-        VBox toggle = (VBox) e.getSource();
-        String section = (String) toggle.getUserData();
+        VBox clicked = (VBox) e.getSource();
 
-        switch (section) {
-            case "INVESTIGATORS"  -> includeInvestigators = flip(
-                    toggle, checkInvestigators, includeInvestigators);
-            case "PHOTO_EVIDENCE" -> includePhotoEvidence = flip(
-                    toggle, checkPhotoEvidence, includePhotoEvidence);
-            case "TIMELINE"       -> includeTimeline = flip(
-                    toggle, checkTimeline, includeTimeline);
-            case "AUDIT_TRAIL"    -> includeAuditTrail = flip(
-                    toggle, checkAuditTrail, includeAuditTrail);
+        if (clicked == toggleInvestigators) {
+            includeInvestigators = !includeInvestigators;
+            updateToggleStyle(toggleInvestigators, checkInvestigators, includeInvestigators);
+        } else if (clicked == togglePhotoEvidence) {
+            includePhotoEvidence = !includePhotoEvidence;
+            updateToggleStyle(togglePhotoEvidence, checkPhotoEvidence, includePhotoEvidence);
+        } else if (clicked == toggleTimeline) {
+            includeTimeline = !includeTimeline;
+            updateToggleStyle(toggleTimeline, checkTimeline, includeTimeline);
+        } else if (clicked == toggleAuditTrail) {
+            includeAuditTrail = !includeAuditTrail;
+            updateToggleStyle(toggleAuditTrail, checkAuditTrail, includeAuditTrail);
         }
 
         refreshPreviewBar();
-    }
-
-    private boolean flip(VBox toggle, Label check, boolean current) {
-        boolean next = !current;
-        toggle.getStyleClass().removeAll("toggle-on", "toggle-off");
-        toggle.getStyleClass().add(next ? "toggle-on" : "toggle-off");
-        check.getStyleClass().removeAll("toggle-check", "toggle-check-off");
-        check.getStyleClass().add(next ? "toggle-check" : "toggle-check-off");
-        check.setText(next ? "✓" : "✕");
-        return next;
     }
 
     // ══════════════════════════════════════════════════════════
@@ -250,189 +317,218 @@ public class ReportGenController extends StackPane {
     // ══════════════════════════════════════════════════════════
 
     private void refreshPreviewBar() {
-        boolean hasCase  = selectedCaseId != null
-                || selectedReportType.equals("AUDIT_LOG");
-        boolean hasDate  = !dateFrom.getText().isBlank()
-                && !dateTo.getText().isBlank();
-        boolean ready    = hasCase && hasDate;
+        previewReportType.setText(selectedReportType.replace("_", " "));
+        previewCaseId.setText(selectedCaseId != null ? "Case #" + selectedCaseId : "—");
 
-        previewBar.setVisible(ready);
-        previewBar.setManaged(ready);
-
-        if (!ready) {
-            btnExportPDF.setDisable(true);
-            btnExportCSV.setDisable(true);
-            return;
-        }
-
-        // Populate preview labels
-        previewReportType.setText(
-                selectedReportType.equals("CASE_SUMMARY") ? "Case Summary" : "Audit Log"
+        String from = dateFrom.getText().trim();
+        String to   = dateTo.getText().trim();
+        previewDateRange.setText(
+                (!from.isEmpty() || !to.isEmpty())
+                        ? (from.isEmpty() ? "—" : from) + " → " + (to.isEmpty() ? "—" : to)
+                        : "All dates"
         );
-        previewCaseId.setText(
-                selectedCaseId != null ? selectedCaseId : "System-wide"
-        );
-        previewDateRange.setText(dateFrom.getText() + " → " + dateTo.getText());
-        previewFormat.setText(outputFormat.getValue());
+
+        previewFormat.setText(outputFormat.getValue() != null ? outputFormat.getValue() : "PDF");
 
         List<String> sections = new ArrayList<>();
         if (includeInvestigators) sections.add("Investigators");
-        if (includePhotoEvidence) sections.add("Photos");
+        if (includePhotoEvidence) sections.add("Evidence");
         if (includeTimeline)      sections.add("Timeline");
         if (includeAuditTrail)    sections.add("Audit");
         previewSections.setText(sections.isEmpty() ? "None" : String.join(", ", sections));
-
-        btnExportPDF.setDisable(false);
-        btnExportCSV.setDisable(false);
     }
 
     // ══════════════════════════════════════════════════════════
-    //  GENERATE / EXPORT
+    //  GENERATE REPORT
     // ══════════════════════════════════════════════════════════
 
     @FXML
     private void handleGenerateReport() {
-        if (!validateForm()) return;
-        showGeneratingOverlay("PDF");
-    }
-
-    @FXML
-    private void handleExportPDF() {
-        if (!validateForm()) return;
-        showGeneratingOverlay("PDF");
-    }
-
-    @FXML
-    private void handleExportCSV() {
-        if (!validateForm()) return;
-        showGeneratingOverlay("CSV");
-    }
-
-    private boolean validateForm() {
-        lblValidationError.setVisible(false);
-        lblValidationError.setManaged(false);
+        setValidationError("");
 
         if (selectedReportType.equals("CASE_SUMMARY") && selectedCaseId == null) {
-            showValidationError("Please select a case before generating.");
-            return false;
+            setValidationError("⚠  Please select a case before generating.");
+            return;
         }
-        if (dateFrom.getText().isBlank() || dateTo.getText().isBlank()) {
-            showValidationError("Please enter both From and To dates.");
-            return false;
-        }
-        // TODO: Validate date format YYYY-MM-DD
-        // TODO: Validate dateFrom is before dateTo
-        return true;
+
+        int    currentUserID = SessionManager.getInstance().getCurrentUser().getUserID();
+        int    caseID        = selectedReportType.equals("CASE_SUMMARY")
+                ? Integer.parseInt(selectedCaseId) : 0;
+        String format        = outputFormat.getValue() != null ? outputFormat.getValue() : "PDF";
+
+        showGeneratingOverlay(true);
+        animateProgress();
+
+        new Thread(() -> {
+            Report report = reportManager.generateReport(
+                    caseID, currentUserID, selectedReportType, format
+            );
+            Platform.runLater(() -> {
+                showGeneratingOverlay(false);
+                if (report == null) {
+                    setValidationError("⚠  Report generation failed. Check permissions or case ID.");
+                    return;
+                }
+                lastGeneratedReport = report;
+                btnExportPDF.setDisable(false);
+                btnExportCSV.setDisable(false);
+                showSuccessAlert("Report generated successfully! Use Export to save.");
+            });
+        }).start();
     }
 
-    private void showValidationError(String msg) {
-        lblValidationError.setText("⚠  " + msg);
-        lblValidationError.setVisible(true);
-        lblValidationError.setManaged(true);
-    }
-
-    private void showGeneratingOverlay(String format) {
-        generatingOverlay.setVisible(true);
-        generatingOverlay.setManaged(true);
-
-        // Animate progress bar 0 → full width over 2.5s
-        double targetWidth = 260.0;
-        Timeline progress = new Timeline(
-                new KeyFrame(Duration.ZERO,
-                        new KeyValue(progressFill.prefWidthProperty(), 0)),
-                new KeyFrame(Duration.millis(800),
-                        e -> lblProgressStep.setText("Querying case data..."),
-                        new KeyValue(progressFill.prefWidthProperty(), targetWidth * 0.3)),
-                new KeyFrame(Duration.millis(1600),
-                        e -> lblProgressStep.setText("Compiling evidence..."),
-                        new KeyValue(progressFill.prefWidthProperty(), targetWidth * 0.65)),
-                new KeyFrame(Duration.millis(2400),
-                        e -> lblProgressStep.setText("Formatting " + format + "..."),
-                        new KeyValue(progressFill.prefWidthProperty(), targetWidth * 0.9)),
-                new KeyFrame(Duration.millis(2800),
-                        e -> {
-                            lblProgressStep.setText("Done.");
-                            lblProgress.setText("100%");
-                            progressFill.setPrefWidth(targetWidth);
-                            finishGeneration(format);
-                        })
-        );
-
-        // Update % label in parallel
-        Timeline pct = new Timeline(
-                new KeyFrame(Duration.ZERO,
-                        new KeyValue(progressFill.prefWidthProperty(), 0))
-        );
-        progress.currentTimeProperty().addListener((o, ov, nv) -> {
-            double pctVal = Math.min(100,
-                    (nv.toMillis() / 2800.0) * 100);
-            lblProgress.setText((int) pctVal + "%");
-        });
-
-        progress.play();
-    }
-
-    private void finishGeneration(String format) {
-        // TODO: Trigger actual report generation:
-        //   1. Gather case data from DB using selectedCaseId
-        //   2. Gather investigators: SELECT u.name FROM case_users cu
-        //                            JOIN users u ON cu.user_id = u.id
-        //                            WHERE cu.case_id = ?
-        //   3. Gather photo evidence: SELECT * FROM evidence
-        //                             WHERE case_id = ? AND file_type = 'IMAGE'
-        //   4. Gather timeline events: SELECT * FROM timeline
-        //                              WHERE case_id = ? ORDER BY event_time
-        //   5. Gather audit trail: SELECT * FROM audit_log
-        //                          WHERE case_id = ?
-        //                          AND timestamp BETWEEN dateFrom AND dateTo
-        //   6. Pass collected data to ReportBuilder.generate(data, format)
-        //   7. Open FileChooser for save path
-        //   8. Write file to chosen path
-        //   9. Log to audit_log: action=REPORT_GENERATE, type=Case
-
-        javafx.animation.PauseTransition wait =
-                new javafx.animation.PauseTransition(Duration.millis(600));
-        wait.setOnFinished(e -> {
-            generatingOverlay.setVisible(false);
-            generatingOverlay.setManaged(false);
-            progressFill.setPrefWidth(0);
-            lblProgress.setText("0%");
-            lblProgressStep.setText("Gathering case data...");
-        });
-        wait.play();
-    }
+    // ══════════════════════════════════════════════════════════
+    //  RESET FORM
+    //  Called from FXML onAction="#handleResetForm"
+    // ══════════════════════════════════════════════════════════
 
     @FXML
     private void handleResetForm() {
-        selectedCaseId   = null;
-        selectedCaseName = null;
-        dateFrom.clear();
-        dateTo.clear();
-        reportNotes.clear();
-        outputFormat.setValue("PDF");
+        // Report type
+        selectedReportType = "CASE_SUMMARY";
+        cardCaseSummary.getStyleClass().add("report-type-active");
+        cardAuditLog.getStyleClass().remove("report-type-active");
+        sectionCaseSelect.setVisible(true);
+        sectionCaseSelect.setManaged(true);
+
+        // Case
+        clearCaseSelection();
         caseSearchField.clear();
-        selectedCaseChip.setVisible(false);
-        selectedCaseChip.setManaged(false);
+        caseStatusFilter.setValue("All");
+        caseResultsList.getChildren().clear();
         caseResultsList.setVisible(false);
         caseResultsList.setManaged(false);
 
-        // Reset toggles to defaults
+        // Parameters
+        dateFrom.clear();
+        dateTo.clear();
+        outputFormat.setValue("PDF");
+
+        // Toggles — reset to defaults
         includeInvestigators = true;
         includePhotoEvidence = true;
         includeTimeline      = true;
         includeAuditTrail    = false;
-        flip(toggleInvestigators, checkInvestigators, false);
-        flip(togglePhotoEvidence, checkPhotoEvidence, false);
-        flip(toggleTimeline,      checkTimeline,      false);
-        flip(toggleAuditTrail,    checkAuditTrail,    true);
+        updateToggleStyle(toggleInvestigators, checkInvestigators, true);
+        updateToggleStyle(togglePhotoEvidence,  checkPhotoEvidence,  true);
+        updateToggleStyle(toggleTimeline,       checkTimeline,       true);
+        updateToggleStyle(toggleAuditTrail,     checkAuditTrail,     false);
 
-        // Reset type card
-        cardAuditLog.getStyleClass().remove("report-type-active");
-        cardCaseSummary.getStyleClass().add("report-type-active");
-        selectedReportType = "CASE_SUMMARY";
-        sectionCaseSelect.setVisible(true);
-        sectionCaseSelect.setManaged(true);
+        // Notes
+        reportNotes.clear();
+
+        // State
+        lastGeneratedReport = null;
+        btnExportPDF.setDisable(true);
+        btnExportCSV.setDisable(true);
+        setValidationError("");
 
         refreshPreviewBar();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    //  EXPORT PDF
+    // ══════════════════════════════════════════════════════════
+
+    @FXML
+    private void handleExportPDF() {
+        if (lastGeneratedReport == null) {
+            setValidationError("⚠  Generate a report first.");
+            return;
+        }
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save PDF Report");
+        chooser.setInitialFileName(
+                "Report_Case" + lastGeneratedReport.getCaseID()
+                        + "_" + lastGeneratedReport.getReportID() + ".pdf"
+        );
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+        );
+        File file = chooser.showSaveDialog(getScene().getWindow());
+        if (file == null) return;
+
+        boolean saved = reportManager.exportToPDF(lastGeneratedReport, file.getAbsolutePath());
+        if (saved) showSuccessAlert("PDF saved to:\n" + file.getAbsolutePath());
+        else       setValidationError("⚠  PDF export failed. Check console for details.");
+    }
+
+    // ══════════════════════════════════════════════════════════
+    //  EXPORT CSV
+    // ══════════════════════════════════════════════════════════
+
+    @FXML
+    private void handleExportCSV() {
+        if (lastGeneratedReport == null) {
+            setValidationError("⚠  Generate a report first.");
+            return;
+        }
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save CSV Report");
+        chooser.setInitialFileName(
+                "Report_Case" + lastGeneratedReport.getCaseID()
+                        + "_" + lastGeneratedReport.getReportID() + ".csv"
+        );
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("CSV Files", "*.csv")
+        );
+        File file = chooser.showSaveDialog(getScene().getWindow());
+        if (file == null) return;
+
+        boolean saved = reportManager.exportToCSV(lastGeneratedReport, file.getAbsolutePath());
+        if (saved) showSuccessAlert("CSV saved to:\n" + file.getAbsolutePath());
+        else       setValidationError("⚠  CSV export failed. Check console for details.");
+    }
+
+    // ══════════════════════════════════════════════════════════
+    //  OVERLAY + PROGRESS
+    // ══════════════════════════════════════════════════════════
+
+    private void showGeneratingOverlay(boolean show) {
+        generatingOverlay.setVisible(show);
+        generatingOverlay.setManaged(show);
+    }
+
+    private void animateProgress() {
+        String[] steps = {
+                "Authorizing access...",
+                "Gathering case data...",
+                "Formatting report...",
+                "Hashing content...",
+                "Finalizing..."
+        };
+        Timeline tl = new Timeline();
+        for (int i = 0; i < steps.length; i++) {
+            final int    idx = i;
+            final double pct = (i + 1) / (double) steps.length;
+            tl.getKeyFrames().add(new KeyFrame(Duration.millis(i * 600), e -> {
+                lblProgressStep.setText(steps[idx]);
+                lblProgress.setText((int)(pct * 100) + "%");
+            }));
+            tl.getKeyFrames().add(new KeyFrame(
+                    Duration.millis(i * 600),
+                    new KeyValue(progressFill.prefWidthProperty(), pct * 300)
+            ));
+        }
+        tl.play();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    //  HELPERS
+    // ══════════════════════════════════════════════════════════
+
+    private void setValidationError(String msg) {
+        lblValidationError.setText(msg);
+        boolean hasError = !msg.isEmpty();
+        lblValidationError.setVisible(hasError);
+        lblValidationError.setManaged(hasError);
+    }
+
+    private void showSuccessAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Indicium — Report");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

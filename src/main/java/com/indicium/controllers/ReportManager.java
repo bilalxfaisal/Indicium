@@ -60,6 +60,66 @@ public class ReportManager {
         return newReport;
     }
 
+    // ── Export to PDF (already uses iText — just save to the given path) ──
+    public boolean exportToPDF(Report report, String filePath) {
+        try {
+            Document doc = new Document();
+            PdfWriter.getInstance(doc, new FileOutputStream(filePath));
+            doc.open();
+
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
+            Font bodyFont  = FontFactory.getFont(FontFactory.HELVETICA, 12);
+
+            doc.add(new Paragraph("INDICIUM — Forensic Report", titleFont));
+            doc.add(new Paragraph("Report ID   : " + report.getReportID(),   bodyFont));
+            doc.add(new Paragraph("Case ID     : " + report.getCaseID(),     bodyFont));
+            doc.add(new Paragraph("Report Type : " + report.getFormat(), bodyFont));
+            doc.add(new Paragraph("Format      : " + report.getFormat(),     bodyFont));
+            doc.add(new Paragraph("Generated   : " + report.getGenerationDate(), bodyFont));
+            doc.add(new Paragraph("Hash        : " + report.getReportHash(), bodyFont));
+            doc.add(new Paragraph(" "));
+            doc.add(new Paragraph(report.getContent(), bodyFont));
+
+            doc.close();
+
+            auditLog.logEvent(0, "Report exported to PDF: " + filePath, AuditCategory.SYSTEM);
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("[ReportManager] PDF export failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // ── Export to CSV ──
+    public boolean exportToCSV(Report report, String filePath) {
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(filePath))) {
+            pw.println("ReportID,CaseID,ReportType,Format,GeneratedDate,Hash");
+            pw.printf("%d,%d,%s,%s,%s,%s%n",
+                    report.getReportID(),
+                    report.getCaseID(),
+                    report.getFormat(),
+                    report.getFormat(),
+                    report.getGenerationDate(),
+                    report.getReportHash()
+            );
+            pw.println();
+            pw.println("Content");
+            pw.println(report.getContent().replace(",", ";"));   // escape commas
+
+            auditLog.logEvent(0, "Report exported to CSV: " + filePath, AuditCategory.SYSTEM);
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("[ReportManager] CSV export failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+
+
+
+
     /**
      * Generates a physical PDF on the disk and returns the absolute file path.
      */
