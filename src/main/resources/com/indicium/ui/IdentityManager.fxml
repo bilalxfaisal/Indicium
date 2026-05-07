@@ -60,19 +60,19 @@
 
                     <VBox styleClass="id-stat-card" spacing="4" HBox.hgrow="ALWAYS">
                         <Label fx:id="statTotal" text="0" styleClass="id-stat-number"/>
-                        <Label text="Total Users"        styleClass="id-stat-label"/>
+                        <Label text="Total Users" styleClass="id-stat-label"/>
                     </VBox>
                     <VBox styleClass="id-stat-card" spacing="4" HBox.hgrow="ALWAYS">
                         <Label fx:id="statActive" text="0" styleClass="id-stat-number id-stat-green"/>
-                        <Label text="Active"             styleClass="id-stat-label"/>
+                        <Label text="Active" styleClass="id-stat-label"/>
                     </VBox>
                     <VBox styleClass="id-stat-card" spacing="4" HBox.hgrow="ALWAYS">
                         <Label fx:id="statInvestigators" text="0" styleClass="id-stat-number id-stat-cyan"/>
-                        <Label text="Investigators"      styleClass="id-stat-label"/>
+                        <Label text="Investigators" styleClass="id-stat-label"/>
                     </VBox>
                     <VBox styleClass="id-stat-card" spacing="4" HBox.hgrow="ALWAYS">
                         <Label fx:id="statAdmins" text="0" styleClass="id-stat-number id-stat-orange"/>
-                        <Label text="Admins"             styleClass="id-stat-label"/>
+                        <Label text="Admins" styleClass="id-stat-label"/>
                     </VBox>
                 </HBox>
 
@@ -85,12 +85,12 @@
                            onMouseClicked="#handleTableClick">
 
                     <columns>
-                        <TableColumn fx:id="colId"     text="ID"           prefWidth="60"  styleClass="id-col"/>
-                        <TableColumn fx:id="colName"   text="Name"         prefWidth="160" styleClass="id-col"/>
-                        <TableColumn fx:id="colEmail"  text="Email"        prefWidth="200" styleClass="id-col"/>
-                        <TableColumn fx:id="colRole"   text="Role"         prefWidth="120" styleClass="id-col"/>
-                        <TableColumn fx:id="colStatus" text="Status"       prefWidth="100" styleClass="id-col"/>
-                        <TableColumn fx:id="colLast"   text="Last Login"   prefWidth="140" styleClass="id-col"/>
+                        <TableColumn fx:id="colId"     text="ID"         prefWidth="60"  styleClass="id-col"/>
+                        <TableColumn fx:id="colName"   text="Name"       prefWidth="160" styleClass="id-col"/>
+                        <TableColumn fx:id="colEmail"  text="Email"      prefWidth="200" styleClass="id-col"/>
+                        <TableColumn fx:id="colRole"   text="Role"       prefWidth="120" styleClass="id-col"/>
+                        <TableColumn fx:id="colStatus" text="Status"     prefWidth="100" styleClass="id-col"/>
+                        <TableColumn fx:id="colLast"   text="Last Login" prefWidth="140" styleClass="id-col"/>
                     </columns>
 
                     <placeholder>
@@ -111,7 +111,8 @@
                     <padding><Insets top="16" bottom="16" left="20" right="20"/></padding>
                     <Label fx:id="detailTitle" text="User Details" styleClass="id-detail-title"/>
                     <HBox HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="btnEdit"   text="Edit"   styleClass="id-btn-secondary" onAction="#handleEdit"   visible="false"/>
+                    <!-- FIX 3: added managed="false" to match visible="false" -->
+                    <Button fx:id="btnEdit"   text="Edit"   styleClass="id-btn-secondary" onAction="#handleEdit"   visible="false" managed="false"/>
                     <Button fx:id="btnCancel" text="Cancel" styleClass="id-btn-ghost"     onAction="#handleCancel" visible="false" managed="false"/>
                 </HBox>
 
@@ -127,8 +128,8 @@
                                 <Label fx:id="avatarLabel" text="?" styleClass="id-avatar-lg-text"/>
                             </StackPane>
                             <VBox spacing="4">
-                                <Label fx:id="detailName"  text="Select a user" styleClass="id-detail-name"/>
-                                <Label fx:id="detailRole"  text=""              styleClass="id-role-badge"/>
+                                <Label fx:id="detailName" text="Select a user" styleClass="id-detail-name"/>
+                                <Label fx:id="detailRole" text=""              styleClass="id-role-badge"/>
                             </VBox>
                         </HBox>
 
@@ -139,22 +140,18 @@
 
                             <VBox spacing="4">
                                 <Label text="Full Name" styleClass="id-field-label"/>
-                                <TextField fx:id="fieldName"  styleClass="id-field" promptText="Full name"  editable="false"/>
+                                <TextField fx:id="fieldName"  styleClass="id-field" promptText="Full name" editable="false"/>
                             </VBox>
 
                             <VBox spacing="4">
                                 <Label text="Email Address" styleClass="id-field-label"/>
-                                <TextField fx:id="fieldEmail" styleClass="id-field" promptText="Email"      editable="false"/>
+                                <TextField fx:id="fieldEmail" styleClass="id-field" promptText="Email"     editable="false"/>
                             </VBox>
 
                             <VBox spacing="4">
                                 <Label text="Role" styleClass="id-field-label"/>
+                                <!-- FIX 1: removed fieldClearance entirely, kept only fieldRole and fieldStatus -->
                                 <ComboBox fx:id="fieldRole" styleClass="id-field-combo" maxWidth="Infinity" disable="true"/>
-                            </VBox>
-
-                            <VBox spacing="4">
-                                <Label text="Clearance Level" styleClass="id-field-label"/>
-                                <ComboBox fx:id="fieldClearance" styleClass="id-field-combo" maxWidth="Infinity" disable="true"/>
                             </VBox>
 
                             <VBox spacing="4">
@@ -168,9 +165,10 @@
 
                         <!-- Action buttons -->
                         <VBox spacing="10">
-                            <Button fx:id="btnSave"   text="Save Changes"  styleClass="id-btn-primary"  maxWidth="Infinity" onAction="#handleSave"   visible="false" managed="false"/>
-                            <Button fx:id="btnRevoke" text="Revoke Access" styleClass="id-btn-danger"   maxWidth="Infinity" onAction="#handleRevoke" visible="false"/>
-                            <Button fx:id="btnReset"  text="Reset Password" styleClass="id-btn-secondary" maxWidth="Infinity" onAction="#handleReset" visible="false"/>
+                            <Button fx:id="btnSave"   text="Save Changes"   styleClass="id-btn-primary"   maxWidth="Infinity" onAction="#handleSave"   visible="false" managed="false"/>
+                            <!-- FIX 2: added managed="false" to btnRevoke and btnReset -->
+                            <Button fx:id="btnRevoke" text="Revoke Access"  styleClass="id-btn-danger"    maxWidth="Infinity" onAction="#handleRevoke" visible="false" managed="false"/>
+                            <Button fx:id="btnReset"  text="Reset Password" styleClass="id-btn-secondary" maxWidth="Infinity" onAction="#handleReset"  visible="false" managed="false"/>
                         </VBox>
 
                     </VBox>

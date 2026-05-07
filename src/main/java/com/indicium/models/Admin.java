@@ -173,4 +173,26 @@ public class Admin extends SystemUser {
                 ", active=" + isActive +
                 '}';
     }
+
+    /**
+     * Updates the role of an existing user.
+     * Step 13 from sequence diagram — recordTransaction(adminID, "User Modified")
+     */
+    public boolean modifyUserRole(int targetUserID, UserRole newRole) {
+        if (!verifyAdminSession()) return false;
+
+        AuditLog auditLog = new AuditLog();
+        boolean success = UserDirectory.updateRole(targetUserID, newRole);
+        if (success) {
+            auditLog.logEvent(this.userID,
+                    "Modified role for user ID: " + targetUserID + " → " + newRole.name(),
+                    AuditCategory.USER);
+        } else {
+            auditLog.logEvent(this.userID,
+                    "Failed to modify role for user ID: " + targetUserID,
+                    AuditCategory.USER);
+        }
+        return success;
+    }
+
 }
