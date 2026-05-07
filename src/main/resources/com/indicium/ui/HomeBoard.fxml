@@ -13,7 +13,7 @@
               AnchorPane.rightAnchor="30.0"
               AnchorPane.topAnchor="30.0">
             <!-- ADD DB SHI TO FETCH NAME AND STUFF -->
-            <Label fx:id="welcomeLabel" styleClass="welcome-title" text="Welcome back, Bee!" />
+            <Label fx:id="welcomeLabel" styleClass="welcome-title" text="Welcome back!" />
             <Label styleClass="welcome-sub" text="Here's what's happening with your investigation today." />
 
             <HBox spacing="16.0">
