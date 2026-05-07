@@ -27,13 +27,18 @@
                 </graphic>
             </Button>
 
-            <!-- App name -->
-            <Label styleClass="app-title" text="INDICIUM">
-                <HBox.margin><Insets left="6.0" /></HBox.margin>
-            </Label>
-
             <!-- Spacer -->
-            <HBox HBox.hgrow="ALWAYS" />
+            <HBox HBox.hgrow="ALWAYS">
+            <children>
+               <ImageView fitHeight="76.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@Assets/Indicium_Logo_v2.png" />
+                  </image>
+                  <HBox.margin>
+                     <Insets top="5.0" />
+                  </HBox.margin>
+               </ImageView>
+            </children></HBox>
 
             <!-- Top nav buttons -->
             <Button fx:id="navDashboard" onAction="#handleNavDashboard" styleClass="top-nav-btn,active" text="Dashboard" />

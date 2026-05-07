@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class InvestigationDashBoard extends Application {
@@ -21,6 +22,9 @@ public class InvestigationDashBoard extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+        primaryStage.getIcons().add(
+                new Image(getClass().getResourceAsStream("/com/indicium/ui/Assets/Indicium_Icon.png"))
+        );
     }
 
     /**
