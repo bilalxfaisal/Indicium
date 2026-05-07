@@ -52,10 +52,10 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   AVATAR
+   AVATAR  (higher specificity to override CaseDashBoard.css)
    ═══════════════════════════════════════════════════════════ */
 
-.avatar-circle {
+.report-section .avatar-circle {
     -fx-background-color: #0D1B1E;
     -fx-background-radius: 50;
     -fx-min-width: 80;
@@ -97,8 +97,8 @@
    ═══════════════════════════════════════════════════════════ */
 
 .form-field {
-    -fx-background-color: #FAFAFA;
-    -fx-border-color: #E0E0E0;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D0D5DD;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-border-width: 1;
@@ -106,21 +106,34 @@
     -fx-font-size: 13px;
     -fx-font-family: "Segoe UI";
     -fx-text-fill: #0D1B1E;
+    -fx-cursor: text;
+}
+.form-field:hover {
+    -fx-border-color: #00BCD4;
 }
 .form-field:focused {
     -fx-border-color: #00BCD4;
     -fx-background-color: #FFFFFF;
+    -fx-effect: dropshadow(gaussian, rgba(0,188,212,0.18), 6, 0, 0, 0);
 }
 .field-readonly {
     -fx-background-color: #ECEFF1;
     -fx-text-fill: #90A4AE;
     -fx-border-color: #E0E0E0;
+    -fx-cursor: default;
+}
+.field-readonly:hover {
+    -fx-border-color: #E0E0E0;
 }
 .field-readonly:focused {
     -fx-border-color: #E0E0E0;
     -fx-background-color: #ECEFF1;
+    -fx-effect: none;
 }
 .field-error-border {
+    -fx-border-color: #EF5350;
+}
+.field-error-border:hover {
     -fx-border-color: #EF5350;
 }
 .field-error {
@@ -197,5 +210,24 @@
     -fx-min-height: 0;
     -fx-max-height: 0;
     -fx-opacity: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DISCARD BUTTON (red)
+   ═══════════════════════════════════════════════════════════ */
+
+.btn-delete {
+    -fx-background-color: #EF5350;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+    -fx-background-radius: 8;
+    -fx-padding: 8 18 8 18;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+.btn-delete:hover {
+    -fx-background-color: #C62828;
 }
 
