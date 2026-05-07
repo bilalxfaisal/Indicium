@@ -333,6 +333,10 @@ public class IdentityManagerDashboardController extends BorderPane {
 
             // Revoke if status changed to Revoked
             if ("Revoked".equals(status) && "Active".equals(selectedUser.getStatus())) {
+                if ("ADMIN".equals(selectedUser.getRole()) && selectedUser.getId() != currentAdmin.getUserID()) {
+                    showAlert("Update Failed", "Cannot revoke access for another administrator.");
+                    return;
+                }
                 currentAdmin.deactivateUser(selectedUser.getId());
             }
 
@@ -359,6 +363,11 @@ public class IdentityManagerDashboardController extends BorderPane {
     @FXML
     private void handleRevoke() {
         if (selectedUser == null || currentAdmin == null) return;
+        
+        if ("ADMIN".equals(selectedUser.getRole())) {
+            showAlert("Revoke Failed", "Cannot revoke access for another administrator.");
+            return;
+        }
 
         // Store name before clearing
         String userName = selectedUser.getName();
@@ -527,8 +536,11 @@ public class IdentityManagerDashboardController extends BorderPane {
         btnReset.setManaged(true);
 
         boolean isActive = "Active".equals(row.getStatus());
-        btnRevoke.setVisible(isActive);
-        btnRevoke.setManaged(isActive);
+        boolean isOtherAdmin = "ADMIN".equals(row.getRole()) && row.getId() != currentAdmin.getUserID();
+        boolean canRevoke = isActive && !isOtherAdmin;
+        
+        btnRevoke.setVisible(canRevoke);
+        btnRevoke.setManaged(canRevoke);
     }
 
     private void clearDetailPanel() {
@@ -554,13 +566,22 @@ public class IdentityManagerDashboardController extends BorderPane {
         fieldName.setEditable(true);
         fieldEmail.setEditable(true);
         fieldRole.setDisable(false);
-        fieldStatus.setDisable(false);
+        
+        boolean isOtherAdmin = selectedUser != null && "ADMIN".equals(selectedUser.getRole()) && selectedUser.getId() != currentAdmin.getUserID();
+        if (isOtherAdmin) {
+            fieldStatus.setDisable(true);
+        } else {
+            fieldStatus.setDisable(false);
+        }
+        
         btnSave.setVisible(true);
         btnSave.setManaged(true);
         btnCancel.setVisible(true);
         btnCancel.setManaged(true);
         btnEdit.setVisible(false);
         btnEdit.setManaged(false);
+        btnRevoke.setVisible(false);
+        btnRevoke.setManaged(false);
     }
 
     private void exitEditMode() {
@@ -573,6 +594,16 @@ public class IdentityManagerDashboardController extends BorderPane {
         btnSave.setManaged(false);
         btnCancel.setVisible(false);
         btnCancel.setManaged(false);
+        
+        if (selectedUser != null) {
+            boolean isActive = "Active".equals(selectedUser.getStatus());
+            boolean isOtherAdmin = "ADMIN".equals(selectedUser.getRole()) && selectedUser.getId() != currentAdmin.getUserID();
+            boolean canRevoke = isActive && !isOtherAdmin;
+            btnRevoke.setVisible(canRevoke);
+            btnRevoke.setManaged(canRevoke);
+            btnEdit.setVisible(true);
+            btnEdit.setManaged(true);
+        }
     }
 
     // ══════════════════════════════════════════

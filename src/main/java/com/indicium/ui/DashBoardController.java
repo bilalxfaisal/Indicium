@@ -112,6 +112,11 @@ public class DashBoardController extends BorderPane {
                     ? String.valueOf(name.charAt(0)).toUpperCase()
                     : "?";
             avatarLabel.setText(initial);
+            
+            if (currentUser.getRole() != com.indicium.models.UserRole.ADMIN) {
+                sideUserMgr.setVisible(false);
+                sideUserMgr.setManaged(false);
+            }
         }
 
 

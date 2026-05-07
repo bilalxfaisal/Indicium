@@ -780,6 +780,19 @@ public class EvidenceDashBoardController extends StackPane {
                 List<Case> linked = linkedCasesMap.get(evidenceId);
                 if (linked != null) {
                     linked.removeIf(c -> c.getCaseID() == targetCase.getCaseID());
+                    
+                    if (linked.isEmpty()) {
+                        allEvidence.stream()
+                                .filter(e -> String.valueOf(e.getEvidenceID()).equals(evidenceId))
+                                .findFirst()
+                                .ifPresent(e -> {
+                                    if (e.getStatus() == EvidenceStatus.LINKED) {
+                                        e.setStatus(EvidenceStatus.COLLECTED);
+                                        com.indicium.repository.EvidenceRepo.updateStatus(e.getEvidenceID(), EvidenceStatus.COLLECTED);
+                                        loadEvidence();
+                                    }
+                                });
+                    }
                 }
                 System.out.println("[EvidenceDashBoard] Unlinked EV-" + evidenceId
                         + " from Case #" + targetCase.getCaseID());
@@ -852,7 +865,20 @@ public class EvidenceDashBoardController extends StackPane {
 
                 FileChooser save = new FileChooser();
                 save.setTitle("Save Evidence File");
-                save.setInitialFileName(e.getName());
+                
+                String ext = "";
+                int idx = e.getFilePath().lastIndexOf('.');
+                if (idx > 0) {
+                    ext = e.getFilePath().substring(idx);
+                    save.getExtensionFilters().add(new FileChooser.ExtensionFilter("Evidence File (" + ext + ")", "*" + ext));
+                }
+                
+                String initName = e.getName();
+                if (!ext.isEmpty() && !initName.toLowerCase().endsWith(ext.toLowerCase())) {
+                    initName += ext;
+                }
+                save.setInitialFileName(initName);
+                
                 File dest = save.showSaveDialog(getScene().getWindow());
 
                 if (dest != null) {
