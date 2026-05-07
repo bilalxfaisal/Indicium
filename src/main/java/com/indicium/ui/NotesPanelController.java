@@ -16,6 +16,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.indicium.models.Note;
+import com.indicium.models.Task;
+import com.indicium.repository.NotesRepository;
+import com.indicium.services.SessionManager;
+
 public class NotesPanelController extends VBox {
 
     // ── Header ──
@@ -50,9 +55,11 @@ public class NotesPanelController extends VBox {
     @FXML private Button filterDone;
 
     // ── Data ──
-    private final List<NoteItem> notes = new ArrayList<>();
-    private final List<TaskItem> tasks = new ArrayList<>();
+    private final List<Note> notes = new ArrayList<>();
+    private final List<Task> tasks = new ArrayList<>();
     private String activeTaskFilter = "All";
+    
+    private final NotesRepository notesRepo = new NotesRepository();
 
     private static final DateTimeFormatter FMT =
             DateTimeFormatter.ofPattern("MMM d, h:mm a");
@@ -80,12 +87,21 @@ public class NotesPanelController extends VBox {
         ));
         taskPriorityCombo.setValue("Medium");
 
+        // Load data from DB
+        if (SessionManager.getInstance().isLoggedIn()) {
+            int userId = SessionManager.getInstance().getCurrentUser().getUserID();
+            notes.addAll(notesRepo.getNotesByUserId(userId));
+            tasks.addAll(notesRepo.getTasksByUserId(userId));
+        }
+
         // Hide panel off-screen initially
         setTranslateX(340);
         setVisible(false);
         setManaged(false);
 
         refreshCounts();
+        renderNotes();
+        renderTasks();
     }
 
     // ══════════════════════════════════════════
@@ -155,8 +171,11 @@ public class NotesPanelController extends VBox {
         noteTitleInput.setStyle("");
 
         String tag = noteTagCombo.getValue() != null ? noteTagCombo.getValue() : "General";
-        NoteItem note = new NoteItem(title, body, tag, LocalDateTime.now());
-        notes.add(note);
+        int userId = SessionManager.getInstance().getCurrentUser().getUserID();
+        
+        Note note = new Note(title, body, tag, LocalDateTime.now(), userId);
+        Note savedNote = notesRepo.saveNote(note);
+        notes.add(savedNote);
 
         noteTitleInput.clear();
         noteBodyInput.clear();
@@ -174,22 +193,22 @@ public class NotesPanelController extends VBox {
         notesEmpty.setManaged(notes.isEmpty());
 
         for (int i = notes.size() - 1; i >= 0; i--) {
-            NoteItem n = notes.get(i);
-            final int idx = i;
-            notesList.getChildren().add(buildNoteCard(n, idx));
+            Note n = notes.get(i);
+            notesList.getChildren().add(buildNoteCard(n));
         }
     }
 
-    private VBox buildNoteCard(NoteItem note, int index) {
+    private VBox buildNoteCard(Note note) {
         // Tag chip
-        Label tag = new Label(note.tag);
-        tag.getStyleClass().addAll("tag-chip", "tag-" + note.tag.toLowerCase());
+        Label tag = new Label(note.getTag());
+        tag.getStyleClass().addAll("tag-chip", "tag-" + note.getTag().toLowerCase());
 
         // Delete button
         Button del = new Button("✕");
         del.getStyleClass().add("note-delete-btn");
         del.setOnAction(e -> {
-            notes.remove(index);
+            notesRepo.deleteNote(note.getNoteId());
+            notes.remove(note);
             renderNotes();
             refreshCounts();
         });
@@ -200,17 +219,17 @@ public class NotesPanelController extends VBox {
         HBox topRow = new HBox(6, tag, spacer, del);
         topRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-        Label title = new Label(note.title);
+        Label title = new Label(note.getTitle());
         title.getStyleClass().add("note-card-title");
         title.setWrapText(true);
 
-        Label body = new Label(note.body);
+        Label body = new Label(note.getBody());
         body.getStyleClass().add("note-card-body");
         body.setWrapText(true);
-        body.setVisible(!note.body.isEmpty());
-        body.setManaged(!note.body.isEmpty());
+        body.setVisible(!note.getBody().isEmpty());
+        body.setManaged(!note.getBody().isEmpty());
 
-        Label meta = new Label(note.timestamp.format(FMT));
+        Label meta = new Label(note.getCreatedAt().format(FMT));
         meta.getStyleClass().add("note-card-meta");
 
         VBox card = new VBox(6, topRow, title, body, meta);
@@ -229,8 +248,12 @@ public class NotesPanelController extends VBox {
 
         String priority = taskPriorityCombo.getValue() != null
                 ? taskPriorityCombo.getValue() : "Medium";
+                
+        int userId = SessionManager.getInstance().getCurrentUser().getUserID();
 
-        tasks.add(new TaskItem(text, priority, LocalDateTime.now()));
+        Task task = new Task(text, priority, false, LocalDateTime.now(), userId);
+        Task savedTask = notesRepo.saveTask(task);
+        tasks.add(savedTask);
         taskInput.clear();
 
         renderTasks();
@@ -254,9 +277,9 @@ public class NotesPanelController extends VBox {
         tasksList.getChildren().clear();
         tasksList.getChildren().add(tasksEmpty);
 
-        List<TaskItem> filtered = tasks.stream().filter(t -> switch (activeTaskFilter) {
-            case "Open" -> !t.done;
-            case "Done" -> t.done;
+        List<Task> filtered = tasks.stream().filter(t -> switch (activeTaskFilter) {
+            case "Open" -> !t.isDone();
+            case "Done" -> t.isDone();
             default     -> true;
         }).toList();
 
@@ -264,45 +287,47 @@ public class NotesPanelController extends VBox {
         tasksEmpty.setManaged(filtered.isEmpty());
 
         for (int i = filtered.size() - 1; i >= 0; i--) {
-            TaskItem t = filtered.get(i);
+            Task t = filtered.get(i);
             tasksList.getChildren().add(buildTaskItem(t));
         }
     }
 
-    private HBox buildTaskItem(TaskItem task) {
+    private HBox buildTaskItem(Task task) {
         // Checkbox
         CheckBox cb = new CheckBox();
-        cb.setSelected(task.done);
+        cb.setSelected(task.isDone());
         cb.setStyle("-fx-cursor: hand;");
 
         // Task text
-        Label text = new Label(task.text);
-        text.getStyleClass().add(task.done ? "task-text-done" : "task-text");
+        Label text = new Label(task.getText());
+        text.getStyleClass().add(task.isDone() ? "task-text-done" : "task-text");
         text.setWrapText(true);
         HBox.setHgrow(text, javafx.scene.layout.Priority.ALWAYS);
 
         // Priority badge
-        Label pri = new Label(task.priority);
-        pri.getStyleClass().add("task-priority-" + task.priority.toLowerCase());
+        Label pri = new Label(task.getPriority());
+        pri.getStyleClass().add("task-priority-" + task.getPriority().toLowerCase());
 
         // Delete
         Button del = new Button("✕");
         del.getStyleClass().add("task-delete-btn");
         del.setOnAction(e -> {
+            notesRepo.deleteTask(task.getTaskId());
             tasks.remove(task);
             renderTasks();
             refreshCounts();
         });
 
         cb.setOnAction(e -> {
-            task.done = cb.isSelected();
+            task.setDone(cb.isSelected());
+            notesRepo.updateTaskStatus(task.getTaskId(), cb.isSelected());
             renderTasks();
             refreshCounts();
         });
 
         HBox row = new HBox(10, cb, text, pri, del);
         row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        row.getStyleClass().addAll("task-item", task.done ? "task-item-done" : "");
+        row.getStyleClass().addAll("task-item", task.isDone() ? "task-item-done" : "");
         return row;
     }
 
@@ -311,31 +336,8 @@ public class NotesPanelController extends VBox {
     // ══════════════════════════════════════════
 
     private void refreshCounts() {
-        long done = tasks.stream().filter(t -> t.done).count();
+        long done = tasks.stream().filter(Task::isDone).count();
         noteCountLabel.setText(notes.size() + " notes · "
                 + tasks.size() + " tasks (" + done + " done)");
-    }
-
-    // ══════════════════════════════════════════
-    //  Data models (inner classes)
-    // ══════════════════════════════════════════
-
-    private static class NoteItem {
-        String title, body, tag;
-        LocalDateTime timestamp;
-        NoteItem(String title, String body, String tag, LocalDateTime ts) {
-            this.title = title; this.body = body;
-            this.tag = tag; this.timestamp = ts;
-        }
-    }
-
-    private static class TaskItem {
-        String text, priority;
-        boolean done;
-        LocalDateTime timestamp;
-        TaskItem(String text, String priority, LocalDateTime ts) {
-            this.text = text; this.priority = priority;
-            this.timestamp = ts; this.done = false;
-        }
     }
 }

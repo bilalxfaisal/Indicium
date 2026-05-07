@@ -85,10 +85,31 @@ CREATE TABLE IF NOT EXISTS correlation_links (
                                                  created_by    INT,
                                                  created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-                                                 FOREIGN KEY (source_ev_id) REFERENCES evidence(evidence_id) ON DELETE CASCADE,
+    FOREIGN KEY (source_ev_id) REFERENCES Evidence(Evidence_id) ON DELETE CASCADE,
     FOREIGN KEY (target_ev_id) REFERENCES Evidence(EvidenceID) ON DELETE CASCADE,
     FOREIGN KEY (created_by)   REFERENCES Users(UserID)         ON DELETE SET NULL,
 
     -- Prevent duplicate links in either direction
     UNIQUE KEY uq_link (source_ev_id, target_ev_id)
     );
+
+-- 9. Create Notes and Tasks Tables
+CREATE TABLE IF NOT EXISTS Notes (
+    NoteID INT AUTO_INCREMENT PRIMARY KEY,
+    Title VARCHAR(255) NOT NULL,
+    Body TEXT,
+    Tag VARCHAR(50),
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UserID INT NOT NULL,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Tasks (
+    TaskID INT AUTO_INCREMENT PRIMARY KEY,
+    Text VARCHAR(255) NOT NULL,
+    Priority VARCHAR(50),
+    IsDone BOOLEAN DEFAULT FALSE,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UserID INT NOT NULL,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
