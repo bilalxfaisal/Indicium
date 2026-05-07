@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS Users (
 
 -- Insert a default Admin account so you can log in immediately
 INSERT IGNORE INTO Users (FullName, Email, PasswordHash, Role)
-VALUES ('System Admin', 'admin@indicium.com', '5b40171489659251097e7790fc2f1892e2183a72546fe1df283d07865db9149c', 'ADMIN');
+VALUES ('System Admin', 'admin@indicium.com', '307bca9e273e362dae7b88ddbd78e4f1f53b48b64d11775c441fa01ca782d500', 'ADMIN');
 
 -- 3. Create Cases Table
 CREATE TABLE IF NOT EXISTS Cases (

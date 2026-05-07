@@ -86,27 +86,28 @@ public class CorrelationRepo {
                                             String typeFilter) {
         List<CorrelationLink> results = new ArrayList<>();
 
+        // ✅ All column names now match your actual schema (PascalCase)
         StringBuilder sql = new StringBuilder("""
                 SELECT
                     cl.link_id,
-                    src_ev.evidence_id  AS src_ev_id,
-                    src_ev.name         AS src_ev_name,
-                    src_ev.type         AS src_ev_type,
-                    src_c.case_id       AS src_case_id,
-                    src_c.title         AS src_case_title,
-                    tgt_ev.evidence_id  AS tgt_ev_id,
-                    tgt_ev.name         AS tgt_ev_name,
-                    tgt_ev.type         AS tgt_ev_type,
-                    tgt_c.case_id       AS tgt_case_id,
-                    tgt_c.title         AS tgt_case_title,
+                    src_ev.EvidenceID   AS src_ev_id,
+                    src_ev.FileName     AS src_ev_name,
+                    src_ev.Status       AS src_ev_type,
+                    src_c.CaseID        AS src_case_id,
+                    src_c.Title         AS src_case_title,
+                    tgt_ev.EvidenceID   AS tgt_ev_id,
+                    tgt_ev.FileName     AS tgt_ev_name,
+                    tgt_ev.Status       AS tgt_ev_type,
+                    tgt_c.CaseID        AS tgt_case_id,
+                    tgt_c.Title         AS tgt_case_title,
                     u.FullName          AS linked_by,
                     cl.created_at
                 FROM correlation_links cl
-                JOIN evidence src_ev ON cl.source_ev_id = src_ev.evidence_id
-                JOIN cases    src_c  ON src_ev.case_id  = src_c.case_id
-                JOIN evidence tgt_ev ON cl.target_ev_id = tgt_ev.evidence_id
-                JOIN cases    tgt_c  ON tgt_ev.case_id  = tgt_c.case_id
-                LEFT JOIN users u    ON cl.created_by   = u.UserID
+                JOIN Evidence src_ev ON cl.source_ev_id = src_ev.EvidenceID
+                JOIN Cases    src_c  ON src_ev.CaseID   = src_c.CaseID
+                JOIN Evidence tgt_ev ON cl.target_ev_id = tgt_ev.EvidenceID
+                JOIN Cases    tgt_c  ON tgt_ev.CaseID   = tgt_c.CaseID
+                LEFT JOIN Users u    ON cl.created_by   = u.UserID
                 WHERE 1=1
                 """);
 
@@ -114,10 +115,10 @@ public class CorrelationRepo {
 
         if (search != null && !search.isBlank()) {
             sql.append("""
-                    AND (src_ev.name  LIKE ?
-                      OR tgt_ev.name  LIKE ?
-                      OR src_c.title  LIKE ?
-                      OR tgt_c.title  LIKE ?)
+                    AND (src_ev.FileName LIKE ?
+                      OR tgt_ev.FileName LIKE ?
+                      OR src_c.Title     LIKE ?
+                      OR tgt_c.Title     LIKE ?)
                     """);
             String like = "%" + search + "%";
             params.add(like); params.add(like);
@@ -125,13 +126,15 @@ public class CorrelationRepo {
         }
         if (caseFilter != null && !caseFilter.isBlank()
                 && !caseFilter.equalsIgnoreCase("All")) {
-            sql.append(" AND (src_c.title = ? OR tgt_c.title = ?)");
+            sql.append(" AND (src_c.Title = ? OR tgt_c.Title = ?)");
             params.add(caseFilter); params.add(caseFilter);
         }
+        // Evidence table has no Type column — filter by FileName extension instead
         if (typeFilter != null && !typeFilter.isBlank()
                 && !typeFilter.equalsIgnoreCase("All")) {
-            sql.append(" AND (src_ev.type = ? OR tgt_ev.type = ?)");
-            params.add(typeFilter); params.add(typeFilter);
+            sql.append(" AND (src_ev.FileName LIKE ? OR tgt_ev.FileName LIKE ?)");
+            String extFilter = "%" + typeFilter + "%";
+            params.add(extFilter); params.add(extFilter);
         }
 
         sql.append(" ORDER BY cl.created_at DESC");
@@ -197,21 +200,22 @@ public class CorrelationRepo {
 
     public List<String> fetchDistinctCaseTitles() {
         List<String> titles = new ArrayList<>();
+        // ✅ Uses CaseID and EvidenceID — matches your schema
         String sql = """
-                SELECT DISTINCT c.title FROM cases c
-                WHERE c.case_id IN (
-                    SELECT src_ev.case_id FROM correlation_links cl
-                    JOIN evidence src_ev ON cl.source_ev_id = src_ev.evidence_id
+                SELECT DISTINCT c.Title FROM Cases c
+                WHERE c.CaseID IN (
+                    SELECT src_ev.CaseID FROM correlation_links cl
+                    JOIN Evidence src_ev ON cl.source_ev_id = src_ev.EvidenceID
                     UNION
-                    SELECT tgt_ev.case_id FROM correlation_links cl
-                    JOIN evidence tgt_ev ON cl.target_ev_id = tgt_ev.evidence_id
+                    SELECT tgt_ev.CaseID FROM correlation_links cl
+                    JOIN Evidence tgt_ev ON cl.target_ev_id = tgt_ev.EvidenceID
                 )
-                ORDER BY c.title
+                ORDER BY c.Title
                 """;
         try (Connection con = connect();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) titles.add(rs.getString("title"));
+            while (rs.next()) titles.add(rs.getString("Title"));
         } catch (SQLException e) {
             System.err.println("[CorrelationRepo] fetchDistinctCaseTitles failed: " + e.getMessage());
         }
