@@ -108,7 +108,7 @@ public class Case {
     }
 
     private int generateUniqueID(){
-        return LocalDateTime.now().hashCode();
+        return com.indicium.repository.CaseRepository.generateNextCaseID();
     }
 }
 

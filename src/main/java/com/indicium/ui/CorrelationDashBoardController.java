@@ -361,12 +361,11 @@ public class CorrelationDashBoardController extends StackPane {
     @FXML
     private void handleTargetCaseSearch() {
         String query = targetCaseSearch.getText().trim().toLowerCase();
-        if (query.isEmpty()) return;
 
         try {
             List<Case> results = caseRepo.findAll().stream()
                     .filter(c -> c.getCaseID() != selectedSourceCaseID)
-                    .filter(c -> c.getTitle().toLowerCase().contains(query)
+                    .filter(c -> query.isEmpty() || c.getTitle().toLowerCase().contains(query)
                             || String.valueOf(c.getCaseID()).contains(query))
                     .collect(Collectors.toList());
 
