@@ -13,13 +13,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-import static java.lang.IO.print;
-
-public class LoginController
-{
+public class LoginController {
 
     @FXML private TextField     emailField;
     @FXML private PasswordField passwordField;
@@ -37,14 +33,13 @@ public class LoginController
 
         // Hash using the shared utility — no duplicate logic
         String hashedInput = SessionManager.hashSHA256(rawPassword);
-        print("Attempting login for: " + email);
-        print("Hashed password: " + hashedInput);
+        System.out.println("Attempting login for: " + email);
+        System.out.println("Hashed password: " + hashedInput);
 
         // Authenticate against DB
         SystemUser loggedInUser = UserDirectory.authenticate(email, hashedInput);
 
-        if (loggedInUser != null)
-        {
+        if (loggedInUser != null) {
             // Store in session — sets currentUser + currentUserAuth
             SessionManager.getInstance().loginUser(loggedInUser);
 
@@ -58,29 +53,18 @@ public class LoginController
                 errorLabel.setText("Login succeeded but role is unrecognised. Contact your admin.");
                 SessionManager.getInstance().logoutUser();
             }
-        }
-        else {
+        } else {
             errorLabel.setText("Invalid email, password, or inactive account.");
         }
     }
 
     /**
-     * Loads the Investigator Dashboard using the existing DashBoardController (BorderPane).
-     * This mirrors the original loadDashboard behaviour.
+     * Loads the Investigator Dashboard using the InvestigationDashBoard launcher.
      */
     private void loadInvestigatorDashboard(ActionEvent event) {
         try {
-            DashBoardController dashboard = new DashBoardController();
-
-            // Wrap in StackPane so the search overlay sits on top
-            StackPane root = new StackPane(dashboard, dashboard.getGlobalSearch());
-
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Indicium - Investigator Dashboard");
-            stage.setMaximized(true);
-            stage.show();
-
+            InvestigationDashBoard.launchDashboard(stage);
         } catch (Exception e) {
             System.err.println("[Login] Failed to load investigator dashboard: " + e.getMessage());
             errorLabel.setText("Failed to load dashboard. Contact support.");
