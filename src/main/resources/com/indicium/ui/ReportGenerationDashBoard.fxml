@@ -35,8 +35,6 @@
                 <Label styleClass="report-subtitle" text="Compile and export a forensic case report" />
             </VBox>
             <Region HBox.hgrow="ALWAYS" />
-
-            <!-- Export buttons — disabled until form is valid -->
             <Button fx:id="btnExportPDF" disable="true" onAction="#handleExportPDF" styleClass="btn-export-pdf" text="⬇  Export PDF" />
             <Button fx:id="btnExportCSV" disable="true" onAction="#handleExportCSV" styleClass="btn-export-csv" text="⬇  Export CSV" />
         </HBox>
@@ -57,35 +55,35 @@
                         <Label styleClass="report-section-title" text="Report Type" />
                     </HBox>
 
-                    <!-- Type selector cards -->
                     <HBox spacing="12">
-                        <VBox fx:id="cardCaseSummary" onMouseClicked="#handleSelectReportType" spacing="6" styleClass="report-type-card,report-type-active" userData="CASE_SUMMARY">
-                            <padding>
-                                <Insets bottom="16" left="16" right="16" top="16" />
-                            </padding>
+
+                        <VBox fx:id="cardCaseSummary"
+                              onMouseClicked="#handleSelectReportType"
+                              spacing="6"
+                              styleClass="report-type-card,report-type-active"
+                              userData="CASE_SUMMARY">
+                            <padding><Insets bottom="16" left="16" right="16" top="16" /></padding>
                             <ImageView fitHeight="28" fitWidth="28" pickOnBounds="true" preserveRatio="true">
-                                <image>
-                                    <Image url="@Assets/icons8-report-100_black.png" />
-                                </image>
+                                <image><Image url="@Assets/icons8-report-100_black.png" /></image>
                             </ImageView>
                             <Label styleClass="card-type-title" text="Case Summary" />
                             <Label styleClass="card-type-sub" text="Full case details, evidence list, investigators and timeline." wrapText="true" />
                         </VBox>
 
-                        <VBox fx:id="cardAuditLog" onMouseClicked="#handleSelectReportType" spacing="6" styleClass="report-type-card" userData="AUDIT_LOG">
-                            <padding>
-                                <Insets bottom="16" left="16" right="16" top="16" />
-                            </padding>
+                        <VBox fx:id="cardAuditLog"
+                              onMouseClicked="#handleSelectReportType"
+                              spacing="6"
+                              styleClass="report-type-card"
+                              userData="AUDIT_LOG">
+                            <padding><Insets bottom="16" left="16" right="16" top="16" /></padding>
                             <ImageView fitHeight="28" fitWidth="28" pickOnBounds="true" preserveRatio="true">
-                                <image>
-                                    <Image url="@Assets/icons8-audit-100_black.png" />
-                                </image>
+                                <image><Image url="@Assets/icons8-audit-100_black.png" /></image>
                             </ImageView>
                             <Label styleClass="card-type-title" text="System Audit Log" />
                             <Label styleClass="card-type-sub" text="Full system activity log filtered by date range and user." wrapText="true" />
                         </VBox>
-                    </HBox>
 
+                    </HBox>
                 </VBox>
 
                 <!-- ════════════════════════════════════
@@ -101,25 +99,38 @@
                     <HBox alignment="CENTER_LEFT" spacing="10">
                         <HBox alignment="CENTER_LEFT" spacing="6" styleClass="search-box" HBox.hgrow="ALWAYS">
                             <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                                <image>
-                                    <Image url="@Assets/icons8-search-100.png" />
-                                </image>
+                                <image><Image url="@Assets/icons8-search-100.png" /></image>
                             </ImageView>
-                            <TextField fx:id="caseSearchField" onKeyReleased="#handleCaseSearch" prefWidth="300" promptText="Search by Case ID or title..." styleClass="search-field" />
+                            <TextField fx:id="caseSearchField"
+                                       onKeyReleased="#handleCaseSearch"
+                                       prefWidth="300"
+                                       promptText="Search by Case ID or title..."
+                                       styleClass="search-field" />
                         </HBox>
-                        <ComboBox fx:id="caseStatusFilter" onAction="#handleCaseSearch" prefWidth="130" promptText="Status" styleClass="filter-combo" />
+                        <ComboBox fx:id="caseStatusFilter"
+                                  onAction="#handleCaseSearch"
+                                  prefWidth="130"
+                                  promptText="Status"
+                                  styleClass="filter-combo" />
                     </HBox>
 
-                    <!-- Case search results -->
-                    <VBox fx:id="caseResultsList" managed="false" spacing="0" styleClass="case-results-list" visible="false" />
+                    <!-- Case search results — hidden until search fires -->
+                    <VBox fx:id="caseResultsList"
+                          managed="false"
+                          spacing="0"
+                          styleClass="case-results-list"
+                          visible="false" />
 
-                    <!-- Selected case chip -->
-                    <HBox fx:id="selectedCaseChip" alignment="CENTER_LEFT" managed="false" spacing="10" styleClass="selected-case-chip" visible="false">
-                        <padding>
-                            <Insets bottom="10" left="14" right="14" top="10" />
-                        </padding>
+                    <!-- Selected case chip — hidden until case is picked -->
+                    <HBox fx:id="selectedCaseChip"
+                          alignment="CENTER_LEFT"
+                          managed="false"
+                          spacing="10"
+                          styleClass="selected-case-chip"
+                          visible="false">
+                        <padding><Insets bottom="10" left="14" right="14" top="10" /></padding>
                         <VBox spacing="2" HBox.hgrow="ALWAYS">
-                            <Label fx:id="chipCaseId" styleClass="chip-case-id" text="—" />
+                            <Label fx:id="chipCaseId"    styleClass="chip-case-id"    text="—" />
                             <Label fx:id="chipCaseTitle" styleClass="chip-case-title" text="—" />
                         </VBox>
                         <Button onAction="#handleClearCase" styleClass="modal-close-btn" text="✕" />
@@ -128,7 +139,7 @@
                 </VBox>
 
                 <!-- ════════════════════════════════════
-                     SECTION 3 — Report Parameters
+                     SECTION 3 — Parameters
                      ════════════════════════════════════ -->
                 <VBox spacing="12" styleClass="report-section">
 
@@ -139,30 +150,25 @@
 
                     <HBox spacing="16">
 
-                        <!-- Date range -->
                         <VBox spacing="6" HBox.hgrow="ALWAYS">
                             <Label styleClass="form-label" text="DATE RANGE" />
                             <HBox alignment="CENTER_LEFT" spacing="10">
                                 <TextField fx:id="dateFrom" prefWidth="160" promptText="From  (YYYY-MM-DD)" styleClass="form-field" />
                                 <Label styleClass="form-label" text="→" />
-                                <TextField fx:id="dateTo" prefWidth="160" promptText="To  (YYYY-MM-DD)" styleClass="form-field" />
+                                <TextField fx:id="dateTo"   prefWidth="160" promptText="To  (YYYY-MM-DD)"   styleClass="form-field" />
                             </HBox>
-                            <!-- TODO: Replace TextFields with DatePicker once
-                                 DatePicker styling is consistent -->
                         </VBox>
 
-                        <!-- Output format -->
                         <VBox spacing="6">
                             <Label styleClass="form-label" text="OUTPUT FORMAT" />
                             <ComboBox fx:id="outputFormat" prefWidth="160" styleClass="filter-combo" />
                         </VBox>
 
                     </HBox>
-
                 </VBox>
 
                 <!-- ════════════════════════════════════
-                     SECTION 4 — Include Sections
+                     SECTION 4 — Include in Report
                      ════════════════════════════════════ -->
                 <VBox spacing="12" styleClass="report-section">
 
@@ -173,16 +179,16 @@
 
                     <HBox alignment="TOP_LEFT" spacing="12">
 
-                        <!-- Investigators toggle -->
-                        <VBox fx:id="toggleInvestigators" onMouseClicked="#handleToggleSection" spacing="4" styleClass="include-toggle,toggle-on" userData="INVESTIGATORS">
-                            <padding>
-                                <Insets bottom="12" left="14" right="14" top="12" />
-                            </padding>
+                        <!-- Investigators -->
+                        <VBox fx:id="toggleInvestigators"
+                              onMouseClicked="#handleToggleSection"
+                              spacing="4"
+                              styleClass="include-toggle,toggle-on"
+                              userData="INVESTIGATORS">
+                            <padding><Insets bottom="12" left="14" right="14" top="12" /></padding>
                             <HBox alignment="CENTER_LEFT" spacing="8">
                                 <ImageView fitHeight="18" fitWidth="18" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@Assets/icons8-accessibility-tools-100_bl.png" />
-                                    </image>
+                                    <image><Image url="@Assets/icons8-accessibility-tools-100_bl.png" /></image>
                                 </ImageView>
                                 <Label styleClass="toggle-label" text="Investigators" />
                                 <Region HBox.hgrow="ALWAYS" />
@@ -191,16 +197,16 @@
                             <Label styleClass="toggle-sub" text="All users who worked on this case" />
                         </VBox>
 
-                        <!-- Photo Evidence toggle -->
-                        <VBox fx:id="togglePhotoEvidence" onMouseClicked="#handleToggleSection" spacing="4" styleClass="include-toggle,toggle-on" userData="PHOTO_EVIDENCE">
-                            <padding>
-                                <Insets bottom="12" left="14" right="14" top="12" />
-                            </padding>
+                        <!-- Photo Evidence -->
+                        <VBox fx:id="togglePhotoEvidence"
+                              onMouseClicked="#handleToggleSection"
+                              spacing="4"
+                              styleClass="include-toggle,toggle-on"
+                              userData="PHOTO_EVIDENCE">
+                            <padding><Insets bottom="12" left="14" right="14" top="12" /></padding>
                             <HBox alignment="CENTER_LEFT" spacing="8">
                                 <ImageView fitHeight="18" fitWidth="18" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@Assets/icons8-image-file-100_bl.png" />
-                                    </image>
+                                    <image><Image url="@Assets/icons8-image-file-100_bl.png" /></image>
                                 </ImageView>
                                 <Label styleClass="toggle-label" text="Photo Evidence" />
                                 <Region HBox.hgrow="ALWAYS" />
@@ -209,16 +215,16 @@
                             <Label styleClass="toggle-sub" text="Embedded image thumbnails" />
                         </VBox>
 
-                        <!-- Timeline toggle -->
-                        <VBox fx:id="toggleTimeline" onMouseClicked="#handleToggleSection" spacing="4" styleClass="include-toggle,toggle-on" userData="TIMELINE">
-                            <padding>
-                                <Insets bottom="12" left="14" right="14" top="12" />
-                            </padding>
+                        <!-- Timeline -->
+                        <VBox fx:id="toggleTimeline"
+                              onMouseClicked="#handleToggleSection"
+                              spacing="4"
+                              styleClass="include-toggle,toggle-on"
+                              userData="TIMELINE">
+                            <padding><Insets bottom="12" left="14" right="14" top="12" /></padding>
                             <HBox alignment="CENTER_LEFT" spacing="8">
                                 <ImageView fitHeight="18" fitWidth="18" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@Assets/icons8-timeline-100_bl.png" />
-                                    </image>
+                                    <image><Image url="@Assets/icons8-timeline-100_bl.png" /></image>
                                 </ImageView>
                                 <Label styleClass="toggle-label" text="Timeline" />
                                 <Region HBox.hgrow="ALWAYS" />
@@ -227,16 +233,16 @@
                             <Label styleClass="toggle-sub" text="Chronological incident events" />
                         </VBox>
 
-                        <!-- Audit Trail toggle -->
-                        <VBox fx:id="toggleAuditTrail" onMouseClicked="#handleToggleSection" spacing="4" styleClass="include-toggle,toggle-off" userData="AUDIT_TRAIL">
-                            <padding>
-                                <Insets bottom="12" left="14" right="14" top="12" />
-                            </padding>
+                        <!-- Audit Trail — off by default -->
+                        <VBox fx:id="toggleAuditTrail"
+                              onMouseClicked="#handleToggleSection"
+                              spacing="4"
+                              styleClass="include-toggle,toggle-off"
+                              userData="AUDIT_TRAIL">
+                            <padding><Insets bottom="12" left="14" right="14" top="12" /></padding>
                             <HBox alignment="CENTER_LEFT" spacing="8">
                                 <ImageView fitHeight="18" fitWidth="18" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@Assets/icons8-audit-100_black.png" />
-                                    </image>
+                                    <image><Image url="@Assets/icons8-audit-100_black.png" /></image>
                                 </ImageView>
                                 <Label styleClass="toggle-label" text="Audit Trail" />
                                 <Region HBox.hgrow="ALWAYS" />
@@ -246,7 +252,6 @@
                         </VBox>
 
                     </HBox>
-
                 </VBox>
 
                 <!-- ════════════════════════════════════
@@ -260,22 +265,25 @@
                         <Label styleClass="optional-tag" text="optional" />
                     </HBox>
 
-                    <TextArea fx:id="reportNotes" prefHeight="80" promptText="Add any notes to be included in the report header..." styleClass="form-field" wrapText="true" />
+                    <TextArea fx:id="reportNotes"
+                              prefHeight="80"
+                              promptText="Add any notes to be included in the report header..."
+                              styleClass="form-field"
+                              wrapText="true" />
 
                 </VBox>
 
                 <!-- ════════════════════════════════════
                      PREVIEW SUMMARY BAR
+                     Always visible — controller manages content
                      ════════════════════════════════════ -->
-                <VBox fx:id="previewBar" managed="false" spacing="10" styleClass="preview-bar" visible="false">
-                    <padding>
-                        <Insets bottom="16" left="20" right="20" top="16" />
-                    </padding>
+                <VBox fx:id="previewBar" spacing="10" styleClass="preview-bar">
+                    <padding><Insets bottom="16" left="20" right="20" top="16" /></padding>
 
                     <HBox alignment="CENTER_LEFT" spacing="8">
                         <Label styleClass="preview-bar-title" text="Report Preview" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="previewReportType" styleClass="preview-type-chip" text="Case Summary" />
+                        <Label fx:id="previewReportType" styleClass="preview-type-chip" text="CASE SUMMARY" />
                     </HBox>
 
                     <HBox spacing="24">
@@ -285,11 +293,11 @@
                         </VBox>
                         <VBox spacing="2">
                             <Label styleClass="preview-meta-label" text="DATE RANGE" />
-                            <Label fx:id="previewDateRange" styleClass="preview-meta-value" text="—" />
+                            <Label fx:id="previewDateRange" styleClass="preview-meta-value" text="All dates" />
                         </VBox>
                         <VBox spacing="2">
                             <Label styleClass="preview-meta-label" text="FORMAT" />
-                            <Label fx:id="previewFormat" styleClass="preview-meta-value" text="—" />
+                            <Label fx:id="previewFormat" styleClass="preview-meta-value" text="PDF" />
                         </VBox>
                         <VBox spacing="2">
                             <Label styleClass="preview-meta-label" text="SECTIONS" />
@@ -297,12 +305,15 @@
                         </VBox>
                     </HBox>
 
-                    <!-- Validation error -->
-                    <Label fx:id="lblValidationError" managed="false" styleClass="field-error" text="" visible="false" />
+                    <!-- Validation error — hidden until needed, controller shows/hides -->
+                    <Label fx:id="lblValidationError" styleClass="field-error" text="" />
 
                     <HBox alignment="CENTER_RIGHT" spacing="10">
-                        <Button onAction="#handleResetForm" styleClass="btn-cancel" text="Reset" />
-                        <Button fx:id="btnGenerateReport" onAction="#handleGenerateReport" styleClass="btn-new-case" text="Generate Report" />
+                        <Button onAction="#handleResetForm"    styleClass="btn-cancel"   text="Reset" />
+                        <Button fx:id="btnGenerateReport"
+                                onAction="#handleGenerateReport"
+                                styleClass="btn-new-case"
+                                text="Generate Report" />
                     </HBox>
 
                 </VBox>
@@ -313,9 +324,13 @@
     </VBox>
 
     <!-- ══════════════════════════════════════════
-         GENERATING OVERLAY
+         GENERATING OVERLAY — hidden until report runs
          ══════════════════════════════════════════ -->
-    <StackPane fx:id="generatingOverlay" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
+    <StackPane fx:id="generatingOverlay"
+               alignment="CENTER"
+               managed="false"
+               styleClass="modal-overlay"
+               visible="false">
 
         <VBox alignment="CENTER" maxWidth="340" spacing="16" styleClass="modal-box">
             <padding><Insets bottom="36" left="36" right="36" top="36" /></padding>
@@ -326,13 +341,14 @@
 
             <Label styleClass="modal-title" text="Generating Report..." />
 
-            <!-- Progress bar -->
             <VBox maxWidth="260" spacing="6">
                 <HBox alignment="CENTER_RIGHT">
                     <Label fx:id="lblProgress" styleClass="preview-meta-label" text="0%" />
                 </HBox>
                 <StackPane styleClass="progress-track">
-                    <StackPane fx:id="progressFill" styleClass="progress-fill" StackPane.alignment="CENTER_LEFT" />
+                    <StackPane fx:id="progressFill"
+                               styleClass="progress-fill"
+                               StackPane.alignment="CENTER_LEFT" />
                 </StackPane>
             </VBox>
 

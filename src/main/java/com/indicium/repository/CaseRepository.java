@@ -178,5 +178,36 @@ public class CaseRepository {
         }
         return cases;
     }
+    public List<Case> searchCases(String query, String status) {
+        List<Case> results = new ArrayList<>();
+        String sql = """
+            SELECT CaseID, Title, IncidentDate, Status
+            FROM Cases
+            WHERE (LOWER(Title) LIKE ? OR CAST(CaseID AS CHAR) LIKE ?)
+              AND (? = 'All' OR Status = ?)
+            ORDER BY CaseID DESC LIMIT 8
+            """;
+        try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            String like = "%" + query + "%";
+            ps.setString(1, like);
+            ps.setString(2, like);
+            ps.setString(3, status);
+            ps.setString(4, status);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                results.add(new Case(
+                        rs.getInt("CaseID"),
+                        rs.getString("Title"),
+                        rs.getTimestamp("IncidentDate").toLocalDateTime(),
+                        CaseStatus.valueOf(rs.getString("Status"))
+                ));
+            }
+        } catch (SQLException e) {
+            System.err.println("[CaseRepository] searchCases failed: " + e.getMessage());
+        }
+        return results;
+    }
+
 
 }

@@ -15,6 +15,7 @@ public class Report
     private LocalDateTime generatedDate;
     private String content;
     private String reportHash;
+    private String generationDate;
 
     public Report(int caseID, String reportType, String format) {
         this.reportID = idCounter++;
@@ -53,4 +54,5 @@ public class Report
     public String getContent() { return content; }
     public String getFormat() { return format; }
     public String getReportHash() { return reportHash; }
+    public String getGenerationDate() { return generationDate; }
 }
