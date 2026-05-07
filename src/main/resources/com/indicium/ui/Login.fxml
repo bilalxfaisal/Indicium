@@ -19,15 +19,14 @@
         <!-- LEFT — branding panel -->
         <VBox alignment="CENTER" spacing="16" styleClass="login-brand-panel" HBox.hgrow="ALWAYS">
             <padding><Insets bottom="60" left="50" right="50" top="60" /></padding>
-
-            <ImageView fitHeight="64" fitWidth="64" preserveRatio="true">
-                <image><Image url="@Assets/indicium-logo.png" /></image>
-            </ImageView>
-
-            <Label styleClass="brand-title" text="INDICIUM" />
+         <ImageView fitHeight="175.0" fitWidth="387.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+               <Image url="@Assets/Indicium_Logo.png" />
+            </image>
+         </ImageView>
             <Label styleClass="brand-subtitle" text="Digital Forensics Platform" />
 
-            <VBox spacing="12" styleClass="brand-features">
+            <VBox prefHeight="105.0" prefWidth="0.0" spacing="12" styleClass="brand-features">
                 <padding><Insets top="40" /></padding>
                 <Label styleClass="brand-feature" text="⬡  Case &amp; Evidence Management" />
                 <Label styleClass="brand-feature" text="⬡  Timeline &amp; Correlation Analysis" />
@@ -53,8 +52,8 @@
 
                     <!-- Email field -->
                     <VBox spacing="6">
-                        <Label styleClass="field-label" text="UserId" />
-                        <TextField fx:id="emailField" promptText="UserID" styleClass="login-field" />
+                        <Label styleClass="field-label" text="Email" />
+                        <TextField fx:id="emailField" promptText="email@indicium.com" styleClass="login-field" />
                     </VBox>
 
                     <!-- Password field -->

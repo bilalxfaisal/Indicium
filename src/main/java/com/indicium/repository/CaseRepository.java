@@ -223,6 +223,43 @@ public class CaseRepository {
         }
         return results;
     }
+    // ===================================================================================
+// HOME DASHBOARD STATS
+// ===================================================================================
+
+    public static int countActiveCases() {
+        // Schema uses 'OPEN' as the active status, not 'ACTIVE'
+        return runCountQuery("SELECT COUNT(*) FROM Cases WHERE Status = 'OPEN'");
+    }
+
+    public static int countEvidenceItems() {
+        return runCountQuery("SELECT COUNT(*) FROM Evidence");
+    }
+
+    public static int countTimelineEvents() {
+        // Table is named timeline_events (lowercase) per setup.sql
+        return runCountQuery("SELECT COUNT(*) FROM timeline_events");
+    }
+
+    public static int countAuditEntries() {
+        // Table is named ForensicAuditLog per setup.sql
+        return runCountQuery("SELECT COUNT(*) FROM ForensicAuditLog");
+    }
+
+    // Shared helper — runs any SELECT COUNT(*) query
+    private static int runCountQuery(String sql) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) return rs.getInt(1);
+
+        } catch (SQLException e) {
+            System.err.println("[CaseRepository] COUNT query failed: " + e.getMessage());
+        }
+        return 0;
+    }
+
 
 
 }
