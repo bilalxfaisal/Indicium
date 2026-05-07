@@ -20,6 +20,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.indicium.models.SystemUser;
+import com.indicium.services.SessionManager;
+
+
 public class DashBoardController extends BorderPane {
 
     // ── Top nav ──
@@ -57,6 +61,9 @@ public class DashBoardController extends BorderPane {
 
     // ── Global search overlay ──
     private GlobalSearchController globalSearch;
+    // Add this field at the top with the other @FXML fields
+    @FXML private javafx.scene.control.Label avatarLabel;
+
 
 
 
@@ -97,6 +104,16 @@ public class DashBoardController extends BorderPane {
         sideNavButtons.forEach(btn -> sideLabels.put(btn, btn.getText()));
 
         globalSearch = new GlobalSearchController();
+        // Set avatar initial from session
+        SystemUser currentUser = SessionManager.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String name    = currentUser.getName();
+            String initial = (name != null && !name.isEmpty())
+                    ? String.valueOf(name.charAt(0)).toUpperCase()
+                    : "?";
+            avatarLabel.setText(initial);
+        }
+
 
 
 

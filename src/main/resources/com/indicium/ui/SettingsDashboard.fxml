@@ -60,7 +60,7 @@
 
                         <!-- Avatar circle -->
                         <StackPane styleClass="avatar-circle">
-                            <ImageView fx:id="avatarImageView" fitHeight="72" fitWidth="72" pickOnBounds="true" preserveRatio="true" visible="false">
+                            <ImageView fitHeight="72" fitWidth="72" pickOnBounds="true" preserveRatio="true" visible="false">
                                 <image>
                                     <Image url="@Assets/icons8-user-100.png" />
                                 </image>
@@ -186,8 +186,8 @@
     <!-- ══════════════════════════════════════════
          TOAST NOTIFICATION
          ══════════════════════════════════════════ -->
-    <StackPane StackPane.alignment="BOTTOM_CENTER">
-        <VBox fx:id="toastBox" alignment="CENTER" managed="false" styleClass="toast-box" visible="false">
+    <StackPane mouseTransparent="true" StackPane.alignment="BOTTOM_CENTER">
+        <VBox fx:id="toastBox" alignment="CENTER" managed="false" mouseTransparent="true" styleClass="toast-box" visible="false">
             <padding><Insets bottom="32" /></padding>
 
             <HBox alignment="CENTER_LEFT" spacing="10" styleClass="toast-content">
@@ -204,7 +204,7 @@
     <!-- ══════════════════════════════════════════
          CONFIRM DISCARD MODAL
          ══════════════════════════════════════════ -->
-    <StackPane fx:id="discardModal" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
+    <StackPane fx:id="discardModal" alignment="CENTER" managed="false" pickOnBounds="false" styleClass="modal-overlay" visible="false">
 
         <VBox alignment="TOP_LEFT" maxWidth="400" spacing="16" styleClass="modal-box">
             <padding><Insets bottom="28" left="32" right="32" top="28" /></padding>

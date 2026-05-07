@@ -53,10 +53,11 @@
             </Button>
 
 
-            <!-- User avatar -->
+
             <StackPane styleClass="avatar-circle">
-                <Label styleClass="avatar-label" text="B" />
+                <Label fx:id="avatarLabel" styleClass="avatar-label" text="?" />
             </StackPane>
+
 
         </HBox>
     </top>
