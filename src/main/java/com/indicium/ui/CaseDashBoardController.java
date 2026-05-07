@@ -352,18 +352,10 @@ public class CaseDashBoardController extends StackPane {
         });
         archiveToggle.setDisable(!isAdmin || isLocked); //  admin only + not on locked
 
-        // ── Delete — admin only ──
-        MenuItem delete = makeMenuItem("Delete", "icons8-delete-100.png");
-        delete.setOnAction(e -> handleDeleteCase(caseId));
-        delete.setDisable(!isAdmin);
-        delete.getStyleClass().add("menu-item-delete");
-
         menu.getItems().addAll(
                 open, edit,
                 new SeparatorMenuItem(),
-                lockToggle, archiveToggle,
-                new SeparatorMenuItem(),
-                delete
+                lockToggle, archiveToggle
         );
 
         menu.show(anchor, javafx.geometry.Side.BOTTOM, 0, 0);
@@ -576,21 +568,7 @@ public class CaseDashBoardController extends StackPane {
         System.out.println("[CaseDashBoard] Case unarchived: " + caseId);
         loadCases();
     }
-    private void handleDeleteCase(String caseId) {
-        // Confirm dialog before delete
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Delete Case");
-        confirm.setHeaderText("Are you sure?");
-        confirm.setContentText("This action cannot be undone.");
 
-        confirm.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                // TODO: Add CaseRepository.delete(int caseID) method
-                System.out.println("[CaseDashBoard] Delete case: " + caseId);
-                loadCases();
-            }
-        });
-    }
 
     // ══════════════════════════════════════════
     //  Validation

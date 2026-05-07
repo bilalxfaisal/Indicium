@@ -60,6 +60,21 @@ public class CaseRepository {
         }
     }
 
+    public static int generateNextCaseID() {
+        String sql = "SELECT MAX(CaseID) FROM Cases";
+        try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                int max = rs.getInt(1);
+                return max > 0 ? max + 1 : 1;
+            }
+        } catch (SQLException e) {
+            System.err.println("[CaseRepo] ERROR generating next case ID: " + e.getMessage());
+        }
+        return 1;
+    }
+
     // ===================================================================================
     // RETRIEVAL & FILTERING
     // ===================================================================================
