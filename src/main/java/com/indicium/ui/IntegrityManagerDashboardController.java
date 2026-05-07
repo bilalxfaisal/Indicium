@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class IntegrityManagerDashboardController extends StackPane {
 
@@ -58,12 +59,6 @@ public class IntegrityManagerDashboardController extends StackPane {
     @FXML private Label     restoreModalSummary;
     @FXML private Button    btnConfirmRestore;
 
-    // ── Lockdown modal ──
-    @FXML private StackPane lockdownModal;
-    @FXML private TextField lockdownCodeField;
-    @FXML private Label     lockdownError;
-    @FXML private Button    btnConfirmLockdown;
-
     // ── Processing overlay ──
     @FXML private StackPane processingOverlay;
     @FXML private Label     lblProcessingTitle;
@@ -98,6 +93,10 @@ public class IntegrityManagerDashboardController extends StackPane {
     @FXML
     public void initialize() {
         loadStats();
+        // Restore status chip and button state from persisted lockdown state on every load
+        boolean locked = com.indicium.services.AccessManager.isLockdownActive();
+        updateStatusChip(locked);
+        updateLockdownButton(locked);
     }
 
     // ══════════════════════════════════════════════════════════
@@ -134,15 +133,6 @@ public class IntegrityManagerDashboardController extends StackPane {
 
         if (query.isEmpty()) return;
 
-        // TODO: SELECT case_id, title, closed_date, evidence_count
-        //       FROM cases
-        //       WHERE status = 'CLOSED'
-        //       AND (LOWER(case_id) LIKE ? OR LOWER(title) LIKE ?)
-        //       ORDER BY closed_date ASC
-        // TODO: For each result call buildIntegrityRow(
-        //           archiveCaseList, caseId, title, closedDate,
-        //           evidenceCount, "VERIFIED", true)
-
         archiveEmptyHint.setVisible(false);
         archiveEmptyHint.setManaged(false);
     }
@@ -177,15 +167,6 @@ public class IntegrityManagerDashboardController extends StackPane {
 
         if (query.isEmpty()) return;
 
-        // TODO: SELECT case_id, title, archived_date, evidence_count
-        //       FROM cases
-        //       WHERE status = 'ARCHIVED'
-        //       AND (LOWER(case_id) LIKE ? OR LOWER(title) LIKE ?)
-        //       ORDER BY archived_date DESC
-        // TODO: For each result call buildIntegrityRow(
-        //           restoreCaseList, caseId, title, archivedDate,
-        //           evidenceCount, "VERIFIED", false)
-
         restoreEmptyHint.setVisible(false);
         restoreEmptyHint.setManaged(false);
     }
@@ -210,17 +191,6 @@ public class IntegrityManagerDashboardController extends StackPane {
     //  ROW BUILDER
     // ══════════════════════════════════════════════════════════
 
-    /**
-     * Builds a single selectable case row for archive or restore list.
-     *
-     * @param container    archiveCaseList or restoreCaseList
-     * @param caseId       case primary key string
-     * @param title        case title
-     * @param date         closed/archived date string
-     * @param evCount      number of evidence files
-     * @param hashStatus   "VERIFIED" | "PENDING" | "FAILED"
-     * @param isArchiveRow true = adds to archive selection, false = restore
-     */
     private void buildIntegrityRow(VBox container, String caseId, String title,
                                    String date, int evCount,
                                    String hashStatus, boolean isArchiveRow) {
@@ -229,14 +199,12 @@ public class IntegrityManagerDashboardController extends StackPane {
         row.setAlignment(Pos.CENTER_LEFT);
         row.setUserData(caseId);
 
-        // Checkbox
         StackPane checkBox = new StackPane();
         checkBox.getStyleClass().add("row-select-box");
         Label checkMark = new Label("");
         checkMark.getStyleClass().add("row-check-label");
         checkBox.getChildren().add(checkMark);
 
-        // Case info
         VBox info = new VBox(3);
         HBox.setHgrow(info, Priority.ALWAYS);
         Label lblId    = new Label(caseId);
@@ -247,13 +215,11 @@ public class IntegrityManagerDashboardController extends StackPane {
         lblMeta.getStyleClass().add("integrity-case-meta");
         info.getChildren().addAll(lblId, lblTitle, lblMeta);
 
-        // Hash status chip
         Label hashChip = new Label(hashStatus);
         hashChip.getStyleClass().addAll("hash-chip", getHashChipStyle(hashStatus));
 
         row.getChildren().addAll(checkBox, info, hashChip);
 
-        // Click to toggle selection
         row.setOnMouseClicked(e -> {
             List<String> selection = isArchiveRow
                     ? selectedArchiveCaseIds : selectedRestoreCaseIds;
@@ -286,14 +252,9 @@ public class IntegrityManagerDashboardController extends StackPane {
                 if (id == null) return;
 
                 boolean selected = selection.contains(id);
-                row.getStyleClass().removeAll(
-                        "integrity-row", "integrity-row-selected"
-                );
-                row.getStyleClass().add(
-                        selected ? "integrity-row-selected" : "integrity-row"
-                );
+                row.getStyleClass().removeAll("integrity-row", "integrity-row-selected");
+                row.getStyleClass().add(selected ? "integrity-row-selected" : "integrity-row");
 
-                // Reset checkbox
                 row.getChildren().stream()
                         .filter(c -> c instanceof StackPane sp &&
                                 sp.getStyleClass().contains("row-select-box"))
@@ -342,14 +303,6 @@ public class IntegrityManagerDashboardController extends StackPane {
                         "Writing audit log entry..."
                 ),
                 () -> {
-                    // TODO: For each caseId in selectedArchiveCaseIds:
-                    //   1. SELECT evidence files, verify SHA-256 hash matches stored hash
-                    //   2. Move files to archive storage path
-                    //   3. UPDATE cases SET status = 'ARCHIVED',
-                    //                       archived_at = NOW()
-                    //      WHERE case_id = ?
-                    //   4. INSERT INTO audit_log (action, type, case_id, user_id, timestamp)
-                    //      VALUES ('ARCHIVE', 'Case', ?, currentUserId, NOW())
                     selectedArchiveCaseIds.clear();
                     updateArchiveActionBar();
                     loadStats();
@@ -388,15 +341,6 @@ public class IntegrityManagerDashboardController extends StackPane {
                         "Writing audit log entry..."
                 ),
                 () -> {
-                    // TODO: For each caseId in selectedRestoreCaseIds:
-                    //   1. Retrieve files from archive storage
-                    //   2. Compare current SHA-256 hash with original_hash in DB
-                    //   3. If hash mismatch: flag case, notify admin, abort restore
-                    //   4. UPDATE cases SET status = 'ACTIVE',
-                    //                       restored_at = NOW()
-                    //      WHERE case_id = ?
-                    //   5. INSERT INTO audit_log (action, type, case_id, user_id, timestamp)
-                    //      VALUES ('RESTORE', 'Case', ?, currentUserId, NOW())
                     selectedRestoreCaseIds.clear();
                     updateRestoreActionBar();
                     loadStats();
@@ -413,72 +357,109 @@ public class IntegrityManagerDashboardController extends StackPane {
     //  LOCKDOWN
     // ══════════════════════════════════════════════════════════
 
-    @FXML
-    private void handleLockdownPrompt() {
-        lockdownCodeField.clear();
-        lockdownError.setVisible(false);
-        lockdownError.setManaged(false);
-        lockdownModal.setVisible(true);
-        lockdownModal.setManaged(true);
-    }
+    // Hardcoded emergency security code. In production, store this as a hashed value in DB.
+    private static final String EMERGENCY_CODE = "LOCKDOWN-911";
 
+    /**
+     * Toggles the system lockdown state.
+     * Currently locked   → confirms with admin and lifts the lockdown.
+     * Currently unlocked → asks for emergency code and activates the lockdown.
+     */
     @FXML
-    private void handleConfirmLockdown() {
-        String code = lockdownCodeField.getText().trim();
-
-        if (code.isEmpty()) {
-            showLockdownError("Security code cannot be empty.");
+    private void onLockdownTriggered() {
+        // ── RBAC CHECK ───────────────────────────────────────────────────────
+        if (!com.indicium.services.SessionManager.getInstance().isAdminLoggedIn()) {
+            System.err.println("[SECURITY] Unauthorized lockdown operation blocked.");
+            com.indicium.services.AuditLog breach = new com.indicium.services.AuditLog();
+            breach.logEvent(-1, "UNAUTHORIZED LOCKDOWN OPERATION BLOCKED", com.indicium.services.AuditCategory.SECURITY);
+            new Alert(Alert.AlertType.ERROR,
+                    "Admin privileges required for this operation.",
+                    ButtonType.OK).showAndWait();
             return;
         }
 
-        // TODO: Verify code against stored admin security code in DB
-        //   SELECT security_code FROM admin_settings WHERE admin_id = currentUserId
-        //   If code doesn't match → showLockdownError("Invalid security code.")
-        //   If matches → proceed
+        boolean currentlyLocked = com.indicium.services.AccessManager.isLockdownActive();
+        int adminId = com.indicium.services.SessionManager.getInstance().getCurrentUser().getUserID();
 
-        boolean codeValid = true; // placeholder — replace with DB check
+        if (currentlyLocked) {
+            // ── LIFT LOCKDOWN ───────────────────────────────────────────────
+            Alert confirm = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                "Are you sure you want to lift the system lockdown?\nAll users will regain access.",
+                ButtonType.YES, ButtonType.NO
+            );
+            confirm.setTitle("Lift System Lockdown");
+            confirm.setHeaderText("Confirm Lockdown Removal");
+            Optional<ButtonType> choice = confirm.showAndWait();
+            if (choice.isEmpty() || choice.get() != ButtonType.YES) return;
 
-        if (!codeValid) {
-            showLockdownError("Invalid security code.");
-            return;
+            com.indicium.services.AuditLog auditLog = new com.indicium.services.AuditLog();
+            com.indicium.services.AccessManager.liftLockdown(adminId, auditLog);
+            updateStatusChip(false);
+            updateLockdownButton(false);
+
+            Alert lifted = new Alert(Alert.AlertType.INFORMATION);
+            lifted.setTitle("Lockdown Lifted");
+            lifted.setHeaderText("\uD83D\uDFE2  System Lockdown Lifted");
+            lifted.setContentText("The system is now back online. All users can log in again.");
+            lifted.showAndWait();
+
+        } else {
+            // ── ACTIVATE LOCKDOWN ───────────────────────────────────────────
+            TextInputDialog codeDialog = new TextInputDialog();
+            codeDialog.setTitle("Emergency Lockdown");
+            codeDialog.setHeaderText("\u26A0  This action is irreversible until manually lifted.");
+            codeDialog.setContentText("Enter emergency security code:");
+
+            Optional<String> input = codeDialog.showAndWait();
+            if (input.isEmpty()) return;
+
+            if (!EMERGENCY_CODE.equals(input.get().trim())) {
+                com.indicium.services.AuditLog fail = new com.indicium.services.AuditLog();
+                fail.logEvent(adminId, "LOCKDOWN REJECTED — Wrong security code entered", com.indicium.services.AuditCategory.SECURITY);
+
+                Alert wrong = new Alert(Alert.AlertType.ERROR);
+                wrong.setTitle("Lockdown Failed");
+                wrong.setHeaderText("Incorrect Security Code");
+                wrong.setContentText("The emergency code you entered is incorrect. This event has been logged.");
+                wrong.showAndWait();
+                return;
+            }
+
+            com.indicium.services.AuditLog auditLog = new com.indicium.services.AuditLog();
+            com.indicium.services.AccessManager.activateLockdown(adminId, auditLog);
+            updateStatusChip(true);
+            updateLockdownButton(true);
+
+            Alert done = new Alert(Alert.AlertType.INFORMATION);
+            done.setTitle("Emergency Lockdown Active");
+            done.setHeaderText("\uD83D\uDD12  System Lockdown Activated");
+            done.setContentText(
+                "All active non-admin sessions have been terminated.\n" +
+                "The system is now in lockdown mode.\n\n" +
+                "Only administrators can log in until you lift the lockdown."
+            );
+            done.showAndWait();
         }
-
-        handleCloseLockdownModal();
-        executeLockdown();
     }
 
-    private void showLockdownError(String msg) {
-        lockdownError.setText("⚠  " + msg);
-        lockdownError.setVisible(true);
-        lockdownError.setManaged(true);
-    }
-
-    @FXML private void handleCloseLockdownModal() {
-        lockdownModal.setVisible(false);
-        lockdownModal.setManaged(false);
-        lockdownCodeField.clear();
-    }
-
-    private void executeLockdown() {
-        showProcessingOverlay("Activating Lockdown",
-                List.of(
-                        "Terminating all active sessions...",
-                        "Halting write operations...",
-                        "Alerting security team...",
-                        "Lockdown active."
-                ),
-                () -> {
-                    // TODO: 1. UPDATE user_sessions SET active = false
-                    //          WHERE user_id != currentUserId
-                    // TODO: 2. UPDATE system_settings SET lockdown = true,
-                    //                                     lockdown_by = currentUserId,
-                    //                                     lockdown_at = NOW()
-                    // TODO: 3. Send alert email/notification to security team
-                    // TODO: 4. INSERT INTO audit_log (action='LOCKDOWN', ...)
-                    // TODO: 5. Update status chip to red "System Locked"
-                    updateStatusChip(true);
-                }
-        );
+    /**
+     * Updates the Kill Switch button label and CSS style to reflect current lockdown state.
+     * Locked   → green "Lift Lockdown" button (recovery action)
+     * Unlocked → red   "Kill Switch"   button (danger action)
+     */
+    private void updateLockdownButton(boolean locked) {
+        if (locked) {
+            btnLockdown.setText("Lift Lockdown");
+            btnLockdown.getStyleClass().remove("btn-lockdown");
+            if (!btnLockdown.getStyleClass().contains("btn-lift-lockdown"))
+                btnLockdown.getStyleClass().add("btn-lift-lockdown");
+        } else {
+            btnLockdown.setText("Kill Switch");
+            btnLockdown.getStyleClass().remove("btn-lift-lockdown");
+            if (!btnLockdown.getStyleClass().contains("btn-lockdown"))
+                btnLockdown.getStyleClass().add("btn-lockdown");
+        }
     }
 
     private void updateStatusChip(boolean locked) {
@@ -503,13 +484,7 @@ public class IntegrityManagerDashboardController extends StackPane {
     //  PROCESSING OVERLAY
     // ══════════════════════════════════════════════════════════
 
-    /**
-     * Shows the animated processing overlay, cycles through step labels,
-     * then runs the onComplete callback when done.
-     */
-    private void showProcessingOverlay(String title,
-                                       List<String> steps,
-                                       Runnable onComplete) {
+    private void showProcessingOverlay(String title, List<String> steps, Runnable onComplete) {
         lblProcessingTitle.setText(title);
         lblProcessingStep.setText(steps.get(0));
         lblProcessingPct.setText("0%");
@@ -518,7 +493,7 @@ public class IntegrityManagerDashboardController extends StackPane {
         processingOverlay.setVisible(true);
         processingOverlay.setManaged(true);
 
-        double totalMs   = 2800.0;
+        double totalMs    = 2800.0;
         double trackWidth = 240.0;
         int    stepCount  = steps.size();
 

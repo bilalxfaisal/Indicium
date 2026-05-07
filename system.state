@@ -1,0 +1,4 @@
+#Indicium System State \u2014 Lockdown activated by admin 1
+#Thu May 07 20:14:38 PKT 2026
+lockdown.active=true
+lockdown.by=1

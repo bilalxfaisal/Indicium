@@ -4,13 +4,24 @@ import com.indicium.models.Case;
 import com.indicium.repository.CaseRepository;
 import com.indicium.services.AuditLog;
 import com.indicium.services.AuditCategory;
+import com.indicium.services.SystemStateManager;
 
 public class AccessManager
 {
-
     private final AuditLog auditLog;
-    // Static flag for emergency system-wide lockdown
-    private static boolean isLockdownActive = false;
+
+    /**
+     * Static lockdown flag — initialised from the persisted system.state file
+     * so that a lockdown survives application restarts.
+     */
+    private static boolean isLockdownActive =
+            SystemStateManager.getInstance().isLockdownPersistedActive();
+
+    static {
+        if (isLockdownActive) {
+            System.out.println("[AccessManager] LOCKDOWN state restored from system.state — system is LOCKED.");
+        }
+    }
 
     public AccessManager() {
         this.auditLog = new AuditLog();
@@ -76,12 +87,16 @@ public class AccessManager
 
     public static void activateLockdown(int adminID, AuditLog log) {
         isLockdownActive = true;
+        // Persist to disk so lockdown survives app restarts
+        SystemStateManager.getInstance().persistLockdownActive(adminID);
         log.logEvent(adminID, "SYSTEM LOCKDOWN INITIATED", AuditCategory.SYSTEM);
         System.out.println("[CRITICAL] System is now in Lockdown Mode.");
     }
 
     public static void liftLockdown(int adminID, AuditLog log) {
         isLockdownActive = false;
+        // Clear persisted lockdown flag
+        SystemStateManager.getInstance().persistLockdownLifted(adminID);
         log.logEvent(adminID, "SYSTEM LOCKDOWN LIFTED", AuditCategory.SYSTEM);
         System.out.println("[INFO] System Lockdown has been lifted.");
     }

@@ -301,6 +301,20 @@
 }
 .btn-lockdown:hover { -fx-background-color: #B71C1C; }
 
+/* Lift Lockdown button — green to signal a safe recovery action */
+.btn-lift-lockdown {
+    -fx-background-color: #2E7D32;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 10 24 10 24;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+.btn-lift-lockdown:hover { -fx-background-color: #1B5E20; }
+
 /* Lockdown confirm button in modal */
 .btn-lockdown-confirm {
     -fx-background-color: #C62828;

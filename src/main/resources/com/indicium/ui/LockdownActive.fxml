@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane style="-fx-background-color: #1a1a1a;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+
+    <VBox alignment="CENTER" spacing="20">
+        <padding>
+            <Insets bottom="40" left="40" right="40" top="40" />
+        </padding>
+        
+        <ImageView fitHeight="100" fitWidth="100" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@Assets/icons8-lock-100.png" />
+            </image>
+        </ImageView>
+
+        <Label text="SYSTEM LOCKED" style="-fx-text-fill: #e74c3c; -fx-font-family: 'Segoe UI'; -fx-font-size: 32px; -fx-font-weight: bold; -fx-letter-spacing: 2px;" />
+        
+        <Label text="ALL ACCESS SUSPENDED" style="-fx-text-fill: #c0392b; -fx-font-family: 'Segoe UI'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-letter-spacing: 1px;" />
+
+        <Label text="An emergency lockdown was triggered by a System Administrator. Please contact the security team immediately to restore access." textAlignment="CENTER" wrapText="true" maxWidth="400" style="-fx-text-fill: #95a5a6; -fx-font-family: 'Segoe UI'; -fx-font-size: 14px; -fx-line-spacing: 4px;" />
+    </VBox>
+
+</StackPane>
