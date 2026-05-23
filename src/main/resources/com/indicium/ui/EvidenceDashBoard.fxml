@@ -15,10 +15,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root type="StackPane"
-         stylesheets="@EvidenceDashBoard.css"
-         xmlns="http://javafx.com/javafx/25"
-         xmlns:fx="http://javafx.com/fxml/1">
+<fx:root stylesheets="@EvidenceDashBoard.css" type="StackPane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
 
     <!-- ══════════ MAIN CONTENT ══════════ -->
     <VBox spacing="0" styleClass="evidence-content" StackPane.alignment="TOP_LEFT">
@@ -30,43 +27,37 @@
             <VBox spacing="6">
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <ImageView fitHeight="22" fitWidth="22" preserveRatio="true">
-                        <image><Image url="@Assets/icons8-evidence-100.png" /></image>
+                        <image><Image url="@Assets/icons8-evidence_black.png" /></image>
                     </ImageView>
                     <Label styleClass="section-title" text="Evidence" />
                 </HBox>
                 <HBox spacing="10">
                     <Label fx:id="countVerified" styleClass="count-badge,badge-verified" text="0 Verified" />
                     <Label fx:id="countTampered" styleClass="count-badge,badge-tampered" text="0 Archived" />
-                    <Label fx:id="countPending"  styleClass="count-badge,badge-pending"  text="0 Collected" />
+                    <Label fx:id="countPending" styleClass="count-badge,badge-pending" text="0 Collected" />
                 </HBox>
             </VBox>
 
             <Region HBox.hgrow="ALWAYS" />
 
             <!-- ── Active Case Selector ── -->
-            <VBox spacing="4" alignment="CENTER_RIGHT">
+            <VBox alignment="CENTER_RIGHT" spacing="4">
                 <Label styleClass="form-label" text="Active Case" />
-                <ComboBox fx:id="caseSelector"
-                          prefWidth="240"
-                          promptText="Select a case..."
-                          styleClass="case-selector-combo"
-                          onAction="#handleCaseSelected" />
+                <ComboBox fx:id="caseSelector" onAction="#handleCaseSelected" prefWidth="240" promptText="Select a case..." styleClass="case-selector-combo" />
             </VBox>
 
-            <Button fx:id="btnBulkImport" onAction="#handleBulkImport"
-                    styleClass="btn-bulk" text="Bulk Import">
+            <Button fx:id="btnBulkImport" onAction="#handleBulkImport" styleClass="btn-bulk" text="Bulk Import">
                 <graphic>
                     <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
-                        <image><Image url="@Assets/icons8-upload-100.png" /></image>
+                        <image><Image url="@Assets/icons8-download-file-100.png" /></image>
                     </ImageView>
                 </graphic>
             </Button>
 
-            <Button fx:id="btnAddEvidence" onAction="#handleAddEvidence"
-                    styleClass="btn-add-evidence" text="Add Evidence">
+            <Button fx:id="btnAddEvidence" onAction="#handleAddEvidence" styleClass="btn-add-evidence" text="Add Evidence">
                 <graphic>
                     <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
-                        <image><Image url="@Assets/icons8-add-100.png" /></image>
+                        <image><Image url="@Assets/icons8-add-100_white.png" /></image>
                     </ImageView>
                 </graphic>
             </Button>
@@ -80,22 +71,15 @@
                 <ImageView fitHeight="14" fitWidth="14" pickOnBounds="true" preserveRatio="true">
                     <image><Image url="@Assets/icons8-search-100.png" /></image>
                 </ImageView>
-                <TextField fx:id="searchField" onKeyReleased="#handleSearch"
-                           prefWidth="180" promptText="Search evidence..."
-                           styleClass="search-field" />
+                <TextField fx:id="searchField" onKeyReleased="#handleSearch" prefWidth="180" promptText="Search evidence..." styleClass="search-field" />
             </HBox>
 
-            <ComboBox fx:id="filterType"     onAction="#handleFilter"
-                      prefWidth="130" promptText="Type"   styleClass="filter-combo" />
-            <ComboBox fx:id="filterStatus"   onAction="#handleFilter"
-                      prefWidth="120" promptText="Status" styleClass="filter-combo" />
-            <DatePicker fx:id="filterDateFrom" onAction="#handleFilter"
-                        prefWidth="130" promptText="From" styleClass="filter-date" />
-            <DatePicker fx:id="filterDateTo"   onAction="#handleFilter"
-                        prefWidth="130" promptText="To"   styleClass="filter-date" />
+            <ComboBox fx:id="filterType" onAction="#handleFilter" prefWidth="130" promptText="Type" styleClass="filter-combo" />
+            <ComboBox fx:id="filterStatus" onAction="#handleFilter" prefWidth="120" promptText="Status" styleClass="filter-combo" />
+            <DatePicker fx:id="filterDateFrom" onAction="#handleFilter" prefWidth="130" promptText="From" styleClass="filter-date" />
+            <DatePicker fx:id="filterDateTo" onAction="#handleFilter" prefWidth="130" promptText="To" styleClass="filter-date" />
 
-            <Button fx:id="btnClearFilters" onAction="#handleClearFilters"
-                    prefHeight="32" styleClass="btn-clear-filters" text="Clear">
+            <Button fx:id="btnClearFilters" onAction="#handleClearFilters" prefHeight="32" styleClass="btn-clear-filters" text="Clear">
                 <graphic>
                     <ImageView fitHeight="12" fitWidth="12" preserveRatio="true">
                         <image><Image url="@Assets/icons8-delete-100.png" /></image>
@@ -105,8 +89,7 @@
         </HBox>
 
         <!-- ── Active Case Banner ── -->
-        <HBox fx:id="activeCaseBanner" alignment="CENTER_LEFT" spacing="10"
-              styleClass="active-case-banner" visible="false" managed="false">
+        <HBox fx:id="activeCaseBanner" alignment="CENTER_LEFT" managed="false" spacing="10" styleClass="active-case-banner" visible="false">
             <padding><Insets bottom="10" left="24" right="24" top="10" /></padding>
             <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
                 <image><Image url="@Assets/icons8-open-100.png" /></image>
@@ -126,11 +109,11 @@
         <HBox spacing="0" styleClass="table-header">
             <padding><Insets bottom="10" left="24" right="24" top="10" /></padding>
             <Label prefWidth="120" styleClass="col-header" text="EVIDENCE ID" />
-            <Label prefWidth="200" styleClass="col-header" text="FILENAME"    />
-            <Label prefWidth="100" styleClass="col-header" text="TYPE"        />
-            <Label prefWidth="80"  styleClass="col-header" text="SIZE"        />
+            <Label prefWidth="200" styleClass="col-header" text="FILENAME" />
+            <Label prefWidth="100" styleClass="col-header" text="TYPE" />
+            <Label prefWidth="80" styleClass="col-header" text="SIZE" />
             <Label prefWidth="110" styleClass="col-header" text="DATE SEIZED" />
-            <Label prefWidth="110" styleClass="col-header" text="STATUS"      />
+            <Label prefWidth="110" styleClass="col-header" text="STATUS" />
             <Label styleClass="col-header" text="ACTIONS" HBox.hgrow="ALWAYS" />
         </HBox>
 
@@ -138,19 +121,14 @@
         <ScrollPane fitToWidth="true" styleClass="evidence-scroll" VBox.vgrow="ALWAYS">
             <VBox fx:id="evidenceListContainer" spacing="0" styleClass="evidence-list">
 
-                <VBox fx:id="emptyState" alignment="CENTER" spacing="12"
-                      styleClass="empty-state" VBox.vgrow="ALWAYS">
+                <VBox fx:id="emptyState" alignment="CENTER" spacing="12" styleClass="empty-state" VBox.vgrow="ALWAYS">
                     <padding><Insets top="80" /></padding>
-                    <ImageView fitHeight="56" fitWidth="56" preserveRatio="true" opacity="0.25">
-                        <image><Image url="@Assets/icons8-evidence-100.png" /></image>
+                    <ImageView fitHeight="56" fitWidth="56" opacity="0.82" preserveRatio="true">
+                        <image><Image url="@Assets/icons8-evidence_black.png" /></image>
                     </ImageView>
-                    <Label fx:id="emptyStateTitle" styleClass="empty-title"
-                           text="Select a case to view evidence." />
-                    <Label fx:id="emptyStateSub" styleClass="empty-sub"
-                           text="Use the case selector above to load evidence for a case." />
-                    <Button fx:id="emptyAddBtn" onAction="#handleAddEvidence"
-                            styleClass="btn-add-evidence" text="Add Evidence"
-                            visible="false" managed="false">
+                    <Label fx:id="emptyStateTitle" styleClass="empty-title" text="Select a case to view evidence." />
+                    <Label fx:id="emptyStateSub" styleClass="empty-sub" text="Use the case selector above to load evidence for a case." />
+                    <Button fx:id="emptyAddBtn" managed="false" onAction="#handleAddEvidence" styleClass="btn-add-evidence" text="Add Evidence" visible="false">
                         <graphic>
                             <ImageView fitHeight="13" fitWidth="13" preserveRatio="true">
                                 <image><Image url="@Assets/icons8-add-100.png" /></image>
@@ -165,10 +143,9 @@
     </VBox>
 
     <!-- ══════════ ADD EVIDENCE MODAL ══════════ -->
-    <StackPane fx:id="modalAddEvidence" visible="false" managed="false"
-               styleClass="modal-overlay" alignment="CENTER">
+    <StackPane fx:id="modalAddEvidence" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
 
-        <VBox alignment="TOP_CENTER" maxWidth="500" maxHeight="680" styleClass="modal-box">
+        <VBox alignment="TOP_CENTER" maxHeight="680" maxWidth="500" styleClass="modal-box">
 
             <!-- Fixed Header -->
             <HBox alignment="CENTER_LEFT" styleClass="modal-header-bar">
@@ -176,8 +153,7 @@
                 <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
                     <image><Image url="@Assets/icons8-evidence-100.png" /></image>
                 </ImageView>
-                <Label styleClass="modal-title" text="Add Evidence"
-                       HBox.hgrow="ALWAYS">
+                <Label styleClass="modal-title" text="Add Evidence" HBox.hgrow="ALWAYS">
                     <HBox.margin><Insets left="10" /></HBox.margin>
                 </Label>
                 <Button onAction="#handleCloseAddModal" styleClass="modal-close-btn">
@@ -204,17 +180,14 @@
                     </HBox>
 
                     <!-- Drag & Drop Zone -->
-                    <VBox fx:id="dropZone" alignment="CENTER" spacing="10"
-                          styleClass="drop-zone" onDragOver="#handleDragOver"
-                          onDragDropped="#handleDragDropped">
+                    <VBox fx:id="dropZone" alignment="CENTER" onDragDropped="#handleDragDropped" onDragOver="#handleDragOver" spacing="10" styleClass="drop-zone">
                         <padding><Insets bottom="28" left="24" right="24" top="28" /></padding>
-                        <ImageView fitHeight="36" fitWidth="36" preserveRatio="true" opacity="0.4">
+                        <ImageView fitHeight="36" fitWidth="36" opacity="0.4" preserveRatio="true">
                             <image><Image url="@Assets/icons8-upload-100.png" /></image>
                         </ImageView>
                         <Label styleClass="drop-title" text="Drag and drop file here" />
-                        <Label styleClass="drop-sub"   text="or" />
-                        <Button fx:id="btnPickFile" onAction="#handlePickFile"
-                                styleClass="btn-pick-file" text="Browse File">
+                        <Label styleClass="drop-sub" text="or" />
+                        <Button fx:id="btnPickFile" onAction="#handlePickFile" styleClass="btn-pick-file" text="Browse File">
                             <graphic>
                                 <ImageView fitHeight="12" fitWidth="12" preserveRatio="true">
                                     <image><Image url="@Assets/icons8-open-100.png" /></image>
@@ -227,41 +200,31 @@
                     <!-- Evidence Type -->
                     <VBox spacing="4">
                         <Label styleClass="form-label" text="Evidence Type *" />
-                        <ComboBox fx:id="inputType" prefWidth="436"
-                                  promptText="Select type" styleClass="form-field" />
+                        <ComboBox fx:id="inputType" prefWidth="436" promptText="Select type" styleClass="form-field" />
                     </VBox>
 
                     <!-- Source -->
                     <VBox spacing="4">
                         <Label styleClass="form-label" text="Source of Evidence *" />
-                        <TextField fx:id="inputSource"
-                                   promptText="e.g. Suspect's laptop, CCTV footage"
-                                   styleClass="form-field" />
-                        <Label fx:id="errorSource" managed="false" styleClass="field-error"
-                               text="" visible="false" />
+                        <TextField fx:id="inputSource" promptText="e.g. Suspect's laptop, CCTV footage" styleClass="form-field" />
+                        <Label fx:id="errorSource" managed="false" styleClass="field-error" text="" visible="false" />
                     </VBox>
 
                     <!-- Date Seized -->
                     <VBox spacing="4">
                         <Label styleClass="form-label" text="Date Seized *" />
-                        <DatePicker fx:id="inputDateSeized" prefWidth="436"
-                                    styleClass="form-field" />
-                        <Label fx:id="errorDateSeized" managed="false" styleClass="field-error"
-                               text="" visible="false" />
+                        <DatePicker fx:id="inputDateSeized" prefWidth="436" styleClass="form-field" />
+                        <Label fx:id="errorDateSeized" managed="false" styleClass="field-error" text="" visible="false" />
                     </VBox>
 
                     <!-- Description -->
                     <VBox spacing="4">
                         <Label styleClass="form-label" text="Description" />
-                        <TextArea fx:id="inputDescription" prefHeight="80"
-                                  promptText="Brief description of this evidence item..."
-                                  styleClass="form-field" wrapText="true" />
+                        <TextArea fx:id="inputDescription" prefHeight="80" promptText="Brief description of this evidence item..." styleClass="form-field" wrapText="true" />
                     </VBox>
 
                     <!-- Duplicate warning -->
-                    <Label fx:id="errorDuplicate" managed="false" styleClass="field-error"
-                           text="A file with this fingerprint already exists in this case."
-                           visible="false" />
+                    <Label fx:id="errorDuplicate" managed="false" styleClass="field-error" text="A file with this fingerprint already exists in this case." visible="false" />
 
                 </VBox>
             </ScrollPane>
@@ -270,8 +233,7 @@
             <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="modal-footer-bar">
                 <padding><Insets bottom="20" left="32" right="32" top="16" /></padding>
                 <Button onAction="#handleCloseAddModal" styleClass="btn-cancel" text="Cancel" />
-                <Button fx:id="btnSubmitEvidence" onAction="#handleSubmitEvidence"
-                        styleClass="btn-add-evidence" text="Upload Evidence">
+                <Button fx:id="btnSubmitEvidence" onAction="#handleSubmitEvidence" styleClass="btn-add-evidence" text="Upload Evidence">
                     <graphic>
                         <ImageView fitHeight="13" fitWidth="13" preserveRatio="true">
                             <image><Image url="@Assets/icons8-upload-100.png" /></image>
@@ -284,10 +246,9 @@
     </StackPane>
 
     <!-- ══════════ BULK IMPORT MODAL ══════════ -->
-    <StackPane fx:id="modalBulkImport" visible="false" managed="false"
-               styleClass="modal-overlay" alignment="CENTER">
+    <StackPane fx:id="modalBulkImport" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
 
-        <VBox alignment="TOP_CENTER" maxWidth="580" maxHeight="640" styleClass="modal-box">
+        <VBox alignment="TOP_CENTER" maxHeight="640" maxWidth="580" styleClass="modal-box">
 
             <!-- Fixed Header -->
             <HBox alignment="CENTER_LEFT" styleClass="modal-header-bar">
@@ -295,8 +256,7 @@
                 <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
                     <image><Image url="@Assets/icons8-upload-100.png" /></image>
                 </ImageView>
-                <Label styleClass="modal-title" text="Bulk Import"
-                       HBox.hgrow="ALWAYS">
+                <Label styleClass="modal-title" text="Bulk Import" HBox.hgrow="ALWAYS">
                     <HBox.margin><Insets left="10" /></HBox.margin>
                 </Label>
                 <Button onAction="#handleCloseBulkModal" styleClass="modal-close-btn">
@@ -324,10 +284,7 @@
 
                     <!-- Folder picker -->
                     <HBox alignment="CENTER_LEFT" spacing="10">
-                        <TextField fx:id="bulkFolderPath" prefWidth="380"
-                                   promptText="Select a folder..."
-                                   styleClass="form-field" editable="false"
-                                   HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="bulkFolderPath" editable="false" prefWidth="380" promptText="Select a folder..." styleClass="form-field" HBox.hgrow="ALWAYS" />
                         <Button onAction="#handlePickFolder" styleClass="btn-pick-file" text="Browse">
                             <graphic>
                                 <ImageView fitHeight="12" fitWidth="12" preserveRatio="true">
@@ -341,8 +298,8 @@
                     <HBox spacing="0" styleClass="table-header">
                         <padding><Insets bottom="8" left="8" right="8" top="8" /></padding>
                         <Label prefWidth="220" styleClass="col-header" text="FILENAME" />
-                        <Label prefWidth="80"  styleClass="col-header" text="SIZE"     />
-                        <Label prefWidth="100" styleClass="col-header" text="TYPE"     />
+                        <Label prefWidth="80" styleClass="col-header" text="SIZE" />
+                        <Label prefWidth="100" styleClass="col-header" text="TYPE" />
                         <Label styleClass="col-header" text="STATUS" HBox.hgrow="ALWAYS" />
                     </HBox>
 
@@ -352,25 +309,25 @@
                     </ScrollPane>
 
                     <!-- Progress -->
-                    <VBox fx:id="progressArea" visible="false" managed="false" spacing="6">
+                    <VBox fx:id="progressArea" managed="false" spacing="6" visible="false">
                         <Label fx:id="progressLabel" styleClass="form-label" text="Importing..." />
                     </VBox>
 
                     <!-- Summary -->
-                    <VBox fx:id="summaryArea" visible="false" managed="false" spacing="6">
-                        <HBox spacing="8" alignment="CENTER_LEFT">
+                    <VBox fx:id="summaryArea" managed="false" spacing="6" visible="false">
+                        <HBox alignment="CENTER_LEFT" spacing="8">
                             <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
                                 <image><Image url="@Assets/icons8-checkmark-100.png" /></image>
                             </ImageView>
                             <Label fx:id="summaryImported" styleClass="summary-ok" text="0 files imported" />
                         </HBox>
-                        <HBox spacing="8" alignment="CENTER_LEFT">
+                        <HBox alignment="CENTER_LEFT" spacing="8">
                             <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
                                 <image><Image url="@Assets/icons8-warning-100.png" /></image>
                             </ImageView>
                             <Label fx:id="summarySkipped" styleClass="summary-warn" text="0 duplicates skipped" />
                         </HBox>
-                        <HBox spacing="8" alignment="CENTER_LEFT">
+                        <HBox alignment="CENTER_LEFT" spacing="8">
                             <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
                                 <image><Image url="@Assets/icons8-delete-100.png" /></image>
                             </ImageView>
@@ -385,11 +342,10 @@
             <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="modal-footer-bar">
                 <padding><Insets bottom="20" left="32" right="32" top="16" /></padding>
                 <Button onAction="#handleCloseBulkModal" styleClass="btn-cancel" text="Cancel" />
-                <Button fx:id="btnStartImport" onAction="#handleStartImport"
-                        styleClass="btn-add-evidence" text="Start Import">
+                <Button fx:id="btnStartImport" onAction="#handleStartImport" styleClass="btn-add-evidence" text="Start Import">
                     <graphic>
                         <ImageView fitHeight="13" fitWidth="13" preserveRatio="true">
-                            <image><Image url="@Assets/icons8-upload-100.png" /></image>
+                            <image><Image url="@Assets/icons8-user-100_black%20(2).png" /></image>
                         </ImageView>
                     </graphic>
                 </Button>
@@ -399,10 +355,9 @@
     </StackPane>
 
     <!-- ══════════ LINK MANAGER MODAL ══════════ -->
-    <StackPane fx:id="modalLinkManager" visible="false" managed="false"
-               styleClass="modal-overlay" alignment="CENTER">
+    <StackPane fx:id="modalLinkManager" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
 
-        <VBox alignment="TOP_CENTER" maxWidth="520" maxHeight="580" styleClass="modal-box">
+        <VBox alignment="TOP_CENTER" maxHeight="580" maxWidth="520" styleClass="modal-box">
 
             <!-- Fixed Header -->
             <HBox alignment="CENTER_LEFT" styleClass="modal-header-bar">
@@ -433,32 +388,25 @@
                     <!-- Existing links -->
                     <ScrollPane fitToWidth="true" prefHeight="160" styleClass="evidence-scroll">
                         <VBox fx:id="linksContainer" spacing="0" styleClass="evidence-list">
-                            <VBox fx:id="emptyLinks" alignment="CENTER" spacing="8"
-                                  styleClass="empty-state">
-                                <padding><Insets top="24" bottom="24" /></padding>
-                                <ImageView fitHeight="32" fitWidth="32" preserveRatio="true"
-                                           opacity="0.25">
+                            <VBox fx:id="emptyLinks" alignment="CENTER" spacing="8" styleClass="empty-state">
+                                <padding><Insets bottom="24" top="24" /></padding>
+                                <ImageView fitHeight="32" fitWidth="32" opacity="0.25" preserveRatio="true">
                                     <image><Image url="@Assets/icons8-link-100.png" /></image>
                                 </ImageView>
-                                <Label styleClass="empty-sub"
-                                       text="No cross-case links for this evidence." />
+                                <Label styleClass="empty-sub" text="No cross-case links for this evidence." />
                             </VBox>
                         </VBox>
                     </ScrollPane>
 
                     <!-- Search -->
                     <HBox alignment="CENTER_LEFT" spacing="10">
-                        <HBox alignment="CENTER_LEFT" spacing="6" styleClass="search-box"
-                              HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="6" styleClass="search-box" HBox.hgrow="ALWAYS">
                             <ImageView fitHeight="13" fitWidth="13" preserveRatio="true">
                                 <image><Image url="@Assets/icons8-search-100.png" /></image>
                             </ImageView>
-                            <TextField fx:id="linkSearchField" prefWidth="280"
-                                       promptText="Search case ID or title..."
-                                       styleClass="search-field" />
+                            <TextField fx:id="linkSearchField" prefWidth="280" promptText="Search case ID or title..." styleClass="search-field" />
                         </HBox>
-                        <Button onAction="#handleSearchLinkCase"
-                                styleClass="btn-pick-file" text="Search">
+                        <Button onAction="#handleSearchLinkCase" styleClass="btn-pick-file" text="Search">
                             <graphic>
                                 <ImageView fitHeight="12" fitWidth="12" preserveRatio="true">
                                     <image><Image url="@Assets/icons8-search-100.png" /></image>
@@ -468,8 +416,7 @@
                     </HBox>
 
                     <!-- Search results -->
-                    <VBox fx:id="linkSearchResults" visible="false" managed="false"
-                          spacing="0" styleClass="evidence-list" />
+                    <VBox fx:id="linkSearchResults" managed="false" spacing="0" styleClass="evidence-list" visible="false" />
 
                 </VBox>
             </ScrollPane>

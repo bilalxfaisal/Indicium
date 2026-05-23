@@ -30,7 +30,7 @@
             <padding><Insets bottom="16" left="24" right="24" top="20" /></padding>
 
             <ImageView fitHeight="28" fitWidth="28" pickOnBounds="true" preserveRatio="true">
-                <image><Image url="@Assets/icons8-user-100.png" /></image>
+                <image><Image url="@Assets/icons8-user-100_black%20(1).png" /></image>
             </ImageView>
 
             <VBox spacing="4">
