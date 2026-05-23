@@ -817,39 +817,62 @@ public class EvidenceDashBoardController extends StackPane {
         Evidence e  = evidenceRepo.findById(id);
         if (e == null) return;
 
-        String storedHash  = e.getDigitalFingerprint();
-        String currentHash = HashGenerator.generateSHA256(e.getFilePath());
+        String filePath = e.getFilePath();
 
-        if (storedHash == null || !storedHash.equals(currentHash)) {
-            showAlert("Integrity Check Failed",
-                    "File hash mismatch — this evidence may have been tampered with.\n" +
-                            "Evidence ID: " + evidenceId);
-            e.setStatus(EvidenceStatus.DISCARDED);
-            com.indicium.repository.EvidenceRepo.updateStatus(id, EvidenceStatus.DISCARDED);
-            loadEvidence();
+        if (filePath == null || filePath.isBlank()) {
+            showAlert("No File Attached",
+                    "This evidence item has no file path stored.\n" +
+                            "It may have been added manually without a file.");
             return;
         }
 
-        // Build link summary string
-        List<Case> linked = linkedCasesMap.getOrDefault(evidenceId, new ArrayList<>());
-        String linkSummary = linked.isEmpty()
-                ? "None"
-                : linked.stream()
-                .map(c -> "#" + String.format("%04d", c.getCaseID()) + " " + c.getTitle())
-                .collect(Collectors.joining(", "));
+        File file = new File(filePath);
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Evidence — " + e.getName());
-        alert.setHeaderText("EV-" + e.getEvidenceID() + "  |  " + e.getType());
-        alert.setContentText(
-                "File:          " + e.getName()                       + "\n" +
-                        "Path:          " + e.getFilePath()                   + "\n" +
-                        "Hash:          " + storedHash                        + "\n" +
-                        "Status:        " + mapStatusToDisplay(e.getStatus()) + "\n" +
-                        "Linked Cases:  " + linkSummary
+        if (!file.exists()) {
+            showAlert("File Not Found",
+                    "The file could not be located at:\n" + filePath +
+                            "\n\nIt may have been moved or deleted from disk.");
+            return;
+        }
+
+        if (!java.awt.Desktop.isDesktopSupported()) {
+            showAlert("Not Supported",
+                    "OS file opening is not supported on this platform.");
+            return;
+        }
+
+        java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+
+        if (!desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
+            showAlert("Not Supported",
+                    "Your OS does not support opening files programmatically.");
+            return;
+        }
+
+        // ── Run on background thread so UI doesn't freeze ──
+        Thread opener = new Thread(() -> {
+            try {
+                desktop.open(file);
+            } catch (IOException ex) {
+                javafx.application.Platform.runLater(() ->
+                        showAlert("Failed to Open File",
+                                "Could not open the file:\n" + ex.getMessage())
+                );
+            }
+        });
+        opener.setDaemon(true);
+        opener.start();
+
+        // ── Log the view event in audit trail ──
+        new com.indicium.services.AuditLog().logEvent(
+                currentUserID,
+                "Evidence file opened for viewing: EV-" + evidenceId + " — " + e.getName(),
+                com.indicium.services.AuditCategory.EVIDENCE,
+                currentCaseID,
+                id
         );
-        alert.showAndWait();
     }
+
 
     private void handleDownloadEvidence(String evidenceId) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);

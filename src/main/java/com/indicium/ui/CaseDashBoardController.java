@@ -192,10 +192,11 @@ public class CaseDashBoardController extends StackPane {
                 .filter(c -> c.getStatus() == CaseStatus.CLOSED)
                 .count();
 
-        countActive.setText(String.valueOf(active));
-        countArchived.setText(String.valueOf(archived));
-        countLocked.setText(String.valueOf(locked));
+        countActive.setText(active   + " Active");
+        countArchived.setText(archived + " Archived");
+        countLocked.setText(locked   + " Locked");
     }
+
 
     private String mapStatusToDisplay(CaseStatus status) {
         return switch (status) {

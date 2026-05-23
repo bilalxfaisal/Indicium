@@ -5,7 +5,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
@@ -20,9 +19,6 @@
         <URL value="@IntegrityManagerDashboard.css" />
     </stylesheets>
 
-    <!-- ══════════════════════════════════════════
-         MAIN CONTENT
-         ══════════════════════════════════════════ -->
     <VBox spacing="0" styleClass="corr-content" StackPane.alignment="TOP_LEFT">
 
         <!-- ── Section Header ── -->
@@ -35,7 +31,7 @@
 
             <VBox spacing="4">
                 <Label styleClass="section-title" text="Integrity Manager" />
-                <Label styleClass="report-subtitle" text="System-level archive, restore and emergency controls — Admin only" />
+                <Label styleClass="report-subtitle" text="Emergency system controls — Admin only" />
             </VBox>
 
             <Region HBox.hgrow="ALWAYS" />
@@ -55,166 +51,33 @@
                 <padding><Insets bottom="32" left="32" right="32" top="24" /></padding>
 
                 <!-- ════════════════════════════════════
-                     STATS ROW
-                     ════════════════════════════════════ -->
-                <HBox spacing="16">
-
-                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                        <padding><Insets bottom="16" left="20" right="20" top="16" /></padding>
-                        <Label styleClass="stat-label" text="ACTIVE CASES" />
-                        <Label fx:id="statActiveCases" styleClass="stat-value" text="—" />
-                    </VBox>
-
-                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                        <padding><Insets bottom="16" left="20" right="20" top="16" /></padding>
-                        <Label styleClass="stat-label" text="ARCHIVED CASES" />
-                        <Label fx:id="statArchivedCases" styleClass="stat-value" text="—" />
-                    </VBox>
-
-                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                        <padding><Insets bottom="16" left="20" right="20" top="16" /></padding>
-                        <Label styleClass="stat-label" text="STORAGE USED" />
-                        <Label fx:id="statStorageUsed" styleClass="stat-value" text="—" />
-                    </VBox>
-
-                    <VBox styleClass="stat-card,stat-card-warn" HBox.hgrow="ALWAYS">
-                        <padding><Insets bottom="16" left="20" right="20" top="16" /></padding>
-                        <Label styleClass="stat-label" text="INTEGRITY FAILURES" />
-                        <Label fx:id="statIntegrityFails" styleClass="stat-value,stat-value-warn" text="—" />
-                    </VBox>
-
-                </HBox>
-
-                <!-- ════════════════════════════════════
-                     SECTION A — Archive Cases
-                     ════════════════════════════════════ -->
-                <VBox spacing="12" styleClass="report-section">
-
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-
-                        <ImageView fitHeight="21.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
-                            <image><Image url="@Assets/icons8-archive-100.png" /></image>
-                        </ImageView>
-
-                        <Label styleClass="report-section-num" text="01" />
-                        <Label styleClass="report-section-title" text="Archive Cases" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Label styleClass="section-tag,tag-archive" text="Long-term Storage" />
-                    </HBox>
-
-                    <Label styleClass="section-description" text="Move closed cases to long-term storage. The system will verify each file integrity hash before archiving." wrapText="true" />
-
-                    <!-- Search -->
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <HBox alignment="CENTER_LEFT" spacing="6" styleClass="search-box" HBox.hgrow="ALWAYS">
-                            <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                                <image>
-                                    <Image url="@Assets/icons8-search-100.png" />
-                                </image>
-                            </ImageView>
-                            <TextField fx:id="archiveSearchField" onKeyReleased="#handleArchiveSearch" prefWidth="260" promptText="Search closed cases..." styleClass="search-field" />
-                        </HBox>
-                        <Button onAction="#handleArchiveSearch" styleClass="btn-open" text="Search" />
-                    </HBox>
-
-                    <!-- Case list -->
-                    <VBox fx:id="archiveCaseList" spacing="0" styleClass="integrity-list">
-                        <VBox fx:id="archiveEmptyHint" alignment="CENTER" spacing="8">
-                            <padding><Insets bottom="30" top="30" /></padding>
-                            <Label styleClass="empty-sub" text="Search for closed cases eligible for archiving." />
-                        </VBox>
-                    </VBox>
-
-                    <!-- Action bar -->
-                    <HBox fx:id="archiveActionBar" alignment="CENTER_LEFT" managed="false" spacing="12" styleClass="action-bar" visible="false">
-                        <padding><Insets bottom="10" left="14" right="14" top="10" /></padding>
-                        <Label fx:id="lblArchiveSelected" styleClass="action-bar-count" text="0 cases selected" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button onAction="#handleClearArchiveSelection" styleClass="btn-cancel" text="Clear" />
-                        <Button fx:id="btnArchiveSelected" onAction="#handleArchiveCases" styleClass="btn-archive" text="Archive Selected" />
-                    </HBox>
-
-                </VBox>
-
-                <!-- ════════════════════════════════════
-                     SECTION B — Restore Cases
-                     ════════════════════════════════════ -->
-                <VBox spacing="12" styleClass="report-section">
-
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-
-                        <ImageView fitHeight="20" fitWidth="20" pickOnBounds="true" preserveRatio="true">
-                            <image><Image url="@Assets/icons8-restore-100.png" /></image>
-                        </ImageView>
-
-                        <Label styleClass="report-section-num" text="02" />
-                        <Label styleClass="report-section-title" text="Restore Cases" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Label styleClass="section-tag,tag-restore" text="From Archive" />
-                    </HBox>
-
-                    <Label styleClass="section-description" text="Retrieve archived cases back to active storage. Hash verification is performed on restore to confirm no tampering occurred during storage." wrapText="true" />
-
-                    <!-- Search -->
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <HBox alignment="CENTER_LEFT" spacing="6" styleClass="search-box" HBox.hgrow="ALWAYS">
-                            <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                                <image>
-                                    <Image url="@Assets/icons8-search-100.png" />
-                                </image>
-                            </ImageView>
-                            <TextField fx:id="restoreSearchField" onKeyReleased="#handleRestoreSearch" prefWidth="260" promptText="Search archived cases..." styleClass="search-field" />
-                        </HBox>
-                        <Button onAction="#handleRestoreSearch" styleClass="btn-open" text="Search" />
-                    </HBox>
-
-                    <!-- Case list -->
-                    <VBox fx:id="restoreCaseList" spacing="0" styleClass="integrity-list">
-                        <VBox fx:id="restoreEmptyHint" alignment="CENTER" spacing="8">
-                            <padding><Insets bottom="30" top="30" /></padding>
-                            <Label styleClass="empty-sub" text="Search archived cases to restore." />
-                        </VBox>
-                    </VBox>
-
-                    <!-- Action bar -->
-                    <HBox fx:id="restoreActionBar" alignment="CENTER_LEFT" managed="false" spacing="12" styleClass="action-bar" visible="false">
-                        <padding><Insets bottom="10" left="14" right="14" top="10" /></padding>
-                        <Label fx:id="lblRestoreSelected" styleClass="action-bar-count" text="0 cases selected" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button onAction="#handleClearRestoreSelection" styleClass="btn-cancel" text="Clear" />
-                        <Button fx:id="btnRestoreSelected" onAction="#handleRestoreCases" styleClass="btn-restore" text="Restore Selected" />
-                    </HBox>
-
-                </VBox>
-
-                <!-- ════════════════════════════════════
-                     SECTION C — Emergency Lockdown
+                     SECTION — Emergency Lockdown
                      ════════════════════════════════════ -->
                 <VBox spacing="12" styleClass="report-section,section-danger">
 
                     <HBox alignment="CENTER_LEFT" spacing="10">
-
                         <ImageView fitHeight="20" fitWidth="20" pickOnBounds="true" preserveRatio="true">
                             <image><Image url="@Assets/icons8-lock-100.png" /></image>
                         </ImageView>
-
-                        <Label styleClass="report-section-num,section-num-danger" text="03" />
+                        <Label styleClass="report-section-num,section-num-danger" text="01" />
                         <Label styleClass="report-section-title" text="Emergency Lockdown" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Label styleClass="section-tag,tag-danger" text="Kill Switch" />
                     </HBox>
 
-                    <Label styleClass="section-description" text="Immediately logs out all users, halts all write operations, and displays a system-unavailable notice on the login screen. Requires a secondary security code to activate." wrapText="true" />
+                    <Label styleClass="section-description"
+                           text="Immediately logs out all users, halts all write operations, and displays a system-unavailable notice on the login screen. Requires a secondary security code to activate."
+                           wrapText="true" />
 
                     <!-- Warning banner -->
                     <HBox alignment="CENTER_LEFT" spacing="10" styleClass="danger-warning-banner">
                         <padding><Insets bottom="12" left="14" right="14" top="12" /></padding>
-
                         <ImageView fitHeight="20" fitWidth="20" pickOnBounds="true" preserveRatio="true">
                             <image><Image url="@Assets/icons8-warning-100.png" /></image>
                         </ImageView>
-
-                        <Label styleClass="danger-warning-text" text="This action is irreversible until manually lifted. All active sessions will be terminated and the security team will be alerted." wrapText="true" HBox.hgrow="ALWAYS" />
+                        <Label styleClass="danger-warning-text"
+                               text="This action is irreversible until manually lifted. All active sessions will be terminated and the security team will be alerted."
+                               wrapText="true" HBox.hgrow="ALWAYS" />
                     </HBox>
 
                     <HBox alignment="CENTER_LEFT" spacing="12">
@@ -222,9 +85,7 @@
                         <Button fx:id="btnLockdown" onAction="#onLockdownTriggered" styleClass="btn-lockdown" text="Kill Switch">
                             <graphic>
                                 <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@Assets/icons8-lock-100.png" />
-                                    </image>
+                                    <image><Image url="@Assets/icons8-lock-100.png" /></image>
                                 </ImageView>
                             </graphic>
                         </Button>
@@ -236,84 +97,5 @@
         </ScrollPane>
 
     </VBox>
-
-    <!-- ══════════════════════════════════════════
-         MODAL — CONFIRM ARCHIVE
-         ══════════════════════════════════════════ -->
-    <StackPane fx:id="archiveModal" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
-
-        <VBox alignment="TOP_LEFT" maxWidth="460" spacing="16" styleClass="modal-box">
-            <padding><Insets bottom="28" left="32" right="32" top="28" /></padding>
-
-            <HBox alignment="CENTER_LEFT">
-                <Label styleClass="modal-title" text="Confirm Archive" HBox.hgrow="ALWAYS" />
-                <Button onAction="#handleCloseArchiveModal" styleClass="modal-close-btn" text="X" />
-            </HBox>
-
-            <Label styleClass="section-description" text="The system will verify the integrity hash of each selected case before moving to long-term storage. This may take a moment." wrapText="true" />
-
-            <Label fx:id="archiveModalSummary" styleClass="modal-summary-chip" text="" wrapText="true" />
-
-            <HBox alignment="CENTER_RIGHT" spacing="10">
-                <Button onAction="#handleCloseArchiveModal" styleClass="btn-cancel" text="Cancel" />
-                <Button fx:id="btnConfirmArchive" onAction="#handleConfirmArchive" styleClass="btn-archive" text="Archive Cases" />
-            </HBox>
-
-        </VBox>
-    </StackPane>
-
-    <!-- ══════════════════════════════════════════
-         MODAL — CONFIRM RESTORE
-         ══════════════════════════════════════════ -->
-    <StackPane fx:id="restoreModal" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
-
-        <VBox alignment="TOP_LEFT" maxWidth="460" spacing="16" styleClass="modal-box">
-            <padding><Insets bottom="28" left="32" right="32" top="28" /></padding>
-
-            <HBox alignment="CENTER_LEFT">
-                <Label styleClass="modal-title" text="Confirm Restore" HBox.hgrow="ALWAYS" />
-                <Button onAction="#handleCloseRestoreModal" styleClass="modal-close-btn" text="X" />
-            </HBox>
-
-            <Label styleClass="section-description" text="The system will compare the current hash of each file against the original to confirm integrity before restoring to active storage." wrapText="true" />
-
-            <Label fx:id="restoreModalSummary" styleClass="modal-summary-chip" text="" wrapText="true" />
-
-            <HBox alignment="CENTER_RIGHT" spacing="10">
-                <Button onAction="#handleCloseRestoreModal" styleClass="btn-cancel" text="Cancel" />
-                <Button fx:id="btnConfirmRestore" onAction="#handleConfirmRestore" styleClass="btn-restore" text="Restore Cases" />
-            </HBox>
-
-        </VBox>
-    </StackPane>
-
-
-    <!-- ══════════════════════════════════════════
-         PROCESSING OVERLAY
-         ══════════════════════════════════════════ -->
-    <StackPane fx:id="processingOverlay" alignment="CENTER" managed="false" styleClass="modal-overlay" visible="false">
-
-        <VBox alignment="CENTER" maxWidth="320" spacing="16" styleClass="modal-box">
-            <padding><Insets bottom="36" left="36" right="36" top="36" /></padding>
-
-            <ImageView fitHeight="48" fitWidth="48" pickOnBounds="true" preserveRatio="true">
-                <image><Image url="@Assets/icons8-integrity-100.png" /></image>
-            </ImageView>
-
-            <Label fx:id="lblProcessingTitle" styleClass="modal-title" text="Processing..." />
-
-            <VBox maxWidth="240" spacing="6">
-                <HBox alignment="CENTER_RIGHT">
-                    <Label fx:id="lblProcessingPct" styleClass="preview-meta-label" text="0%" />
-                </HBox>
-                <StackPane styleClass="progress-track">
-                    <StackPane fx:id="processingProgressFill" styleClass="progress-fill" StackPane.alignment="CENTER_LEFT" />
-                </StackPane>
-            </VBox>
-
-            <Label fx:id="lblProcessingStep" styleClass="preview-meta-label" text="Verifying integrity hashes..." />
-
-        </VBox>
-    </StackPane>
 
 </fx:root>
