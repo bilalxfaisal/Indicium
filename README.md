@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="src/main/resources/com/indicium/ui/Assets/icons8-integrity-100.png" alt="Indicium Logo" width="200" />
+<img src="src/main/resources/com/indicium/ui/Assets/Indicium_Logo" alt="Indicium Logo" width="200" />
 
 # INDICIUM
 ### Forensic Case Management System
