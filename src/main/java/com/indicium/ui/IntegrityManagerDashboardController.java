@@ -1,7 +1,9 @@
 package com.indicium.ui;
 
+import com.indicium.services.HashGenerator;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
@@ -19,8 +21,10 @@ public class IntegrityManagerDashboardController extends StackPane {
     // ── Lockdown ──
     @FXML private Button btnLockdown;
 
-    // Hardcoded emergency security code. In production, store as a hashed value in DB.
-    private static final String EMERGENCY_CODE = "LOCKDOWN-911";
+    private boolean verifyAdminPassword(int adminId, String enteredPassword) {
+        String hashed = HashGenerator.generateSHA256FromString(enteredPassword);
+        return com.indicium.repository.UserDirectory.verifyPassword(adminId, hashed);
+    }
 
     // ── Constructor ──
     public IntegrityManagerDashboardController() {
@@ -53,11 +57,6 @@ public class IntegrityManagerDashboardController extends StackPane {
     //  LOCKDOWN
     // ══════════════════════════════════════════════════════════
 
-    /**
-     * Toggles the system lockdown state.
-     * Currently locked   → confirms with admin and lifts the lockdown.
-     * Currently unlocked → asks for emergency code and activates the lockdown.
-     */
     @FXML
     private void onLockdownTriggered() {
 
@@ -102,15 +101,37 @@ public class IntegrityManagerDashboardController extends StackPane {
 
         } else {
             // ── ACTIVATE LOCKDOWN ───────────────────────────────────────────
-            TextInputDialog codeDialog = new TextInputDialog();
+
+            // Build custom dialog with PasswordField
+            Dialog<String> codeDialog = new Dialog<>();
             codeDialog.setTitle("Emergency Lockdown");
             codeDialog.setHeaderText("\u26A0  This action is irreversible until manually lifted.");
-            codeDialog.setContentText("Enter emergency security code:");
+
+            PasswordField pf = new PasswordField();
+            pf.setPromptText("Enter your admin password...");
+            pf.setPrefWidth(300);
+
+            VBox content = new VBox(6,
+                    new Label("Enter emergency security code:"),
+                    pf
+            );
+            content.setPadding(new Insets(10, 0, 0, 0));
+            codeDialog.getDialogPane().setContent(content);
+            codeDialog.getDialogPane().getButtonTypes()
+                    .addAll(ButtonType.OK, ButtonType.CANCEL);
+
+            // Auto-focus the password field when dialog opens
+            codeDialog.setOnShown(e -> pf.requestFocus());
+
+            // Return typed text only on OK
+            codeDialog.setResultConverter(btn ->
+                    btn == ButtonType.OK ? pf.getText() : null
+            );
 
             Optional<String> input = codeDialog.showAndWait();
-            if (input.isEmpty()) return;
+            if (input.isEmpty() || input.get().isBlank()) return;
 
-            if (!EMERGENCY_CODE.equals(input.get().trim())) {
+            if (!verifyAdminPassword(adminId, input.get())) {
                 com.indicium.services.AuditLog fail = new com.indicium.services.AuditLog();
                 fail.logEvent(adminId, "LOCKDOWN REJECTED — Wrong security code entered",
                         com.indicium.services.AuditCategory.SECURITY);

@@ -65,9 +65,7 @@
                         <Label styleClass="section-tag,tag-danger" text="Kill Switch" />
                     </HBox>
 
-                    <Label styleClass="section-description"
-                           text="Immediately logs out all users, halts all write operations, and displays a system-unavailable notice on the login screen. Requires a secondary security code to activate."
-                           wrapText="true" />
+                    <Label styleClass="section-description" text="Immediately logs out all users, halts all write operations, and displays a system-unavailable notice on the login screen. Requires a secondary security code to activate." wrapText="true" />
 
                     <!-- Warning banner -->
                     <HBox alignment="CENTER_LEFT" spacing="10" styleClass="danger-warning-banner">
@@ -75,9 +73,7 @@
                         <ImageView fitHeight="20" fitWidth="20" pickOnBounds="true" preserveRatio="true">
                             <image><Image url="@Assets/icons8-warning-100.png" /></image>
                         </ImageView>
-                        <Label styleClass="danger-warning-text"
-                               text="This action is irreversible until manually lifted. All active sessions will be terminated and the security team will be alerted."
-                               wrapText="true" HBox.hgrow="ALWAYS" />
+                        <Label styleClass="danger-warning-text" text="This action is irreversible until manually lifted. All active sessions will be terminated and the security team will be alerted." wrapText="true" HBox.hgrow="ALWAYS" />
                     </HBox>
 
                     <HBox alignment="CENTER_LEFT" spacing="12">
@@ -85,7 +81,7 @@
                         <Button fx:id="btnLockdown" onAction="#onLockdownTriggered" styleClass="btn-lockdown" text="Kill Switch">
                             <graphic>
                                 <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                                    <image><Image url="@Assets/icons8-lock-100.png" /></image>
+                                    <image><Image url="@Assets/icons8-lock-100_white.png" /></image>
                                 </ImageView>
                             </graphic>
                         </Button>

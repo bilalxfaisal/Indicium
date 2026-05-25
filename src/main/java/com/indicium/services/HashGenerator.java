@@ -55,4 +55,6 @@ public class HashGenerator {
         String computedHash = generateSHA256(evidenceFile.getAbsolutePath());
         return computedHash != null && computedHash.equalsIgnoreCase(originalHash);
     }
+
+
 }
