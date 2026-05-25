@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="src/main/resources/com/indicium/ui/Assets/Indicium_Logo.png" alt="Indicium Logo" width="100" />
+<img src="src/main/resources/com/indicium/ui/Assets/Indicium_Logo.png" alt="Indicium Logo" width="300" />
 
 # INDICIUM
 ### Forensic Case Management System
@@ -78,7 +78,6 @@ Designed with a real-world forensic environment in mind, Indicium enforces **rol
 
 ## 🖥️ Screenshots
 
-> *Add your screenshots in a `/screenshots` folder and update the paths below.*
 
 | Home Dashboard | Case Manager |
 |:-:|:-:|
