@@ -78,15 +78,14 @@ Designed with a real-world forensic environment in mind, Indicium enforces **rol
 
 ## 🖥️ Screenshots
 
-> *Add your screenshots in a `/screenshots` folder and update the paths below.*
 
 | Home Dashboard | Case Manager |
 |:-:|:-:|
-| ![Home](screenshots/home.png) | ![Cases](screenshots/cases.png) |
+| ![Home](screenshots/Home.png) | ![Cases](screenshots/Cases.png) |
 
 | Evidence Module | Integrity Manager |
 |:-:|:-:|
-| ![Evidence](screenshots/evidence.png) | ![Integrity](screenshots/integrity.png) |
+| ![Evidence](screenshots/Evidence.png) | ![Integrity](screenshots/Integrity.png) |
 
 ---
 
